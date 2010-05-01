@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+  	<groupId>org.talframework.objex</groupId>
+  	<artifactId>tal-objex-parent</artifactId>
+  	<version>0.1-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>tal-objex-sample-impl</artifactId>
+  <name>Objex Sample Implementation</name>
+  <description>Implementation of the Sample UI using Objex</description>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-sample-api</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	
+  	<!-- Core Objex -->
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-core</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	
+  	<!-- JDO -->
+  	<dependency>
+ 		<groupId>javax.jdo</groupId>
+ 		<artifactId>jdo2-api</artifactId>
+ 		<version>2.3-eb</version>
+ 		<exclusions>
+ 			<exclusion>
+ 				<groupId>javax.transaction</groupId>
+ 				<artifactId>transaction-api</artifactId>
+ 			</exclusion>
+ 		</exclusions>
+ 	</dependency>
+  </dependencies>
+</project>

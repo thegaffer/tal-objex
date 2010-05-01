@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+  	<groupId>org.talframework.objex</groupId>
+  	<artifactId>tal-objex</artifactId>
+  	<version>0.1-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>tal-objex-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>Objex Parent</name>
+  <description>General parent for Java projects within Objex</description>
+  
+  <dependencies>
+  	<!-- Logging via Commons -->
+  	<dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+  
+  	<!-- Standard Test -->
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.8.1</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.jmock</groupId>
+  		<artifactId>jmock-junit4</artifactId>
+  		<version>2.5.1</version>
+  		<scope>test</scope>
+  	</dependency>
+  </dependencies>
+  
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+	  		<groupId>org.springframework</groupId>
+	  		<artifactId>spring-beans</artifactId>
+	  		<version>3.0.2.RELEASE</version>
+	  	</dependency>
+  	</dependencies>
+  </dependencyManagement>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-compiler-plugin</artifactId>
+  			<configuration>
+  				<source>1.5</source>
+  				<target>1.5</target>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
+  
+  <reporting> 
+	<outputDirectory>${basedir}/../target/site/${project.artifactId}</outputDirectory>
+	
+	<plugins>
+	  <plugin>
+      	<artifactId>maven-surefire-report-plugin</artifactId>
+      	<configuration>
+      		<xrefLocation>${project.reporting.outputDirectory}/../xref-test</xrefLocation>
+      	</configuration>
+      </plugin>
+      <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-pmd-plugin</artifactId>
+      	<configuration>
+      		<targetJdk>1.5</targetJdk>
+      		<rulesets>
+      			<ruleset>/rulesets/basic.xml</ruleset>
+				<ruleset>/rulesets/controversial.xml</ruleset>
+      		</rulesets>
+      		<format>xml</format>
+      		<linkXref>true</linkXref>
+      		<sourceEncoding>utf-8</sourceEncoding>
+      		<minimumTokens>100</minimumTokens>
+      		<xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation>
+      	</configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation>
+          <configLocation>C:\Dev\Data\Site\checkstyle\tal_checks.xml</configLocation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javancss-maven-plugin</artifactId>
+        <version>2.0-beta-2</version>
+        <configuration>
+          <xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation>
+        </configuration>
+      </plugin>
+	</plugins> 
+  </reporting>
+</project>

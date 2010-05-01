@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+  	<groupId>org.talframework.objex</groupId>
+  	<artifactId>tal-objex-parent</artifactId>
+  	<version>0.1-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>tal-objex-sample-api</artifactId>
+  <name>Objex Sample API</name>
+  <description>Classic Repository based domain API that does not imply Objex usage</description>
+</project>

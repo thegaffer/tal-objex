@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+  	<groupId>org.talframework.objex</groupId>
+  	<artifactId>tal-objex-parent</artifactId>
+  	<version>0.1-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>tal-objex-gae-testapp</artifactId>
+  <packaging>war</packaging>
+  <name>Objex GAE TestApp</name>
+  <description>Objex Test Application for Google App Engine</description>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-gae</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-sample-api</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-sample-impl</artifactId>
+  		<version>${project.version}</version>
+  		<!-- <scope>runtime</scope> -->
+  	</dependency>
+  	
+  	<!-- Google App Engine -->
+  	<dependency>
+  		<groupId>geronimo-spec</groupId>
+  		<artifactId>geronimo-spec-servlet</artifactId>
+  		<version>2.4-rc4</version>
+  		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
+ 		<groupId>org.tpspencer</groupId>
+		<artifactId>google-appengine-runtime</artifactId>
+		<version>0.1-SNAPSHOT</version>
+		<type>pom</type>
+ 	</dependency>
+ 	<dependency>
+ 		<groupId>com.google.gwt</groupId>
+ 		<artifactId>gwt-servlet</artifactId>
+ 		<version>2.0.3</version>
+ 	</dependency>
+  </dependencies>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <version>2.0.2</version>
+	        <configuration>
+	          <source>1.5</source>
+	          <target>1.5</target>
+	        </configuration>
+	    </plugin>
+  		<plugin> 
+        	<groupId>org.datanucleus</groupId> 
+            <artifactId>maven-datanucleus-plugin</artifactId> 
+            <version>2.0.0-release</version> 
+            <configuration> 
+                <log4jConfiguration>${basedir}/log4j.properties</log4jConfiguration>
+                <verbose>true</verbose> 
+            </configuration> 
+            <executions> 
+                <execution> 
+                    <phase>process-classes</phase> 
+                    <goals> 
+                        <goal>enhance</goal> 
+                    </goals> 
+				</execution> 
+        	</executions> 
+		</plugin>
+		<plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-war-plugin</artifactId>
+	        <version>2.0.2</version>
+	        <configuration>
+	          <webappDirectory>target/webapp</webappDirectory>
+	        </configuration>
+	    </plugin>
+  	</plugins>
+  </build>
+</project>
