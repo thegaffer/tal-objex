@@ -5,11 +5,15 @@ package org.tpspencer.tal.objexj.sample.api.order;
  * 
  * @author Tom Spencer
  */
-public interface Order {
+public interface Order extends OrderState {
 
 	public OrderState getOrderState();
 	
 	public void setOrderState(OrderState state);
 	
-	public void addItem(OrderItem item);
+	public OrderItem createNewItem();
+	
+	public OrderItem getItem(Object id);
+	
+	public void removeItem(Object id);
 }

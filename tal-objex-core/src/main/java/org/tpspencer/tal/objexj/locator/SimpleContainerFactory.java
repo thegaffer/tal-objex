@@ -34,11 +34,6 @@ public final class SimpleContainerFactory implements ContainerFactory {
 		this.middlewareFactory = middlewareFactory;
 	}
 	
-	public EditableContainer create(String type, Object state) {
-		String id = middlewareFactory.createContainer(strategy, state);
-		return open(id);
-	}
-
 	/**
 	 * Simply constructs an instance of the standard container
 	 * with plugins configured.
@@ -53,19 +48,16 @@ public final class SimpleContainerFactory implements ContainerFactory {
 	 * transactionId.
 	 */
 	public EditableContainer get(String id, String transactionId) {
-		TransactionMiddleware middleware = 
-			transactionId != null 
-				? middlewareFactory.getTransaction(id, transactionId) 
-				: middlewareFactory.createTransaction(id);
-		
-		return new SimpleTransaction(strategy, middleware, id, transactionId);
+	    TransactionMiddleware middleware = middlewareFactory.getTransaction(id, transactionId);
+        return new SimpleTransaction(strategy, middleware, id, null);
 	}
 	
 	/**
 	 * Simply creates a new transaction with no transactionId.
 	 * Derived class can override if it requires.
 	 */
-	public EditableContainer open(String id) {
-		return get(id, null);
+	public EditableContainer open(String id, boolean expectExists) {
+	    TransactionMiddleware middleware = middlewareFactory.createTransaction(id, expectExists);
+	    return new SimpleTransaction(strategy, middleware, id, null);
 	}
 }

@@ -14,17 +14,6 @@ import org.tpspencer.tal.objexj.EditableContainer;
 public interface ContainerFactory {
 	
 	/**
-	 * Call to create a brand new container of the
-	 * given type. The container is immediately created
-	 * as Editable.
-	 * 
-	 * @param type The type of container to create
-	 * @param rootObject The persistable state of the root object
-	 * @return The EditableContainer
-	 */
-	public EditableContainer create(String type, Object rootObject);
-
-	/**
 	 * Gets a container if this type given its ID.
 	 * 
 	 * @param id The ID of the container
@@ -44,10 +33,12 @@ public interface ContainerFactory {
 	/**
 	 * Opens a transaction on the container given by the ID.
 	 * This transaction represents a brand new isolated transaction
-	 * from any other. 
+	 * from any other. The container will be created if it does
+	 * not exist when completed.
 	 * 
 	 * @param id The ID of the container
+	 * @param expectExists Will fail if the container does not already exist
 	 * @return The {@link EditableContainer}
 	 */
-	public EditableContainer open(String id);
+	public EditableContainer open(String id, boolean expectExists);
 }

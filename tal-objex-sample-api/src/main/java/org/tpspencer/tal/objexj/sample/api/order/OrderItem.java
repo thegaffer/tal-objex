@@ -1,6 +1,6 @@
 package org.tpspencer.tal.objexj.sample.api.order;
 
-public interface OrderItem {
+public interface OrderItem extends OrderItemState {
 
 	/**
 	 * @return The state of the order item

@@ -1,6 +1,7 @@
 package org.tpspencer.tal.objexj.container;
 
 
+
 /**
  * This interface represents a class that can create 
  * ContainerMiddleware instances.
@@ -19,26 +20,14 @@ public interface ContainerMiddlewareFactory {
 	public ContainerMiddleware getMiddleware(String id);
 	
 	/**
-	 * Called to create a new container and returns it's ID. Typically
-	 * this ID is then used inside a new transaction and returned to the
-	 * client. Whether the container is persisted at this point or 
-	 * whether it waits for the first transaction to commit is runtime
-	 * environment specific.
-	 * 
-	 * @param strategy The strategy of the container
-	 * @param state The root objects state
-	 * @return The ID of the new container
-	 */
-	public String createContainer(ContainerStrategy strategy, Object state);
-	
-	/**
 	 * Called to get a new {@link TransactionMiddleware} instance for
 	 * the given container.
 	 * 
 	 * @param id The ID of the container in question
+	 * @param expectExists True if the container is expected to exist, false if it may or may not
 	 * @return A new transaction middleware for the editable container to use
 	 */
-	public TransactionMiddleware createTransaction(String id);
+	public TransactionMiddleware createTransaction(String id, boolean expectExists);
 	
 	/**
 	 * Called to get an existing transaction middleware.

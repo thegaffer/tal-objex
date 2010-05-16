@@ -7,7 +7,7 @@ package org.tpspencer.tal.objexj.sample.api.stock;
  * 
  * @author Tom Spencer
  */
-public interface Product {
+public interface Product extends ProductState {
 
 	/**
 	 * Call to get the products raw state. The return is

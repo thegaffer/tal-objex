@@ -1,6 +1,7 @@
 package org.tpspencer.tal.objexj.container;
 
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
 /**
  * Extends the ContainerMiddleware to provide the runtime environment
@@ -10,6 +11,11 @@ import org.tpspencer.tal.objexj.ObjexID;
  */
 public interface TransactionMiddleware extends ContainerMiddleware {
 
+    /**
+     * @return True if the container is a new container (not yet persisted)
+     */
+    public boolean isNew();
+    
 	/**
 	 * Call to get an existing {@link TransactionCache} for the
 	 * transaction.
@@ -44,12 +50,12 @@ public interface TransactionMiddleware extends ContainerMiddleware {
 	
 	/**
 	 * Create a new ID for the object. This may be temporary
-	 * until the editable container is saved. Not that it is
-	 * the containers responsibility to attach this ID to the
-	 * actual object.
+	 * until the editable container is saved. The ID should
+	 * be attached to the bean directly.
 	 * 
-	 * @param beanName The simple name of the bean we are creating the ID for
+	 * @param type The type of object we are creating id for
+	 * @param bean The bean holding state of new object
 	 * @return The new ID
 	 */
-	public ObjexID createNewId(String beanName);
+	public ObjexID createNewId(String type, ObjexObjStateBean bean);
 }

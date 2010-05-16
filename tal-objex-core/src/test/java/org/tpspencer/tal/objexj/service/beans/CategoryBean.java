@@ -1,5 +1,7 @@
 package org.tpspencer.tal.objexj.service.beans;
 
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
+
 /**
  * This bean class represents the raw persistable version of
  * an object, in this case a CategoryBean. As it's simplest
@@ -20,7 +22,7 @@ package org.tpspencer.tal.objexj.service.beans;
  * 
  * @author Tom Spencer
  */
-public class CategoryBean {
+public class CategoryBean implements ObjexObjStateBean {
 	/** Represents the ID of this object */
 	private String id;
 	/** Represents the id of parent object of this object */
@@ -35,6 +37,13 @@ public class CategoryBean {
 	private String[] products;
 	
 	/**
+	 * Hard-coded type
+	 */
+	public String getType() {
+	    return "Category";
+	}
+	
+	/**
 	 * @return the id
 	 */
 	public String getId() {
@@ -43,8 +52,8 @@ public class CategoryBean {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(String id) {
-		this.id = id;
+	public void setId(Object id) {
+		this.id = id != null ? id.toString() : null;
 	}
 	/**
 	 * @return the parentId
@@ -55,8 +64,8 @@ public class CategoryBean {
 	/**
 	 * @param parentId the parentId to set
 	 */
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
+	public void setParentId(Object parentId) {
+		this.parentId = parentId != null ? parentId.toString() : null;
 	}
 	/**
 	 * @return the name

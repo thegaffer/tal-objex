@@ -1,10 +1,9 @@
 package org.tpspencer.tal.objexj.container;
 
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
 public class SimpleTransaction extends StandardContainer implements EditableContainer {
@@ -35,6 +34,10 @@ public class SimpleTransaction extends StandardContainer implements EditableCont
 		return transactionId;
 	}
 	
+	public boolean isNew() {
+	    return middleware.isNew();
+	}
+	
 	public boolean isOpen() {
 		return open;
 	}
@@ -55,20 +58,36 @@ public class SimpleTransaction extends StandardContainer implements EditableCont
 		return middleware.suspend(cache);
 	}
 	
-	public ObjexObj newObject(Object state) {
+	/**
+	 * Overridden to get from the cache if it exists there.
+	 */
+	@Override
+	public ObjexObj getObject(Object id) {
+	    ObjexID objexId = middleware.convertId(id);
+	    
+	    if( cache.isDeleted(objexId) ) return null;
+	    
+	    Object obj = cache.findObject(objexId);
+	    if( obj != null ) return createObjexObj(objexId, obj);
+	    
+	    return super.getObject(id);
+	}
+	
+	public ObjexObj newObject(String type, Object parent) {
 		if( !open ) throw new IllegalArgumentException("Cannot amend closed transaction");
 		
+		ObjectStrategy strategy = getContainerStrategy().getObjectStrategies().get(type);
+		ObjexObjStateBean state = strategy.getNewStateInstance();
+		
 		// a. Create new ID and add it to state object
-		String type = state.getClass().getSimpleName();
-		ObjexID newId = middleware.createNewId(type);
-		ObjectStrategy objectStrategy = getContainerStrategy().getObjectStrategies().get(type);
-		BeanWrapper wrapper = new BeanWrapperImpl(state);
-		wrapper.setPropertyValue(objectStrategy.getIdProp(), newId.toString());
+		ObjexID newId = middleware.createNewId(type, state);
+		ObjexID parentId = parent != null ? middleware.convertId(parent) : null;
+		state.setParentId(parentId);
 		
 		// b. Add to cache
 		cache.addNewObject(newId, state);
 		
-		return createObjexObj(newId, state);
+		return strategy.getObjexObjInstance(this, parentId, newId, state);
 	}
 	
 	public void updateObject(ObjexID id, ObjexObj obj) {

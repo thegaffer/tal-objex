@@ -11,9 +11,14 @@
     <servlet-class>org.tpspencer.tal.gaetest.server.GreetingServiceImpl</servlet-class>
   </servlet>
   
+  <servlet>
+    <servlet-name>sampleApp</servlet-name>
+    <servlet-class>org.tpspencer.tal.gaetest.GAEObjexSampleApp</servlet-class>
+  </servlet>
+  
   <servlet-mapping>
-    <servlet-name>greetServlet</servlet-name>
-    <url-pattern>/googletestapp/greet</url-pattern>
+    <servlet-name>sampleApp</servlet-name>
+    <url-pattern>/sampleApp/*</url-pattern>
   </servlet-mapping>
   
   <!-- Default page to serve -->

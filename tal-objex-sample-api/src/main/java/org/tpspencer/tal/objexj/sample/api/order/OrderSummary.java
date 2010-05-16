@@ -8,4 +8,9 @@ package org.tpspencer.tal.objexj.sample.api.order;
  */
 public interface OrderSummary {
 
+	public String getOrderId();
+	
+	public String getAccount();
+	
+	public int getNosItems(); 
 }

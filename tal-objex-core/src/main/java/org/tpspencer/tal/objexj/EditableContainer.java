@@ -10,6 +10,15 @@ package org.tpspencer.tal.objexj;
  * @author Tom Spencer
  */
 public interface EditableContainer extends Container {
+    
+    /**
+     * Call to determine if the editable container represents a
+     * new container that has not yet been persisted. If so the
+     * next object will be the root object.
+     * 
+     * @return Determines if the container if new (and not yet persisted)
+     */
+    public boolean isNew();
 	
 	/**
 	 * Call to determine if the editable container can still
@@ -35,9 +44,10 @@ public interface EditableContainer extends Container {
 	/**
 	 * Called to add an object to the container 
 	 * 
-	 * @param state The 'state' of the new object
+	 * @param type The type of the new object
+	 * @param parent The ID of the parent object (if any)
 	 */
-	public ObjexObj newObject(Object state);
+	public ObjexObj newObject(String type, Object parent);
 	
 	/**
 	 * Called to remove an object from the container.

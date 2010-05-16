@@ -52,6 +52,19 @@ public interface ObjexObj {
 	public Object getStateObject();
 	
 	/**
+	 * Call to get a behaviour interface from this object. We 
+	 * encourage the use of this method over instanceof on
+	 * ObjexObj instances in case the interface is supported
+	 * only at certain points in the lifecycle of the object
+	 * or at times when the object contains strong-form
+	 * compound elements.
+	 * 
+	 * @param behaviour The type of behaviour required
+	 * @return
+	 */
+	public <T> T getBehaviour(Class<T> behaviour);
+	
+	/**
 	 * Convienience version of getStateObject when you know the
 	 * type of the object. As above this will be a cloned instance
 	 * unless we are inside an {@link EditableContainer}.

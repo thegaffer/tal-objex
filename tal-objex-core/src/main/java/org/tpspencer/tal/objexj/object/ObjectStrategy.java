@@ -3,6 +3,7 @@ package org.tpspencer.tal.objexj.object;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
 /**
  * This interface represents something that can describe
@@ -10,6 +11,8 @@ import org.tpspencer.tal.objexj.ObjexObj;
  * The strategy includes the type of object that holds the
  * state of the object and can create ObjexObj instances
  * as appropriate.
+ * 
+ * TODO: Remove the ID/ParentID Prop Name
  * 
  * @author Tom Spencer
  */
@@ -49,7 +52,7 @@ public interface ObjectStrategy {
 	 * 
 	 * @return A new instance of the state class
 	 */
-	public Object getNewStateInstance();
+	public ObjexObjStateBean getNewStateInstance();
 	
 	/**
 	 * @return The name of the property on state object holding the ID

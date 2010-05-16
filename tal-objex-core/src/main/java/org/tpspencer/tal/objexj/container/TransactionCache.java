@@ -11,6 +11,22 @@ import org.tpspencer.tal.objexj.ObjexID;
  * @author Tom Spencer
  */
 public interface TransactionCache {
+    
+    /**
+     * Find the object in the cache.
+     * 
+     * @param id The ID of the object
+     * @return The object in the cache
+     */
+    public Object findObject(ObjexID id);
+    
+    /**
+     * Determine if an object is pending deletion.
+     * 
+     * @param id The ID of the object
+     * @return True if it is.
+     */
+    public boolean isDeleted(ObjexID id);
 
 	/**
 	 * Simple adds the object to the set being added.

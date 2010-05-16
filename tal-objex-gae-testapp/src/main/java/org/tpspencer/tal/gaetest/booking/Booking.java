@@ -15,7 +15,7 @@ public class Booking {
 	 */
 	public Booking(EditableContainer container) {
 		BookingBean bean = new BookingBean();
-		container.newObject(bean);
+		container.newObject("BookingBean", null);
 	}
 	
 	/**

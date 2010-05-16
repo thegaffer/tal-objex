@@ -26,6 +26,8 @@ public class SimpleObjexObj implements ObjexObj {
 	private final ObjectStrategy strategy;
 	/** The container that the object belongs to */
 	private final Container container;
+	/** Determines if object is in transaction already */
+	private boolean inTransaction;
 	
 	/** ID of the object */
 	private ObjexID id;
@@ -113,6 +115,38 @@ public class SimpleObjexObj implements ObjexObj {
 			return state;
 		else
 			return cloneState();
+	}
+	
+	/**
+	 * The default method tests whether the instance supports
+	 * this interface.
+	 */
+	public <T> T getBehaviour(Class<T> behaviour) {
+		if( behaviour.isInstance(this) ) return behaviour.cast(this);
+		else throw new ClassCastException("The behaviour is not supported by this object");
+	}
+	
+	/**
+	 * Simply checks if we are in an Editable Container
+	 */
+	public boolean isUpdatableable() {
+	    if( inTransaction ) return true;
+	    else if( container instanceof EditableContainer &&
+				((EditableContainer)container).isOpen() )
+			return true;
+		else 
+			return false;
+	}
+	
+	/**
+	 * 
+	 */
+	public void checkUpdateable(boolean placeInTransaction) {
+		if( !isUpdatableable() ) throw new IllegalArgumentException("Cannot update an object that is not inside a transaction: " + this);
+		if( placeInTransaction && !inTransaction ) {
+		    ((EditableContainer)container).updateObject(this.id, this);
+		    inTransaction = true;
+		}
 	}
 	
 	/**

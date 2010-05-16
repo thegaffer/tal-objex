@@ -29,9 +29,12 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 		removedObjects = null;
 	}
 	
-	public Object getObject(ObjexID id) {
+	public Object findObject(ObjexID id) {
 		Object ret = null;
-		if( newObjects != null && newObjects.containsKey(id) ) {
+		if( isDeleted(id) ) {
+		    ret = null;
+		}
+		else if( newObjects != null && newObjects.containsKey(id) ) {
 			ret = newObjects.get(id);
 		}
 		else if( updatedObjects != null && updatedObjects.containsKey(id) ) {
@@ -39,6 +42,14 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * Simply determines if removed
+	 */
+	public boolean isDeleted(ObjexID id) {
+	    if( removedObjects != null && removedObjects.containsKey(id) ) return true;
+	    return false;
 	}
 	
 	/**
@@ -57,6 +68,9 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 	 * @param obj The existing object we are updating
 	 */
 	public void addUpdatedObject(ObjexID id, Object state) {
+	    if( newObjects != null && newObjects.containsKey(id) ) return;
+	    if( removedObjects != null && removedObjects.containsKey(id) ) return;
+	    
 		if( updatedObjects == null ) updatedObjects = new HashMap<ObjexID, Object>();
 		updatedObjects.put(id, state);
 	}
@@ -67,6 +81,15 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 	 * @param obj The object we are removing
 	 */
 	public void addRemovedObject(ObjexID id, Object state) {
+	    if( newObjects != null && newObjects.containsKey(id) ) {
+	        newObjects.remove(id);
+	        return; // never existed
+	    }
+	    
+	    if( updatedObjects != null && updatedObjects.containsKey(id) ) {
+	        updatedObjects.remove(id);
+	    }
+	    
 		if( removedObjects == null ) removedObjects = new HashMap<ObjexID, Object>();
 		removedObjects.put(id, state);
 	}

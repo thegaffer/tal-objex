@@ -16,12 +16,16 @@ public class OrderBean extends BaseBean implements OrderState {
 	
 	/** Holds the account number for the order (effectively a ref to customer) */
 	private long account;
-	/** Holds the details of the customer as they were at time of order */
-	// TODO: Customer Details
 	/** Holds the items in the order */
 	private String[] items;
-	/** Holds the summary price etc */
-	// TODO: Summary details!?!
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getType()
+	 */
+	public String getType() {
+	    return "Order";
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.tpspencer.tal.objexj.sample.beans.order.OrderState#getAccount()
@@ -29,6 +33,7 @@ public class OrderBean extends BaseBean implements OrderState {
 	public long getAccount() {
 		return account;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.tpspencer.tal.objexj.sample.beans.order.OrderState#setAccount(long)
 	 */

@@ -13,6 +13,7 @@ import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.container.SimpleTransactionCache;
@@ -72,10 +73,8 @@ public class TestService {
 			allowing(idProduct).isNull(); will(returnValue(false));
 			
 			allowing(middlewareFactory).getMiddleware((String)with(anything())); will(returnValue(middleware));
-			allowing(middlewareFactory).createTransaction((String)with(anything())); will(returnValue(middleware));
+			allowing(middlewareFactory).createTransaction((String)with(anything()), with(any(boolean.class))); will(returnValue(middleware));
 			allowing(middlewareFactory).getTransaction("Stock/1", "1"); will(returnValue(middleware));
-			atMost(1).of(middlewareFactory).createContainer(with(strategy), with(anything()));
-			  will(returnValue("Stock/1"));
 			
 			allowing(middleware).init(with(any(Container.class)));
 			allowing(middleware).convertId(1); will(returnValue(idCategory));
@@ -86,6 +85,8 @@ public class TestService {
 			allowing(middleware).convertId(21); will(returnValue(idProduct));
 			allowing(middleware).convertId(idProduct); will(returnValue(idProduct));
 			allowing(middleware).getObjectType(idProduct); will(returnValue("Product"));
+			
+			oneOf(middleware).createNewId(with("Category"), with(any(ObjexObjStateBean.class))); will(returnValue(idCategory));
 			
 			allowing(middleware).init(with(any(Container.class)));
 			// allowing(transaction).init(with(any(Container.class)));
@@ -123,7 +124,7 @@ public class TestService {
 		CategoryBean category = obj1.getStateObject(CategoryBean.class);
 		ProductBean product = obj2.getStateObject(ProductBean.class);
 		
-		// You could not return you aggregate object, we are going to test it though!
+		// You could now form and return you aggregate object, we are going to test it though!
 		Assert.assertNotNull(category);
 		Assert.assertEquals("Cat1", category.getName());
 		Assert.assertNotNull(product);
@@ -135,10 +136,11 @@ public class TestService {
 	 */
 	@Test
 	public void createDocument() {
-		CategoryBean rootCategory = new CategoryBean();
-		rootCategory.setName("Hi");
+	    EditableContainer store = containerLocator.open("Stock/1", false);
 		
-		EditableContainer store = containerLocator.create("Stock", rootCategory);
+		ObjexObj root = store.newObject("Category", null);
+        root.getStateObject(CategoryBean.class).setName("Hi");
+        
 		store.saveContainer();
 		
 		// End of simple example, now test
@@ -156,7 +158,7 @@ public class TestService {
 	 */
 	@Test
 	public void update() {
-		EditableContainer store = containerLocator.open("Stock/1");
+		EditableContainer store = containerLocator.open("Stock/1", true);
 		
 		ObjexObj obj1 = store.getObject(20);
 		CategoryBean category = obj1.getStateObject(CategoryBean.class);
@@ -176,7 +178,7 @@ public class TestService {
 	 */
 	@Test
 	public void startLongLivedEdit() {
-		EditableContainer store = containerLocator.open("Stock/1");
+		EditableContainer store = containerLocator.open("Stock/1", true);
 		Assert.assertNotNull(store.suspend());
 		
 		// Example ends, Close is so this test is isolated
@@ -190,7 +192,7 @@ public class TestService {
 	 */
 	@Test
 	public void updateLongLivedEdit() {
-		EditableContainer store = containerLocator.open("Stock/1");
+		EditableContainer store = containerLocator.open("Stock/1", true);
 		String transId = store.suspend();
 		
 		// Example Starts

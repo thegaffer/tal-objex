@@ -28,7 +28,15 @@ public class ProductBean extends BaseBean implements ProductState {
 	/** The products price currency */
 	private String currency;
 	
-	/**
+	/*
+     * (non-Javadoc)
+     * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getType()
+     */
+    public String getType() {
+        return "Product";
+    }
+    
+    /**
 	 * @return the name
 	 */
 	public String getName() {

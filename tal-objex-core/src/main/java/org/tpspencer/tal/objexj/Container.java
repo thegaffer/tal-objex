@@ -30,6 +30,11 @@ public interface Container {
 	public String getType();
 	
 	/**
+	 * @return The root object for the container
+	 */
+	public ObjexObj getRootObject();
+	
+	/**
 	 * Get an object given its ID
 	 * 
 	 * @param id The ID of the object (may be an ObjexID, may be a string)
@@ -37,7 +42,7 @@ public interface Container {
 	 * @return The object (or null if not found)
 	 * @throws IllegalArgumentException If a null object id is supplied
 	 */
-	public <T> Object getObject(Object id, Class<T> expected);
+	public <T> T getObject(Object id, Class<T> expected);
 	
 	/**
 	 * Call to get an object given its ID

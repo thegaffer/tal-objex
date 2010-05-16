@@ -32,7 +32,15 @@ public class OrderItemBean extends BaseBean implements OrderItemState {
 	/** The currency of the price */
 	private String currency;
 	
-	/* (non-Javadoc)
+	/*
+     * (non-Javadoc)
+     * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getType()
+     */
+    public String getType() {
+        return "OrderItem";
+    }
+    
+    /* (non-Javadoc)
 	 * @see org.tpspencer.tal.objexj.sample.beans.order.OrderItemState#getRef()
 	 */
 	public String getRef() {

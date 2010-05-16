@@ -1,11 +1,14 @@
 package org.tpspencer.tal.objexj.sample.beans;
 
+import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
 /**
  * Base class for any bean class. Holds the objects
@@ -15,11 +18,14 @@ import javax.jdo.annotations.PrimaryKey;
  */
 @PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE) 
-public class BaseBean {
+public abstract class BaseBean implements ObjexObjStateBean {
+	
 	/** Holds the Id of this object */
 	@PrimaryKey
 	@Persistent(valueStrategy=IdGeneratorStrategy.IDENTITY)
+	@Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true") 
 	private String id;
+	
 	/** Holds the parent objects' id (if any) */
 	private String parentId;
 	
@@ -33,9 +39,9 @@ public class BaseBean {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(String id) {
-		if( id != null ) throw new IllegalArgumentException("You cannot reset a beans ID");
-		this.id = id;
+	public void setId(Object id) {
+		if( this.id != null ) throw new IllegalArgumentException("You cannot reset a beans ID");
+		this.id = id != null ? id.toString() : null;
 	}
 
 	/**
@@ -48,7 +54,7 @@ public class BaseBean {
 	/**
 	 * @param parentId the parentId to set
 	 */
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
+	public void setParentId(Object parentId) {
+		this.parentId = parentId != null ? parentId.toString() : null;
 	}
 }

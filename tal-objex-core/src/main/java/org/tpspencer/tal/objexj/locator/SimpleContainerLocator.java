@@ -1,6 +1,5 @@
 package org.tpspencer.tal.objexj.locator;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.util.Assert;
@@ -46,14 +45,6 @@ public final class SimpleContainerLocator implements ContainerFactory {
 		return ret;
 	}
 	
-	public EditableContainer create(String type, Object rootObject) {
-		EditableContainer ret = factories.get(type).create(type, rootObject);
-		
-		// TODO: Probably an error if no type or no container
-		
-		return ret;
-	}
-	
 	/**
 	 * Simply finds the type of the ID and attempts to
 	 * locate the {@link ContainerFactory} for that type
@@ -74,10 +65,10 @@ public final class SimpleContainerLocator implements ContainerFactory {
 	 * locate the {@link ContainerFactory} for that type
 	 * and use it.
 	 */
-	public EditableContainer open(String id) {
+	public EditableContainer open(String id, boolean expectExists) {
 		EditableContainer ret = null;
 		String type = getType(id);
-		if( type != null ) ret = factories.get(type).open(id);
+		if( type != null ) ret = factories.get(type).open(id, expectExists);
 		
 		// TODO: Probably an error if no type or no container
 		

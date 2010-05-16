@@ -6,7 +6,7 @@ package org.tpspencer.tal.objexj.sample.api.stock;
  * 
  * @author Tom Spencer
  */
-public interface Category {
+public interface Category extends CategoryState {
 
 	/**
 	 * Call to get the current state of the cateogry.
@@ -23,4 +23,18 @@ public interface Category {
 	 * @param category The state to set
 	 */
 	public void setCategoryState(CategoryState category);
+	
+	/**
+     * Call to create a new category inside this category
+     * 
+     * @return The new categry
+     */
+    public Category createNewCategory();
+	
+	/**
+	 * Call to create a new product inside this category
+	 * 
+	 * @return The new product
+	 */
+	public Product createNewProduct();
 }

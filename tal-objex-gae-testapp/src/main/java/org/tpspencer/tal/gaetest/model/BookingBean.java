@@ -6,8 +6,10 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
+
 @PersistenceCapable
-public class BookingBean {
+public class BookingBean implements ObjexObjStateBean {
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY) 
@@ -20,6 +22,9 @@ public class BookingBean {
 	private String goodsDetails;
 	private String serviceDetails;
 	
+	public String getType() {
+	    return "Booking";
+	}
 	/**
 	 * @return the id
 	 */
@@ -29,8 +34,15 @@ public class BookingBean {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(String id) {
-		this.id = id;
+	public void setId(Object id) {
+		this.id = id != null ? id.toString() : null;
+	}
+	public Object getParentId() {
+	    return null;
+	}
+	public void setParentId(Object parentId) {
+	    // TODO Auto-generated method stub
+	    
 	}
 	/**
 	 * @return the account

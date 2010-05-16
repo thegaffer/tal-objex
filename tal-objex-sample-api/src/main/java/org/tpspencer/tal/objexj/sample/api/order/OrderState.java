@@ -9,9 +9,28 @@ package org.tpspencer.tal.objexj.sample.api.order;
 public interface OrderState {
 	
 	/**
-	 * @return Call to set the ID of the order state
+	 * @return The ID of this category
 	 */
-	public abstract String getId();
+	public abstract Object getId();
+	
+	/**
+	 * Set the ID of the category. Not allowed if already set.
+	 * 
+	 * @param id The ID to set
+	 */
+	public abstract void setId(Object id);
+	
+	/**
+	 * @return The ID of the category that 'owns' us
+	 */
+	public abstract Object getParentId();
+	
+	/**
+	 * Sets the category that owns us
+	 * 
+	 * @param id the categories id
+	 */
+	public abstract void setParentId(Object id);
 
 	/**
 	 * @return the account
@@ -26,10 +45,10 @@ public interface OrderState {
 	/**
 	 * @return A reference to each item in the order
 	 */
-	public abstract String[] getItemRefs();
+	public abstract String[] getItems();
 	
 	/**
 	 * @param items The items to set
 	 */
-	public abstract void setItemRefs(String[] items);
+	public abstract void setItems(String[] items);
 }

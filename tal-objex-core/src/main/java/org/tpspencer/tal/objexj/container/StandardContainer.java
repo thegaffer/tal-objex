@@ -82,18 +82,30 @@ public class StandardContainer implements Container {
 		return middleware;
 	}
 	
-	public ObjexObj getObject(Object id) {
-		ObjexID realId = middleware.convertId(id);
-		String type = middleware.getObjectType(realId);
-		ObjectStrategy objectStrategy = strategy.getObjectStrategies().get(type);
-		Object state = middleware.loadObject(objectStrategy.getStateClass(), realId);
-		return createObjexObj(realId, state);
+	public ObjexObj getRootObject() {
+		// TODO: For ID 1 for root, strategy must hold 1
+		return null;
 	}
 	
-	public <T> Object getObject(Object id, Class<T> expected) {
+	public ObjexObj getObject(Object id) {
+	    if( id == null ) return null; // Just protect from a stupid call!!
+	    
+		ObjexID realId = middleware.convertId(id);
+		if( realId == null ) throw new IllegalArgumentException("ID passed in does not appear to be valid: " + id);
+		
+		String type = middleware.getObjectType(realId);
+		if( type == null ) throw new IllegalArgumentException("ID passed in does not appear to be of a valid type: " + id);
+		
+		ObjectStrategy objectStrategy = strategy.getObjectStrategies().get(type);
+		if( objectStrategy == null ) throw new IllegalArgumentException("ID passed in does not appear to match a strategy: " + id);
+		
+		Object state = middleware.loadObject(objectStrategy.getStateClass(), realId);
+		return state != null ? createObjexObj(realId, state) : null;
+	}
+	
+	public <T> T getObject(Object id, Class<T> expected) {
 		ObjexObj obj = getObject(id);
-		// TODO: Convert object into correct type, behaviour!
-		return null;
+		return obj != null ? obj.getBehaviour(expected) : null;
 	}
 	
 	public Collection<ObjexObj> getObjects(ObjexID[] ids) {

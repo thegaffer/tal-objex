@@ -1,7 +1,6 @@
 package org.tpspencer.tal.objexj.sample.api.repository;
 
 import org.tpspencer.tal.objexj.sample.api.order.Order;
-import org.tpspencer.tal.objexj.sample.api.order.OrderSummary;
 
 /**
  * This interface represents the repository of orders.
@@ -17,42 +16,27 @@ import org.tpspencer.tal.objexj.sample.api.order.OrderSummary;
 public interface OrderRepository {
 
 	/**
-	 * Call to get an order by its ID. With this method
-	 * you can get the order out for read-only purposes or
-	 * you can get it out for editing.
-	 * 
-	 * @param id The ID of the order
-	 * @param toEdit Determines if the order returned is for editing
-	 * @return The order
+	 * @return The order object
 	 */
-	public Order findOrderById(String id, boolean toEdit);
+	public Order getOrder();
 	
 	/**
-	 * Call to search for all orders using a particular 
-	 * stock item. This call returns only read-only order
-	 * summaries as you can only edit 1 order at a time.
-	 * 
-	 * @param stockItemId
-	 * @return
+	 * Call to open up the repository for changes. Any
+	 * objects obtained from the repository cannot be
+	 * edited with re-getting them.
 	 */
-	public OrderSummary[] findOrdersByStockItem(String stockItemId);
+	public void open();
 	
 	/**
-	 * Call to search for all orders using a particular 
-	 * account id. This call returns only read-only order
-	 * summaries as you can only edit 1 order at a time.
+	 * Call to suspend all changes currently made and
+	 * come back to them later 
 	 * 
-	 * @param stockItemId
-	 * @return
+	 * @return The ID of the transaction
 	 */
-	public OrderSummary[] findOrdersByAccount(String accountId);
+	public String suspend();
 	
 	/**
-	 * Call to persist an order previously obtained via
-	 * a call to findOrderById given its ID and marked
-	 * for edit that has subsequently been changed.
-	 * 
-	 * @param order The order to persist
+	 * Call to persist all changes made on this repository.
 	 */
-	public void persistOrder(Order order);
+	public void persist();
 }
