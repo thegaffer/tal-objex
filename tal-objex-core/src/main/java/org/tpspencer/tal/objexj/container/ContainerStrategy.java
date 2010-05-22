@@ -22,6 +22,19 @@ public interface ContainerStrategy {
 	public String getContainerName();
 	
 	/**
+	 * @return The name of the root object type
+	 */
+	public String getRootObjectName();
+	
+	/**
+	 * Call to get the object strategy for a type of object.
+	 * 
+	 * @param name The name of the object we want strategy for
+	 * @return The strategy for the given object
+	 */
+	public ObjectStrategy getObjectStrategy(String name);
+	
+	/**
 	 * @return The map of all object strategies of allowed objects in the container
 	 */
 	public Map<String, ObjectStrategy> getObjectStrategies();

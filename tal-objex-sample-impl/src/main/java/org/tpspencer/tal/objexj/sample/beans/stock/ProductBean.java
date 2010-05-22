@@ -14,6 +14,7 @@ import org.tpspencer.tal.objexj.sample.beans.BaseBean;
  */
 @PersistenceCapable
 public class ProductBean extends BaseBean implements ProductState {
+    private final static long serialVersionUID = 1L;
 
 	/** The name of the product */
 	private String name;

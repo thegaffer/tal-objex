@@ -21,17 +21,17 @@
 		<th>Description</th>
 		<th>Quantity</th>
 		<th>Price</th>
-		<c:if test="${not empty state.currentTransactionId}"><th>Actions</th></c:if>
+		<c:if test="${not empty state.currentOrderTransaction}"><th>Actions</th></c:if>
 	</tr>
 	
-	<c:forEach var="item" items="${items}">
+	<c:forEach var="item" items="${order.itemsList}">
 		<tr>
 			<td>${item.ref}</td>
 			<td>${item.name}</td>
 			<td>${item.description}</td>
 			<td>${item.quantity}&nbsp;${item.measure}</td>
 			<td>${item.price}&nbsp;${item.currency}</td>
-			<c:if test="${not empty state.currentTransactionId}"><td>
+			<c:if test="${not empty state.currentOrderTransaction}"><td>
 				<a href="/sampleApp/removeItem?item=${item.id}">Remove</a>&nbsp;|
 				<a href="/sampleApp/moveItem?item=${item.id}&dir=up">Up</a>&nbsp;|
 				<a href="/sampleApp/moveItem?item=${item.id}&dir=down">Down</a>
@@ -42,7 +42,7 @@
 
 <div>
 <c:choose>
-<c:when test="${not empty state.currentTransactionId}">
+<c:when test="${not empty state.currentOrderTransaction}">
 <a href="/sampleApp/newOrderItem">New Item</a>&nbsp;|
 <a href="/sampleApp/saveOrder">Save</a>
 </c:when>

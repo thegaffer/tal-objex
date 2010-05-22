@@ -3,12 +3,14 @@ package org.tpspencer.tal.objexj.locator;
 import org.springframework.util.Assert;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerMiddleware;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.container.SimpleTransaction;
 import org.tpspencer.tal.objexj.container.StandardContainer;
 import org.tpspencer.tal.objexj.container.TransactionMiddleware;
+import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
 /**
  * This class can be configured to create instances of a
@@ -39,25 +41,25 @@ public final class SimpleContainerFactory implements ContainerFactory {
 	 * with plugins configured.
 	 */
 	public Container get(String id) {
-		ContainerMiddleware middleware = middlewareFactory.getMiddleware(id);
+		ContainerMiddleware middleware = middlewareFactory.getMiddleware(strategy, id);
 		return new StandardContainer(strategy, middleware, id);
 	}
 	
-	/**
-	 * Creates a new {@link SimpleTransaction} with the given
-	 * transactionId.
-	 */
-	public EditableContainer get(String id, String transactionId) {
-	    TransactionMiddleware middleware = middlewareFactory.getTransaction(id, transactionId);
+	public EditableContainer create(String id) {
+	    ObjectStrategy rootStrategy = strategy.getObjectStrategy(strategy.getRootObjectName());
+	    ObjexObjStateBean bean = rootStrategy.getNewStateInstance();
+	    
+	    TransactionMiddleware middleware = middlewareFactory.createTransaction(strategy, id, bean);
+	    return new SimpleTransaction(strategy, middleware, id, null);
+	}
+	
+	public EditableContainer open(String id) {
+	    TransactionMiddleware middleware = middlewareFactory.createTransaction(strategy, id);
         return new SimpleTransaction(strategy, middleware, id, null);
 	}
 	
-	/**
-	 * Simply creates a new transaction with no transactionId.
-	 * Derived class can override if it requires.
-	 */
-	public EditableContainer open(String id, boolean expectExists) {
-	    TransactionMiddleware middleware = middlewareFactory.createTransaction(id, expectExists);
-	    return new SimpleTransaction(strategy, middleware, id, null);
+	public EditableContainer getTransaction(String id, String transactionId) {
+	    TransactionMiddleware middleware = middlewareFactory.getTransaction(strategy, id, transactionId);
+        return new SimpleTransaction(strategy, middleware, id, transactionId);
 	}
 }

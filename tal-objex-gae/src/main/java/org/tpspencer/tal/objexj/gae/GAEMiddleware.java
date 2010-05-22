@@ -10,6 +10,7 @@ import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.container.SimpleTransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionMiddleware;
@@ -30,58 +31,141 @@ import com.google.appengine.api.users.UserServiceFactory;
  */
 public class GAEMiddleware implements TransactionMiddleware {
 
-    /** Set at construction to indicate if we expect the container to already exist */
-    private final boolean expectExists;
-    /** Holds the container */
+    /** The ID of the container we are a middlware for */
+    private final String id;
+    /** The ID of the transaction (if known) */
+    private String transactionId;
+    
+    /** Holds the container (set in the init method) */
     private Container container;
     
     /** The key for the container */
-    private Key rootKey;
+    private final Key rootKey;
     /** The root type for this container */
-    private ContainerBean root;
+    private final ContainerBean root;
+    
+    /** The transaction cache if we are a transaction */
+    private TransactionCache cache;
     
     /** Holds the last ID we reserved in persisted root entity */
     private long lastBlockId = -1;
     
-    public GAEMiddleware(boolean expectExists) {
-        this.expectExists = expectExists;
+    /**
+     * Constructs a read-only middleware against an existing container.
+     * 
+     * @param strategy The strategy for the container
+     * @param id The ID of the container
+     */
+    public GAEMiddleware(ContainerStrategy strategy, String id) {
+        this.id = id;
+        this.transactionId = null;
+        this.rootKey = KeyFactory.createKey(ContainerBean.class.getSimpleName(), id);
+        
+        this.root = findExistingRoot(id, true);
     }
-
-    public void init(Container container) {
-        this.container = container;
+    
+    /**
+     * Constructs a transaction middleware against either an existing
+     * transaction or a new transaction against an exist container.
+     * 
+     * @param strategy The strategy for the container
+     * @param id The ID of the container
+     * @param transactionId The ID of the transaction (if null, container must exist)
+     */
+    public GAEMiddleware(ContainerStrategy strategy, String id, String transactionId) {
+        this.id = id;
+        this.transactionId = transactionId;
+        this.rootKey = KeyFactory.createKey(ContainerBean.class.getSimpleName(), id);
         
-        // Generate key for the container
-        this.rootKey = KeyFactory.createKey(ContainerBean.class.getSimpleName(), container.getId());
-        
-        // Make sure container exists or otherwise already
-        PersistenceManager pm = PersistenceManagerFactorySingleton.getManager();
-        try {
-            this.root = pm.getObjectById(ContainerBean.class, this.rootKey);
-            pm.detachCopy(this.root);
+        if( transactionId != null ) {
+            MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
+            GAETransaction trans = (GAETransaction)cache.get(transactionId);
+            if( trans != null ) {
+                this.root = trans.getContainerBean();
+                this.cache = trans.getCache();
+            }
+            else {
+                throw new IllegalArgumentException("The transaction does not exist or has expired: " + transactionId);
+            }
+        }
+        else {
+            this.root = findExistingRoot(id, true);
+            this.cache = new SimpleTransactionCache();
             this.lastBlockId = this.root.getLastId();
         }
+    }
+    
+    /**
+     * Constructs a transaction middleware for a new container.
+     * The container is not persisted until saved though.
+     * 
+     * @param strategy The strategy for the container
+     * @param id The ID of the new container
+     * @param root The root object to add to transaction
+     */
+    public GAEMiddleware(ContainerStrategy strategy, String id, ObjexObjStateBean root) {
+        this.id = id;
+        this.transactionId = null;
+        this.rootKey = KeyFactory.createKey(ContainerBean.class.getSimpleName(), id);
+        
+        // Make sure does not already exist
+        if( findExistingRoot(id, false) != null ) {
+            throw new IllegalArgumentException("Container already exists");
+        }
+        
+        // Create new root
+        this.root = createNewRoot(strategy.getContainerName(), id);
+        this.cache = new SimpleTransactionCache();
+        
+        // Prepare root
+        String rootType = strategy.getRootObjectName();
+        String rootKey = KeyFactory.createKeyString(this.rootKey, root.getClass().getSimpleName(), 1);
+        root.setId(rootKey);
+        this.cache.addNewObject(new GAEObjexID(rootType, 1), root);
+    }
+    
+    private ContainerBean findExistingRoot(String id, boolean expectExists) {
+        ContainerBean ret = null;
+        
+        PersistenceManager pm = PersistenceManagerFactorySingleton.getManager();
+        try {
+            ret = pm.getObjectById(ContainerBean.class, this.rootKey);
+            pm.detachCopy(ret);
+        }
         catch( JDOObjectNotFoundException e ) {
-            if( expectExists ) throw new IllegalArgumentException("The container does not exist: " + container.getId(), e);
-            
-            this.root = new ContainerBean();
-            // this.root.setId(rootKey);
-            this.root.setContainerId(container.getId());
-            this.root.setType(container.getType());
-            // TODO: this.root.setName(name);
-            // this.root.setDescription(description);
-            // this.root.setStatus(status);
-            
-            // User and status
-            this.root.setCreated(new Date());
-            UserService userService = UserServiceFactory.getUserService();
-            if( userService.isUserLoggedIn() ) this.root.setCreator(userService.getCurrentUser().getEmail());
-            this.root.setLastId(0);
+            if( expectExists ) throw new IllegalArgumentException("The container does not exist: " + id, e);
         }
         finally {
             pm.close();
         }
         
-        if( this.root == null ) throw new IllegalArgumentException("Cannot find existing container in data store: " + container.getId());
+        return ret;
+    }
+    
+    private ContainerBean createNewRoot(String type, String id) {
+        ContainerBean ret = new ContainerBean();
+        // this.root.setId(rootKey);
+        ret.setContainerId(id);
+        ret.setType(type);
+        // TODO: this.root.setName(name);
+        // this.root.setDescription(description);
+        // this.root.setStatus(status);
+        
+        // User and status
+        ret.setCreated(new Date());
+        UserService userService = UserServiceFactory.getUserService();
+        if( userService.isUserLoggedIn() ) ret.setCreator(userService.getCurrentUser().getEmail());
+        ret.setLastId(1);
+        
+        return ret;
+    }
+    
+    /**
+     * Ensures the container matches our id
+     */
+    public void init(Container container) {
+        if( !container.getId().equals(id) ) throw new IllegalArgumentException("Container id [" + container.getId() + "] does not match expected id: " + id);
+        this.container = container;
     }
     
     /**
@@ -175,24 +259,8 @@ public class GAEMiddleware implements TransactionMiddleware {
      * creates a new one
      */
     public TransactionCache getCache() {
-        TransactionCache ret = null;
-        
-        String transactionId = ((EditableContainer)container).getTransactionId();
-        if( transactionId != null ) {
-            MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
-            ret = (TransactionCache)cache.get(transactionId);
-            
-            if( ret == null ) {
-                // TODO: This is probably an error to return back to say cache expired!!
-                ret = new SimpleTransactionCache();
-            }
-        }
-        
-        else {
-            ret = new SimpleTransactionCache();
-        }
-        
-        return ret;
+        if( cache == null && container instanceof EditableContainer ) cache = new SimpleTransactionCache();
+        return cache;
     }
     
     public void save(TransactionCache cache) {
@@ -222,14 +290,18 @@ public class GAEMiddleware implements TransactionMiddleware {
     }
     
     public String suspend(TransactionCache cache) {
-        String transactionId = ((EditableContainer)container).getTransactionId();
         if( transactionId == null ) {
             // TODO: Create a new transaction ID !?!
-            transactionId = container.getId();
+            transactionId = id;
         }
         
+        GAETransaction trans = new GAETransaction();
+        trans.setId(transactionId);
+        trans.setContainerBean(root);
+        trans.setCache(cache);
+        
         MemcacheService cacheService = MemcacheServiceFactory.getMemcacheService();
-        cacheService.put(transactionId, cache);
+        cacheService.put(transactionId, trans);
         
         return transactionId;
     }

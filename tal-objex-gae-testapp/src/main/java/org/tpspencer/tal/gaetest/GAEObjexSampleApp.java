@@ -3,6 +3,7 @@ package org.tpspencer.tal.gaetest;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.tpspencer.tal.gaetest.actions.CategoryActions;
 import org.tpspencer.tal.gaetest.actions.OrderActions;
 import org.tpspencer.tal.gaetest.actions.ProductActions;
+import org.tpspencer.tal.gaetest.views.OrderViews;
+import org.tpspencer.tal.gaetest.views.StockViews;
 
 /**
  * The sample app. This class represents the app and uses a very simple inbuilt MVC type architecture. Requests are dispatched to appropriate actions and from
@@ -23,7 +26,11 @@ import org.tpspencer.tal.gaetest.actions.ProductActions;
  */
 public class GAEObjexSampleApp extends HttpServlet {
     private final static long serialVersionUID = 1L;
+    
+    /** Member holds the actions */
     private Map<String, Action> actions = new HashMap<String, Action>();
+    /** Member holds the view */
+    private Map<String, View> views = new HashMap<String, View>();
     
     @Override
     public void init() throws ServletException {
@@ -39,16 +46,29 @@ public class GAEObjexSampleApp extends HttpServlet {
         actions.put("/newProduct", new ProductActions.NewProductAction());
         actions.put("/submitProduct", new ProductActions.SubmitProductAction());
         
+        views.put("/viewStock", new StockViews.StockView());
+        views.put("/newCategory", new StockViews.NewCategoryView());
+        views.put("/editCategory", new StockViews.EditCategoryView());
+        views.put("/newProduct", new StockViews.NewProductView());
+        views.put("/editProduct", new StockViews.EditProductView());
+        
         actions.put("/viewOrders", new OrderActions.ViewOrdersAction());
         actions.put("/viewOrder", new OrderActions.ViewOrderAction());
         actions.put("/newOrder", new OrderActions.NewOrderAction());
         actions.put("/editOrder", new OrderActions.EditOrderAction());
         actions.put("/submitOrder", new OrderActions.SubmitOrderAction());
+        actions.put("/submitNewOrder", new OrderActions.SubmitNewOrderAction());
         actions.put("/newOrderItem", new OrderActions.NewOrderItemAction());
         actions.put("/editOrderItem", new OrderActions.EditOrderItemAction());
         actions.put("/submitOrderItem", new OrderActions.SubmitOrderItemAction());
         actions.put("/openOrder", new OrderActions.OpenOrderAction());
         actions.put("/saveOrder", new OrderActions.SaveOrderAction());
+        
+        views.put("/viewOrder", new OrderViews.OrderView());
+        views.put("/newOrderForm", new OrderViews.NewOrderFormView());
+        views.put("/orderForm", new OrderViews.OrderFormView());
+        views.put("/newOrderItem", new OrderViews.NewOrderItemView());
+        views.put("/editOrderItem", new OrderViews.EditOrderItemView());
         
         // Initialise stores
         StockServiceFactory.getInstance().getService().ensureCreated();
@@ -63,8 +83,19 @@ public class GAEObjexSampleApp extends HttpServlet {
         
         // Dispatch
         if( path.startsWith("/view/") ) {
-            req.setAttribute("state", state); // So its available at render!
-            req.getRequestDispatcher(path.substring(5)).include(req, resp);
+            View view = views.get(path.substring(5));
+            
+            Map<String, Object> model = new HashMap<String, Object>();
+            model.put("state", state);
+            String template = view.prepare(state, model);
+            
+            Iterator<String> it = model.keySet().iterator();
+            while( it.hasNext() ) {
+                String n = it.next();
+                req.setAttribute(n, model.get(n));
+            }
+            
+            req.getRequestDispatcher(template).include(req, resp);
         }
         else {
             String view = null;
@@ -221,5 +252,24 @@ public class GAEObjexSampleApp extends HttpServlet {
     public static interface Action {
 
         public String execute(HttpServletRequest request, SampleAppState state);
+    }
+    
+    /**
+     * The interface our views should implement
+     * 
+     * @author Tom Spencer
+     */
+    public static interface View {
+        
+        /**
+         * Called to prepare the view by adding to a set of
+         * objects that should be in the request and returning
+         * the actual view.
+         * 
+         * @param state The current app state
+         * @param model The map of render objects (state has already been aded)
+         * @return The name of the view to despatch to
+         */
+        public String prepare(SampleAppState state, Map<String, Object> model);
     }
 }

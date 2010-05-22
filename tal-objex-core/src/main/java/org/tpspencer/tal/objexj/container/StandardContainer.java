@@ -83,8 +83,9 @@ public class StandardContainer implements Container {
 	}
 	
 	public ObjexObj getRootObject() {
-		// TODO: For ID 1 for root, strategy must hold 1
-		return null;
+	    String rootType = strategy.getRootObjectName();
+	    return getObject(rootType + "|1");
+	    // TODO: This assumes a index based ID strategy, this may be incorrect!!
 	}
 	
 	public ObjexObj getObject(Object id) {
@@ -160,7 +161,7 @@ public class StandardContainer implements Container {
 			BeanWrapper wrapper = new BeanWrapperImpl(state);
 			if( wrapper.isReadableProperty(objectStrategy.getParentIdProp()) ) {
 				Object parentId = wrapper.getPropertyValue(objectStrategy.getParentIdProp());
-				realParentId = middleware.convertId(parentId);
+				realParentId = parentId != null ? middleware.convertId(parentId) : null;
 			}
 		}
 		

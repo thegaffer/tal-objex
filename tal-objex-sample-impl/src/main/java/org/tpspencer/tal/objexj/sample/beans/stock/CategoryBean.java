@@ -23,6 +23,7 @@ import org.tpspencer.tal.objexj.sample.beans.BaseBean;
  */
 @PersistenceCapable
 public class CategoryBean extends BaseBean implements CategoryState {
+    private final static long serialVersionUID = 1L;
 	
 	/** The name of the category */
 	private String name;

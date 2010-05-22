@@ -39,40 +39,36 @@ public final class SimpleContainerLocator implements ContainerFactory {
 		Container ret = null;
 		String type = getType(id);
 		if( type != null ) ret = factories.get(type).get(id);
-		
 		// TODO: Probably an error if no type or no container
 		
 		return ret;
 	}
 	
-	/**
-	 * Simply finds the type of the ID and attempts to
-	 * locate the {@link ContainerFactory} for that type
-	 * and use it.
-	 */
-	public EditableContainer get(String id, String transactionId) {
-		EditableContainer ret = null;
-		String type = getType(id);
-		if( type != null ) ret = factories.get(type).get(id, transactionId);
-		
-		// TODO: Probably an error if no type or no container
-		
-		return ret;
+	public EditableContainer create(String id) {
+	    EditableContainer ret = null;
+        String type = getType(id);
+        if( type != null ) ret = factories.get(type).create(id);
+        // TODO: Probably an error if no type or no container
+        
+        return ret;
 	}
 	
-	/**
-	 * Simply finds the type of the ID and attempts to
-	 * locate the {@link ContainerFactory} for that type
-	 * and use it.
-	 */
-	public EditableContainer open(String id, boolean expectExists) {
-		EditableContainer ret = null;
-		String type = getType(id);
-		if( type != null ) ret = factories.get(type).open(id, expectExists);
-		
-		// TODO: Probably an error if no type or no container
-		
-		return ret;
+	public EditableContainer open(String id) {
+	    EditableContainer ret = null;
+        String type = getType(id);
+        if( type != null ) ret = factories.get(type).open(id);
+        // TODO: Probably an error if no type or no container
+        
+        return ret;
+	}
+	
+	public EditableContainer getTransaction(String id, String transactionId) {
+	    EditableContainer ret = null;
+        String type = getType(id);
+        if( type != null ) ret = factories.get(type).getTransaction(id, transactionId);
+        // TODO: Probably an error if no type or no container
+        
+        return ret;
 	}
 	
 	/**

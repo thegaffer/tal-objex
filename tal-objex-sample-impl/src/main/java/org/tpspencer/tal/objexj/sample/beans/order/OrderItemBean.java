@@ -14,6 +14,7 @@ import org.tpspencer.tal.objexj.sample.beans.BaseBean;
  */
 @PersistenceCapable
 public class OrderItemBean extends BaseBean implements OrderItemState {
+    private final static long serialVersionUID = 1L;
 
 	/** A reference number for this */
 	private String ref;

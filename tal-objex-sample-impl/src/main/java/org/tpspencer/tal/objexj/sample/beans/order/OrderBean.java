@@ -13,6 +13,7 @@ import org.tpspencer.tal.objexj.sample.beans.BaseBean;
  */
 @PersistenceCapable
 public class OrderBean extends BaseBean implements OrderState {
+    private final static long serialVersionUID = 1L;
 	
 	/** Holds the account number for the order (effectively a ref to customer) */
 	private long account;

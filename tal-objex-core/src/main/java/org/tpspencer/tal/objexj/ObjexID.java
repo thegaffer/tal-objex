@@ -1,5 +1,7 @@
 package org.tpspencer.tal.objexj;
 
+import java.io.Serializable;
+
 /**
  * This interface represents an ID of a object inside
  * the current container. All IDs must be stringifiable
@@ -9,7 +11,7 @@ package org.tpspencer.tal.objexj;
  * 
  * @author Tom Spencer
  */
-public interface ObjexID {
+public interface ObjexID extends Serializable {
 
 	/**
 	 * @return True if the ID is a null ID

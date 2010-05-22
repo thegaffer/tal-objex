@@ -1,5 +1,8 @@
 package org.tpspencer.tal.objexj.sample.model.stock.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
@@ -58,6 +61,21 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
         return getLocalState(CategoryBean.class).getCategories();
     }
     
+    public List<Category> getCategoryList() {
+        List<Category> categories = null;
+        String[] cats = getCategories();
+        if( cats != null && cats.length > 0 ) {
+            for( int i = 0 ; i < cats.length ; i++ ) {
+                Category c = getContainer().getObject(cats[i], Category.class);
+                if( c != null ) {
+                    if( categories == null ) categories = new ArrayList<Category>();
+                    categories.add(c);
+                }
+            }
+        }
+        return categories;
+    }
+    
     public void setCategories(String[] categories) {
         checkUpdateable(true);
         getLocalState(CategoryBean.class).setCategories(categories);
@@ -65,6 +83,22 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     
     public String[] getProducts() {
         return getLocalState(CategoryBean.class).getProducts();
+    }
+    
+    public List<Product> getProductList() {
+        List<Product> products = null;
+        String[] prods = getProducts();
+        if( prods != null && prods.length > 0 ) {
+            for( int i = 0 ; i < prods.length ; i++ ) {
+                Product p = getContainer().getObject(prods[i], Product.class);
+                if( p != null ) {
+                    if( products == null ) products = new ArrayList<Product>();
+                    products.add(p);
+                }
+            }
+        }
+        
+        return products;
     }
     
     public void setProducts(String[] products) {

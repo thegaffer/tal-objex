@@ -16,10 +16,10 @@ public class ProductActions {
             String product = RequestUtil.getParameter(request, "product");
             if( product != null ) {
                 state.setCurrentProduct(product);
-                return "/html/stock/viewProduct.jsp";
+                return "/viewProduct";
             }
             else {
-                return "/html/stock/viewStock.jsp";
+                return "/viewStock";
             }
         }
     }
@@ -30,17 +30,17 @@ public class ProductActions {
             if( product != null ) state.setCurrentProduct(product);
             
             if( state.getCurrentProduct() != null ) {
-                return "/html/stock/editProduct.jsp";
+                return "/editProduct";
             }
             else {
-                return "/html/stock/viewStock.jsp";
+                return "/viewStock";
             }
         }
     }
     
     public static class NewProductAction implements GAEObjexSampleApp.Action {
         public String execute(HttpServletRequest request, GAEObjexSampleApp.SampleAppState state) {
-            return "/html/stock/newProduct.jsp";
+            return "/newProduct";
         }
     }
     
@@ -69,7 +69,7 @@ public class ProductActions {
             repository.persist();
             
             // Back to stock view
-            return "/html/stock/viewStock.jsp";
+            return "/viewStock";
         }
     }
 }

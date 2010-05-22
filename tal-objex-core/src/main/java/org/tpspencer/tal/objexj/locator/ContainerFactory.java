@@ -22,23 +22,32 @@ public interface ContainerFactory {
 	public Container get(String id);
 	
 	/**
-	 * Reopens the transaction on the specified container.
+	 * Creates a new container of this type with the
+	 * given ID. Note that the container may not exist
+	 * in the relevant data store until saved.
 	 * 
-	 * @param id The ID of the container
-	 * @param transactionId The ID of the already open transaction
-	 * @return The {@link EditableContainer}
+	 * @param id The ID for the container.
+	 * @return The open container (the root object and any defaults have been set)
 	 */
-	public EditableContainer get(String id, String transactionId);
+	public EditableContainer create(String id);
 	
 	/**
-	 * Opens a transaction on the container given by the ID.
-	 * This transaction represents a brand new isolated transaction
-	 * from any other. The container will be created if it does
-	 * not exist when completed.
+	 * Opens a container for editing.
 	 * 
-	 * @param id The ID of the container
-	 * @param expectExists Will fail if the container does not already exist
-	 * @return The {@link EditableContainer}
+	 * @param id The ID of the container to open
+	 * @return The opened container
 	 */
-	public EditableContainer open(String id, boolean expectExists);
+	public EditableContainer open(String id);
+	
+	/**
+	 * Obtains a previously opened container that has
+	 * been suspended. Note that if a creation was
+	 * previously terminated the container may not exist
+	 * in the data store, but the transaction must exist.
+	 *  
+	 * @param id The ID of the container to open
+	 * @param transactionId The existing transaction
+	 * @return The opened container
+	 */
+	public EditableContainer getTransaction(String id, String transactionId);
 }

@@ -39,10 +39,11 @@ public class TestService {
 	
 	private Mockery context = new JUnit4Mockery();
 	private ContainerFactory containerLocator;
+	private ContainerStrategy strategy;
 	
 	@Before
 	public void setup() {
-		final ContainerStrategy strategy = context.mock(ContainerStrategy.class);
+		strategy = context.mock(ContainerStrategy.class);
 		final ContainerMiddlewareFactory middlewareFactory = context.mock(ContainerMiddlewareFactory.class);
 		final TransactionMiddleware middleware = context.mock(TransactionMiddleware.class);
 		
@@ -72,9 +73,10 @@ public class TestService {
 			allowing(idCategory).isNull(); will(returnValue(false));
 			allowing(idProduct).isNull(); will(returnValue(false));
 			
-			allowing(middlewareFactory).getMiddleware((String)with(anything())); will(returnValue(middleware));
-			allowing(middlewareFactory).createTransaction((String)with(anything()), with(any(boolean.class))); will(returnValue(middleware));
-			allowing(middlewareFactory).getTransaction("Stock/1", "1"); will(returnValue(middleware));
+			allowing(middlewareFactory).getMiddleware(with(strategy), (String)with(anything())); will(returnValue(middleware));
+			allowing(middlewareFactory).createTransaction(with(strategy), (String)with(anything())); will(returnValue(middleware));
+			allowing(middlewareFactory).createTransaction(with(strategy), (String)with(anything()), with(any(ObjexObjStateBean.class))); will(returnValue(middleware));
+			allowing(middlewareFactory).getTransaction(strategy, "Stock/1", "1"); will(returnValue(middleware));
 			
 			allowing(middleware).init(with(any(Container.class)));
 			allowing(middleware).convertId(1); will(returnValue(idCategory));
@@ -85,6 +87,7 @@ public class TestService {
 			allowing(middleware).convertId(21); will(returnValue(idProduct));
 			allowing(middleware).convertId(idProduct); will(returnValue(idProduct));
 			allowing(middleware).getObjectType(idProduct); will(returnValue("Product"));
+			allowing(middleware).convertId("CategoryBean|1"); will(returnValue(idCategory));
 			
 			oneOf(middleware).createNewId(with("Category"), with(any(ObjexObjStateBean.class))); will(returnValue(idCategory));
 			
@@ -136,9 +139,15 @@ public class TestService {
 	 */
 	@Test
 	public void createDocument() {
-	    EditableContainer store = containerLocator.open("Stock/1", false);
+	    context.checking(new Expectations(){{
+	        allowing(strategy).getRootObjectName(); will(returnValue("CategoryBean"));
+	        oneOf(strategy).getObjectStrategy("CategoryBean"); will(returnValue(new SimpleObjectStrategy(CategoryBean.class)));
+	        
+	    }});
+	    
+	    EditableContainer store = containerLocator.create("Stock/1");
 		
-		ObjexObj root = store.newObject("Category", null);
+		ObjexObj root = store.getRootObject();
         root.getStateObject(CategoryBean.class).setName("Hi");
         
 		store.saveContainer();
@@ -148,8 +157,7 @@ public class TestService {
 		Container container = containerLocator.get(id);
 		Assert.assertNotNull(container);
 		Assert.assertNotNull(container.getObject(1));
-		// Not: Becuase we mock out middleware we are testing Cat1, not Hi!, really need stub
-		Assert.assertEquals("Cat1", container.getObject(1).getProperty("name"));
+		Assert.assertEquals("Hi", container.getObject(1).getProperty("name"));
 	}
 	
 	/**
@@ -158,7 +166,7 @@ public class TestService {
 	 */
 	@Test
 	public void update() {
-		EditableContainer store = containerLocator.open("Stock/1", true);
+		EditableContainer store = containerLocator.open("Stock/1");
 		
 		ObjexObj obj1 = store.getObject(20);
 		CategoryBean category = obj1.getStateObject(CategoryBean.class);
@@ -178,7 +186,7 @@ public class TestService {
 	 */
 	@Test
 	public void startLongLivedEdit() {
-		EditableContainer store = containerLocator.open("Stock/1", true);
+		EditableContainer store = containerLocator.open("Stock/1");
 		Assert.assertNotNull(store.suspend());
 		
 		// Example ends, Close is so this test is isolated
@@ -192,11 +200,11 @@ public class TestService {
 	 */
 	@Test
 	public void updateLongLivedEdit() {
-		EditableContainer store = containerLocator.open("Stock/1", true);
+		EditableContainer store = containerLocator.open("Stock/1");
 		String transId = store.suspend();
 		
 		// Example Starts
-		store = containerLocator.get("Stock/1", transId);
+		store = containerLocator.getTransaction("Stock/1", transId);
 		Assert.assertNotNull(store);
 		
 		ObjexObj obj1 = store.getObject(20);

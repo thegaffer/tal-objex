@@ -1,5 +1,7 @@
 package org.tpspencer.tal.objexj.sample.api.stock;
 
+import java.util.List;
+
 
 /**
  * This interface represents a category (of products).
@@ -25,6 +27,16 @@ public interface Category extends CategoryState {
 	public void setCategoryState(CategoryState category);
 	
 	/**
+	 * @return The categories under this one
+	 */
+	public List<Category> getCategoryList();
+	
+	/**
+	 * @return The products under this category
+	 */
+	public List<Product> getProductList();
+	
+    /**
      * Call to create a new category inside this category
      * 
      * @return The new categry

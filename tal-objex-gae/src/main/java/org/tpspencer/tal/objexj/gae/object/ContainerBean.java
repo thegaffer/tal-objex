@@ -1,5 +1,6 @@
 package org.tpspencer.tal.objexj.gae.object;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -18,7 +19,8 @@ import com.google.appengine.api.datastore.Key;
  * @author Tom Spencer
  */
 @PersistenceCapable
-public final class ContainerBean {
+public final class ContainerBean implements Serializable {
+    private final static long serialVersionUID = 1L;
 
     /** The primary key */
     @PrimaryKey

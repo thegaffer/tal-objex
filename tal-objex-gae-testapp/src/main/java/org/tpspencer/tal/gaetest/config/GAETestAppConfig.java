@@ -28,6 +28,7 @@ public class GAETestAppConfig {
 
 		// Booking container
 		SimpleContainerStrategy bookingStrategy = new SimpleContainerStrategy("Booking",
+		        "Booking",
 				new ObjectStrategy[]{
 					new SimpleObjectStrategy(BookingBean.class)
 				});

@@ -14,6 +14,11 @@ import org.tpspencer.tal.objexj.sample.api.order.Order;
  * @author Tom Spencer
  */
 public interface OrderRepository {
+    
+    /**
+     * @return The ID of the order this repository represents
+     */
+    public String getId();
 
 	/**
 	 * @return The order object

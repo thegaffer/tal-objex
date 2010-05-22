@@ -1,5 +1,7 @@
 package org.tpspencer.tal.objexj;
 
+import java.io.Serializable;
+
 /**
  * This interface is a representative interface marking
  * a class that acts as the basic persistable state bean
@@ -17,7 +19,7 @@ package org.tpspencer.tal.objexj;
  * 
  * @author Tom Spencer
  */
-public interface ObjexObjStateBean {
+public interface ObjexObjStateBean extends Serializable {
     
     /**
      * @return The ObjexObj type that this bean represents

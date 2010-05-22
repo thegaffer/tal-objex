@@ -1,13 +1,6 @@
 <%@page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" isELIgnored="false" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<%@page import="org.tpspencer.tal.objexj.sample.api.repository.StockService"%>
-<%@page import="org.tpspencer.tal.gaetest.StockServiceFactory"%>
-<%@page import="org.tpspencer.tal.objexj.sample.api.repository.StockRepository"%>
-<%@page import="org.tpspencer.tal.objexj.sample.api.stock.Category"%>
-<%@page import="org.tpspencer.tal.gaetest.GAEObjexSampleApp"%>
-<%@page import="org.tpspencer.tal.objexj.sample.api.stock.Product"%>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
@@ -16,25 +9,6 @@
 <title>Stock</title>
 </head>
 <body>
-
-<%
-StockService stockService = StockServiceFactory.getInstance().getService();
-StockRepository repository = stockService.getRepository();
-
-GAEObjexSampleApp.SampleAppState state = (GAEObjexSampleApp.SampleAppState)request.getAttribute("state");
-
-if( state == null || state.getCurrentCategory() == null ) {
-	Category[] categories = repository.getRootCategories();
-	pageContext.setAttribute("categories", categories);
-}
-else {
-    Category cat = repository.findCategory(state.getCurrentCategory());
-    pageContext.setAttribute("currentCategory", cat);
-    pageContext.setAttribute("categories", cat.getCategories());
-    // pageContext.setAttribute("categories", repository.findCategoriesByCategory(state.getCurrentCategory()));
-	pageContext.setAttribute("products", repository.findProductsByCategory(state.getCurrentCategory()));
-}
-%>
 
 <h4>Stock</h4>
 <table>
@@ -49,8 +23,7 @@ else {
 		<tr><td colspan="4">There are not categories or stock to display</td></tr>
 	</c:if>
 	
-	<c:forEach var="catId" items="${categories}">
-		<% pageContext.setAttribute("category", repository.findCategory((String)pageContext.getAttribute("catId"))); %>
+	<c:forEach var="category" items="${categories}">
 		<tr>
 			<td>Category</td>
 			<td>${category.name}</td>

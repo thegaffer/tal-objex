@@ -15,7 +15,7 @@ public class OrderActions {
     
     public static class ViewOrdersAction implements GAEObjexSampleApp.Action {
         public String execute(HttpServletRequest request, SampleAppState state) {
-            return "/html/order/orders.jsp";
+            return "/viewOrders";
         }
     }
     
@@ -25,7 +25,7 @@ public class OrderActions {
             state.setCurrentOrderTransaction(null);
             state.setCurrentOrderItem(null);
             
-            return "/html/order/order.jsp";
+            return "/viewOrder";
         }
     }
     
@@ -35,20 +35,20 @@ public class OrderActions {
             state.setCurrentOrderTransaction(null);
             request.setAttribute("newOrder", true);
             
-            return "/html/order/orderForm.jsp";
+            return "/newOrderForm";
         }
     }
     
     public static class EditOrderAction implements GAEObjexSampleApp.Action {
         public String execute(HttpServletRequest request, SampleAppState state) {
-            return "/html/order/orderForm.jsp";
+            return "/orderForm";
         }
     }
     
     public static class NewOrderItemAction implements GAEObjexSampleApp.Action {
         public String execute(HttpServletRequest request, SampleAppState state) {
             request.setAttribute("newOrderItem", true);
-            return "/html/order/orderItem.jsp";
+            return "/newOrderItem";
         }
     }
     
@@ -58,10 +58,10 @@ public class OrderActions {
             if( item != null ) state.setCurrentOrderItem(item);
             
             if( state.getCurrentOrderItem() != null ) {
-                return "/html/order/orderItem.jsp";
+                return "editOrderItem";
             }
             else {
-                return "/html/order/order.jsp";
+                return "/viewOrder";
             }
             
         }
@@ -70,11 +70,10 @@ public class OrderActions {
     public static class OpenOrderAction implements GAEObjexSampleApp.Action {
         public String execute(HttpServletRequest request, SampleAppState state) {
             OrderService service = OrderServiceFactory.getInstance().getService();
-            OrderRepository repository = service.getRepository(state.getCurrentOrder());
-            repository.open();
+            OrderRepository repository = service.getOpenRepository(state.getCurrentOrder(), null);
             state.setCurrentOrderTransaction(repository.suspend());
             
-            return "/html/order/order.jsp";
+            return "/viewOrder";
         }
     }
     
@@ -85,20 +84,14 @@ public class OrderActions {
             repository.persist();
             state.setCurrentOrderTransaction(null);
             
-            return "/html/order/order.jsp";
+            return "/viewOrder";
         }
     }
     
     public static class SubmitOrderItemAction implements GAEObjexSampleApp.Action {
         public String execute(HttpServletRequest request, SampleAppState state) {
-            OrderService service = null;
-            OrderRepository repository = null;
-            if( state.getCurrentOrderTransaction() != null ) {
-                repository = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
-            }
-            else {
-                repository = service.getRepository(state.getCurrentOrder());
-            }
+            OrderService service = OrderServiceFactory.getInstance().getService();
+            OrderRepository repository = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
             
             Order order = repository.getOrder();
             
@@ -112,39 +105,46 @@ public class OrderActions {
             item.setName(RequestUtil.getParameter(request, "name"));
             item.setDescription(RequestUtil.getParameter(request, "description"));
             item.setPrice(RequestUtil.getDoubleParameter(request, "price"));
-            // TODO: Other item parameters
+            item.setCurrency(RequestUtil.getParameter(request, "currency"));
+            item.setQuantity(RequestUtil.getDoubleParameter(request, "quantity"));
+            item.setMeasure(RequestUtil.getParameter(request, "measure"));
             
-            // Save order (unless in a transaction)
-            if( state.getCurrentOrderTransaction() == null ) repository.persist();
+            state.setCurrentOrderTransaction(repository.suspend());
             
-            return "/html/order/order.jsp";
+            return "/viewOrder";
+        }
+    }
+    
+    public static class SubmitNewOrderAction implements GAEObjexSampleApp.Action {
+        public String execute(HttpServletRequest request, SampleAppState state) {
+            OrderService service = OrderServiceFactory.getInstance().getService();
+            
+            String account = RequestUtil.getParameter(request, "account");
+            String name = RequestUtil.getParameter(request, "name");
+            String orderId = account + "/" + name;
+            
+            OrderRepository repository = service.createNewOrder(orderId);
+            repository.getOrder().setAccount(Long.parseLong(account));
+            
+            state.setCurrentOrder(repository.getId());
+            state.setCurrentOrderTransaction(repository.suspend());
+            
+            return "/viewOrder";
         }
     }
     
     public static class SubmitOrderAction implements GAEObjexSampleApp.Action {
         public String execute(HttpServletRequest request, SampleAppState state) {
             OrderService service = OrderServiceFactory.getInstance().getService();
-            
-            // Create or get order repository
-            OrderRepository repository = null;
-            if( state.getCurrentOrder() == null ) {
-                repository = service.createNewOrder();
-            }
-            else if( state.getCurrentOrderTransaction() != null ) {
-                repository = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
-            }
-            else {
-                repository = service.getRepository(state.getCurrentOrder());
-            }
+            OrderRepository repository = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
             
             // Bind
             Order order = repository.getOrder();
             order.setAccount(RequestUtil.getLongParameter(request, "account"));
             
-            // Save order (unless in a transaction)
-            if( state.getCurrentOrderTransaction() == null ) repository.persist();
+            state.setCurrentOrderTransaction(repository.suspend());
             
-            return "/html/order/order.jsp";
+            return "/viewOrder";
         }
     }
 }

@@ -33,9 +33,10 @@ public interface OrderService {
 	 * Call to create a new order. The order is not actually
 	 * saved until persisted.
 	 * 
+	 * @param id The id of the new order
 	 * @return The order
 	 */
-	public OrderRepository createNewOrder();
+	public OrderRepository createNewOrder(String id);
 	
 	/**
 	 * Call to search for all orders using a particular 

@@ -28,7 +28,7 @@ public class StockServiceImpl implements StockService {
                 new SimpleObjectStrategy("Category", CategoryImpl.class, CategoryBean.class),
                 new SimpleObjectStrategy("Product", ProductImpl.class, ProductBean.class),
         };
-        ContainerStrategy strategy = new SimpleContainerStrategy("Stock", strategies);
+        ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "Category", strategies);
         
         locator = new SimpleContainerFactory(strategy, middlewareFactory);
     }
@@ -38,17 +38,17 @@ public class StockServiceImpl implements StockService {
     }
     
     public StockRepository getOpenRepository() {
-        return new StockRepositoryImpl(locator.open("Stock/Stock", true));
+        return new StockRepositoryImpl(locator.open("Stock/Stock"));
     }
     
     public StockRepository getOpenRepository(String id) {
-        return new StockRepositoryImpl(locator.get("Stock/Stock", id));
+        return new StockRepositoryImpl(locator.getTransaction("Stock/Stock", id));
     }
 
     public void ensureCreated() {
-        EditableContainer container = locator.open("Stock/Stock", false);
+        EditableContainer container = locator.create("Stock/Stock");
         if( container.isNew() ) {
-            Category rootCat = container.newObject("Category", null).getBehaviour(Category.class);
+            Category rootCat = container.getRootObject().getBehaviour(Category.class);
             rootCat.setName("Root");
             rootCat.setDescription("The root category for all Stock");
             

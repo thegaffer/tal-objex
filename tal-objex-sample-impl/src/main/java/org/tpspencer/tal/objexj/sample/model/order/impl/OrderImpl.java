@@ -1,5 +1,8 @@
 package org.tpspencer.tal.objexj.sample.model.order.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
@@ -55,23 +58,43 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
 		getLocalState(OrderBean.class).setItems(items);
 	}
 	
+	public List<OrderItem> getItemsList() {
+        List<OrderItem> itemList = null;
+        String[] items = getItems();
+        if( items != null && items.length > 0 ) {
+            for( int i = 0 ; i < items.length ; i++ ) {
+                OrderItem item = getContainer().getObject(items[i], OrderItem.class);
+                if( item != null ) {
+                    if( itemList == null ) itemList = new ArrayList<OrderItem>();
+                    itemList.add(item);
+                }
+            }
+        }
+        return itemList;
+    }
+	
 	public OrderItem createNewItem() {
 		checkUpdateable(true);
 		
 		EditableContainer container = (EditableContainer)getContainer();
 		ObjexObj item = container.newObject("OrderItem", getId());
 		
-		// TODO: Set reference number??!
+		String ref = null;
 		
 		// Add to list of items
 		String[] items = getItems();
-		if( items == null ) items = new String[]{item.getId().toString()};
+		if( items == null || items.length == 0 ) {
+		    ref = "#1";
+		    items = new String[]{item.getId().toString()};
+		}
 		else {
-		    String[] temp = new String[items.length];
+		    ref = "#" + Integer.toString(items.length);
+		    String[] temp = new String[items.length + 1];
 		    System.arraycopy(items, 0, temp, 0, items.length);
 		    temp[items.length] = item.getId().toString();
 		}
 		
+		item.getBehaviour(OrderItem.class).setRef(ref);
 		setItems(items);
 		
 		return item.getBehaviour(OrderItem.class);

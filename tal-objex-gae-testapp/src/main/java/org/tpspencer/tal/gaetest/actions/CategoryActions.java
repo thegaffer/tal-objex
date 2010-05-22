@@ -18,7 +18,7 @@ public class CategoryActions {
                 state.setCurrentCategory(category);
             }
             
-            return "/html/stock/viewStock.jsp";
+            return "/viewStock";
         }
     }
     
@@ -28,17 +28,17 @@ public class CategoryActions {
             if( category != null ) state.setCurrentCategory(category);
             
             if( state.getCurrentCategory() != null ) {
-                return "/html/stock/editCategory.jsp";
+                return "/editCategory";
             }
             else {
-                return "/html/stock/viewStock.jsp";
+                return "/viewStock";
             }
         }
     }
     
     public static class NewCategoryAction implements GAEObjexSampleApp.Action {
         public String execute(HttpServletRequest request, GAEObjexSampleApp.SampleAppState state) {
-            return "/html/stock/newCategory.jsp";
+            return "/newCategory";
         }
     }
     
@@ -66,7 +66,7 @@ public class CategoryActions {
             if( c.getParentId() != null ) state.setCurrentCategory(c.getParentId().toString());
             
             // Back to stock view
-            return "/html/stock/viewStock.jsp";
+            return "/viewStock";
         }
     }
 }

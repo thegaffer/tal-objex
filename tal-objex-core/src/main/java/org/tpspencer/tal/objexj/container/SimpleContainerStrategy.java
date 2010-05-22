@@ -8,10 +8,12 @@ import org.tpspencer.tal.objexj.object.ObjectStrategy;
 public class SimpleContainerStrategy implements ContainerStrategy {
 	
 	private final String name;
+	private final String rootObject;
 	private final Map<String, ObjectStrategy> objectStrategies;
 	
-	public SimpleContainerStrategy(String name, ObjectStrategy[] strategies) {
+	public SimpleContainerStrategy(String name, String rootObject, ObjectStrategy[] strategies) {
 		this.name = name;
+		this.rootObject = rootObject;
 		this.objectStrategies = new HashMap<String, ObjectStrategy>();
 		
 		for( int i = 0 ; i < strategies.length ; i++ ) {
@@ -21,6 +23,14 @@ public class SimpleContainerStrategy implements ContainerStrategy {
 
 	public String getContainerName() {
 		return name;
+	}
+	
+	public String getRootObjectName() {
+	    return rootObject;
+	}
+	
+	public ObjectStrategy getObjectStrategy(String name) {
+	    return objectStrategies != null ? objectStrategies.get(name) : null;
 	}
 	
 	public Map<String, ObjectStrategy> getObjectStrategies() {

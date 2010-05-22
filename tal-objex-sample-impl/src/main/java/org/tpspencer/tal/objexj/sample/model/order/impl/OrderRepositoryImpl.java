@@ -19,6 +19,10 @@ public class OrderRepositoryImpl implements OrderRepository {
 		this.container = container;
 		this.editableContainer = container;
 	}
+	
+	public String getId() {
+	    return editableContainer != null ? editableContainer.getId() : container.getId();
+	}
 
 	public Order getOrder() {
 		Container c = editableContainer != null ? editableContainer : container;

@@ -1,12 +1,6 @@
 <%@page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" isELIgnored="false" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<%@page import="org.tpspencer.tal.objexj.sample.api.stock.Category"%>
-<%@page import="org.tpspencer.tal.gaetest.GAEObjexSampleApp"%>
-<%@page import="org.tpspencer.tal.objexj.sample.api.repository.StockRepository"%>
-<%@page import="org.tpspencer.tal.objexj.sample.api.repository.StockService"%>
-<%@page import="org.tpspencer.tal.gaetest.StockServiceFactory"%>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
@@ -15,20 +9,6 @@
 <title>Category</title>
 </head>
 <body>
-
-<%
-StockService stockService = StockServiceFactory.getInstance().getService();
-StockRepository repository = stockService.getRepository();
-
-GAEObjexSampleApp.SampleAppState state = (GAEObjexSampleApp.SampleAppState)request.getAttribute("state");
-
-if( state == null || state.getCurrentCategory() == null ) {
-    // TODO: Get the root category!!
-}
-else {
-    pageContext.setAttribute("category", repository.findCategory(state.getCurrentCategory()));
-}
-%>
 
 <h3>Edit Category</h3>
 <form action="/sampleApp/submitCategory">
