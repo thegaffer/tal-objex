@@ -6,11 +6,19 @@ public class StockBean implements ObjexObjStateBean {
 	private String id = null;
 	
 	private String[] categories = null;
+	
+	public StockBean() {
+	    
+	}
+	
+	public StockBean(Object id, Object parentId) {
+        this.id = id != null ? id.toString() : null;
+    }
 
 	/**
      * Hard-coded type
      */
-    public String getType() {
+    public String getObjexObjType() {
         return "Stock";
     }
     

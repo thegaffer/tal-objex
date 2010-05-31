@@ -10,8 +10,8 @@ import java.util.Map;
  * @author Tom Spencer
  */
 public interface ObjexObj {
-
-	/**
+    
+    /**
 	 * @return The ID of this object
 	 */
 	public ObjexID getId();

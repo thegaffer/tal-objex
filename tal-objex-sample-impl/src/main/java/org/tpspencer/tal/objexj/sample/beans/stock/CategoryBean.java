@@ -34,11 +34,18 @@ public class CategoryBean extends BaseBean implements CategoryState {
 	/** The sub-cateogories */
 	private String[] categories;
 	
+	public CategoryBean() {
+    }
+    
+    public CategoryBean(Object id, Object parentId) {
+        super(id, parentId);
+    }
+	
 	/*
      * (non-Javadoc)
-     * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getType()
+     * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getObjexObjType()
      */
-    public String getType() {
+    public String getObjexObjType() {
         return "Category";
     }
     

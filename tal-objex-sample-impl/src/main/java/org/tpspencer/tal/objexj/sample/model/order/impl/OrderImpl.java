@@ -3,11 +3,11 @@ package org.tpspencer.tal.objexj.sample.model.order.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
-import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
+import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.order.Order;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItem;
@@ -15,9 +15,11 @@ import org.tpspencer.tal.objexj.sample.api.order.OrderState;
 import org.tpspencer.tal.objexj.sample.beans.order.OrderBean;
 
 public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
+    
+    public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Order", OrderImpl.class, OrderBean.class);
 
-	public OrderImpl(ObjectStrategy strategy, Container container, ObjexID id, ObjexID parent, Object state) {
-		super(strategy, container, id, parent, state);
+	public OrderImpl(ObjexObjStateBean state) {
+		super(STRATEGY, state);
 	}
 	
 	public OrderState getOrderState() {
@@ -25,7 +27,7 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
 	}
 	
 	public void setOrderState(OrderState state) {
-		checkUpdateable(true);
+		checkUpdateable();
 		// TODO: obj.setStateObject(state);
 		EditableContainer container = (EditableContainer)getContainer();
 		container.updateObject(super.getId(), this);
@@ -36,7 +38,7 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
 	}
 	
 	public void setParentId(Object id) {
-		checkUpdateable(true);
+		checkUpdateable();
 		// TODO: Not sure here!?!
 	}
 	
@@ -45,7 +47,7 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
 	}
 	
 	public void setAccount(long account) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderBean.class).setAccount(account);
 	}
 	
@@ -54,7 +56,7 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
 	}
 	
 	public void setItems(String[] items) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderBean.class).setItems(items);
 	}
 	
@@ -74,7 +76,7 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
     }
 	
 	public OrderItem createNewItem() {
-		checkUpdateable(true);
+		checkUpdateable();
 		
 		EditableContainer container = (EditableContainer)getContainer();
 		ObjexObj item = container.newObject("OrderItem", getId());
@@ -109,6 +111,6 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
 	}
 	
 	public void removeItem(Object id) {
-	    checkUpdateable(true);
+	    checkUpdateable();
 	}
 }

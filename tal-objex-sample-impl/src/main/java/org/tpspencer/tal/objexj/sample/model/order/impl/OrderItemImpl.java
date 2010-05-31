@@ -1,18 +1,21 @@
 package org.tpspencer.tal.objexj.sample.model.order.impl;
 
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
+import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItem;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItemState;
+import org.tpspencer.tal.objexj.sample.beans.order.OrderItemBean;
 
 public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderItemState {
+    
+    public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class);
 
-	public OrderItemImpl(ObjectStrategy strategy, Container container, ObjexID id, ObjexID parent, Object state) {
-		super(strategy, container, id, parent, state);
-	}
-	
+    public OrderItemImpl(ObjexObjStateBean state) {
+        super(STRATEGY, state);
+    }
+
 	public OrderItemState getOrderItemState() {
 		return getStateObject(OrderItemState.class);
 	}
@@ -26,7 +29,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setParentId(Object id) {
-		checkUpdateable(true);
+		checkUpdateable();
 		// TODO: Not sure here!?!
 	}
 	
@@ -35,7 +38,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setName(String name) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderItemState.class).setName(name);
 	}
 	
@@ -44,7 +47,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setDescription(String description) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderItemState.class).setDescription(description);
 	}
 	
@@ -53,7 +56,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setStockItem(String item) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderItemState.class).setStockItem(item);
 	}
 	
@@ -62,7 +65,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setRef(String ref) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderItemState.class).setRef(ref);
 	}
 	
@@ -71,7 +74,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setQuantity(double quantity) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderItemState.class).setQuantity(quantity);
 	}
 	
@@ -80,7 +83,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setMeasure(String measure) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderItemState.class).setMeasure(measure);
 	}
 	
@@ -89,7 +92,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setPrice(double price) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderItemState.class).setPrice(price);
 	}
 	
@@ -98,7 +101,7 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
 	}
 	
 	public void setCurrency(String currency) {
-		checkUpdateable(true);
+		checkUpdateable();
 		getLocalState(OrderItemState.class).setCurrency(currency);
 	}
 }

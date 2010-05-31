@@ -19,6 +19,7 @@ import org.tpspencer.tal.objexj.ObjexObjStateBean;
 @PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE) 
 public abstract class BaseBean implements ObjexObjStateBean {
+    private final static long serialVersionUID = 1L;
 	
 	/** Holds the Id of this object */
 	@PrimaryKey
@@ -28,6 +29,14 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	
 	/** Holds the parent objects' id (if any) */
 	private String parentId;
+	
+	public BaseBean() {
+	}
+	
+	public BaseBean(Object id, Object parentId) {
+	    this.id = id != null ? id.toString() : null;
+	    this.parentId = parentId != null ? parentId.toString() : null;
+	}
 	
 	/**
 	 * @return the id

@@ -1,6 +1,5 @@
 package org.tpspencer.tal.objexj.gae;
 
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerMiddleware;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
@@ -21,8 +20,8 @@ public class GAEMiddlewareFactory implements ContainerMiddlewareFactory {
 	    return new GAEMiddleware(strategy, id, (String)null);
 	}
 	
-	public TransactionMiddleware createTransaction(ContainerStrategy strategy, String id, ObjexObjStateBean rootBean) {
-	    return new GAEMiddleware(strategy, id, rootBean);
+	public TransactionMiddleware createContainer(ContainerStrategy strategy, String id) {
+	    return new GAEMiddleware(strategy, id, true);
 	}
 	
 	public TransactionMiddleware getTransaction(ContainerStrategy strategy, String id, String transactionId) {

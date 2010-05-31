@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.sample.model.stock;
+package org.tpspencer.tal.objexj.sample.model.stock.impl;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;

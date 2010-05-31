@@ -24,7 +24,7 @@ public interface ObjexObjStateBean extends Serializable {
     /**
      * @return The ObjexObj type that this bean represents
      */
-    public String getType();
+    public String getObjexObjType();
 
 	/**
 	 * @return The ID of the object this is the state bean for
@@ -41,7 +41,7 @@ public interface ObjexObjStateBean extends Serializable {
 	 * 
 	 * @param id The id of the parent object
 	 */
-	public void setId(Object id);
+	//public void setId(Object id);
 	
 	/**
 	 * @return The ID of the parent object to this one (if any) 
@@ -53,5 +53,5 @@ public interface ObjexObjStateBean extends Serializable {
 	 * 
 	 * @param parentId The ID of the parent object
 	 */
-	public void setParentId(Object parentId);
+	//public void setParentId(Object parentId);
 }

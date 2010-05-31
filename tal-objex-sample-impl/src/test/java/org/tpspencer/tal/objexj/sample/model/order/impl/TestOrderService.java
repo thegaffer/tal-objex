@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.sample.model.order;
+package org.tpspencer.tal.objexj.sample.model.order.impl;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -65,10 +65,12 @@ public class TestOrderService {
         final ObjexID id = context.mock(ObjexID.class);
             
         context.checking(new Expectations() {{
-            oneOf(middlewareFactory).createTransaction(with(any(ContainerStrategy.class)), with(any(String.class)), with(any(OrderBean.class))); 
+            oneOf(middlewareFactory).createContainer(with(any(ContainerStrategy.class)), with(any(String.class))); 
               will(returnValue(middleware));
+            oneOf(middleware).createNewId("Order"); will(returnValue(id));
+            oneOf(middleware).getRawId(id); will(returnValue("o1"));
             oneOf(middleware).init(with(any(Container.class)));
-            oneOf(middleware).getCache(); will(returnValue(cache));
+            allowing(middleware).getCache(); will(returnValue(cache));
             // allowing(id).isNull(); will(returnValue(false));
             allowing(middleware).convertId("Order|1"); will(returnValue(id));
             //oneOf(middleware).getObjectType(id); will(returnValue("Order"));

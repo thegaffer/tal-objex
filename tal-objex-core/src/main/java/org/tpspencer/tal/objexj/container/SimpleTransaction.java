@@ -68,21 +68,35 @@ public class SimpleTransaction extends StandardContainer implements EditableCont
 	    if( cache.isDeleted(objexId) ) return null;
 	    
 	    Object obj = cache.findObject(objexId);
-	    if( obj != null ) return createObjexObj(objexId, obj);
+	    if( obj == null ) {
+    	    String type = middleware.getObjectType(objexId);
+    	    ObjectStrategy objectStrategy = getContainerStrategy().getObjectStrategy(type);
+    	    // TODO: Error!
+    	    obj = middleware.loadObject(objectStrategy.getStateClass(), objexId);
+    	    
+    	    if( obj != null ) {
+    	        cache.addUpdatedObject(objexId, obj);
+    	    }
+	    }
 	    
-	    return super.getObject(id);
+	    if( obj != null ) {
+	        if( obj instanceof ObjexObjStateBean ) return createObjexObj(objexId, (ObjexObjStateBean)obj);
+	        else throw new IllegalArgumentException("The simple transaction only supports ObjexObjStateBean instances: " + obj);
+	    }
+	    else return null;
 	}
 	
 	public ObjexObj newObject(String type, Object parent) {
 		if( !open ) throw new IllegalArgumentException("Cannot amend closed transaction");
 		
 		ObjectStrategy strategy = getContainerStrategy().getObjectStrategies().get(type);
-		ObjexObjStateBean state = strategy.getNewStateInstance();
 		
 		// a. Create new ID and add it to state object
-		ObjexID newId = middleware.createNewId(type, state);
+		ObjexID newId = middleware.createNewId(type);
 		ObjexID parentId = parent != null ? middleware.convertId(parent) : null;
-		state.setParentId(parentId);
+		
+		Object rawId = middleware.getRawId(newId);
+		ObjexObjStateBean state = strategy.getNewStateInstance(rawId, parentId);
 		
 		// b. Add to cache
 		cache.addNewObject(newId, state);

@@ -8,12 +8,9 @@ import org.tpspencer.tal.objexj.container.SimpleContainerStrategy;
 import org.tpspencer.tal.objexj.locator.ContainerFactory;
 import org.tpspencer.tal.objexj.locator.SimpleContainerFactory;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
-import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.sample.api.order.OrderSummary;
 import org.tpspencer.tal.objexj.sample.api.repository.OrderRepository;
 import org.tpspencer.tal.objexj.sample.api.repository.OrderService;
-import org.tpspencer.tal.objexj.sample.beans.order.OrderBean;
-import org.tpspencer.tal.objexj.sample.beans.order.OrderItemBean;
 
 /**
  * This class implements the order service
@@ -30,10 +27,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     public OrderServiceImpl(ContainerMiddlewareFactory middlewareFactory) {
-        ObjectStrategy[] strategies = new ObjectStrategy[]{
-                new SimpleObjectStrategy("Order", OrderImpl.class, OrderBean.class),
-                new SimpleObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class),
-        };
+        ObjectStrategy[] strategies = new ObjectStrategy[]{OrderImpl.STRATEGY, OrderItemImpl.STRATEGY};
         ContainerStrategy strategy = new SimpleContainerStrategy("Order", "Order", strategies);
         
         locator = new SimpleContainerFactory(strategy, middlewareFactory);

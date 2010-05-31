@@ -36,10 +36,19 @@ public class CategoryBean implements ObjexObjStateBean {
 	/** References to the products of this category */
 	private String[] products;
 	
+	public CategoryBean() {
+	    
+	}
+	
+	public CategoryBean(Object id, Object parentId) {
+	    this.id = id != null ? id.toString() : null;
+	    this.parentId = parentId != null ? parentId.toString() : null;
+	}
+	
 	/**
 	 * Hard-coded type
 	 */
-	public String getType() {
+	public String getObjexObjType() {
 	    return "Category";
 	}
 	

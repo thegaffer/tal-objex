@@ -12,23 +12,21 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.lifecycle.ScopeDevelopment;
 import org.springframework.roo.support.util.Assert;
-import org.tpspencer.tal.objexj.annotations.ObjexStateBean;
+import org.tpspencer.tal.objexj.annotations.ObjexObj;
 
 /**
- * This class links the Spring Roo framework to the 
- * {@link ObjexStateBeanMetadata} item, an instance of which
- * is added to each and every class holding the 
- * {@link ObjexStateBean} annotation.
+ * This class links an class with the {@link ObjexObj} annotation
+ * to a {@link ObjexObjMetadata} instance. 
  * 
  * @author Tom Spencer
  */
 @ScopeDevelopment
-public class ObjexStateBeanMetadataProvider extends AbstractItdMetadataProvider {
+public class ObjexObjMetadataProvider extends AbstractItdMetadataProvider {
     
-    public ObjexStateBeanMetadataProvider(MetadataService metadataService, MetadataDependencyRegistry metadataDependencyRegistry, FileManager fileManager, ToStringMetadataProvider toStringProvider) {
+    public ObjexObjMetadataProvider(MetadataService metadataService, MetadataDependencyRegistry metadataDependencyRegistry, FileManager fileManager, ToStringMetadataProvider toStringProvider) {
         super(metadataService, metadataDependencyRegistry, fileManager);
-        addMetadataTrigger(new JavaType(ObjexStateBean.class.getName()));
-        toStringProvider.addMetadataTrigger(new JavaType(ObjexStateBean.class.getName()));
+        addMetadataTrigger(new JavaType(ObjexObj.class.getName()));
+        toStringProvider.addMetadataTrigger(new JavaType(ObjexObj.class.getName()));
     }
 
     @Override
@@ -37,31 +35,34 @@ public class ObjexStateBeanMetadataProvider extends AbstractItdMetadataProvider 
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
         
-        // Get main annotation
-        ObjexObjStateBeanAnnotationValues values = new ObjexObjStateBeanAnnotationValues(governorPhysicalTypeMetadata);
-        Assert.notNull(values.getName(), "Error, type does not appear to have an ObjexStateBean annotation or a ObjexObj name value: " + governorPhysicalTypeMetadata);
+        ObjexObjAnnotationValues values = new ObjexObjAnnotationValues(governorPhysicalTypeMetadata);
+        Assert.notNull(values.getValue(), "Error, type does not appear to have ObjexObj annotation or a ObjexObj StateBean value: " + governorPhysicalTypeMetadata);
         
-        return new ObjexStateBeanMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, values);
+        String stateMetadataKey = ObjexStateBeanMetadata.createIdentifier(values.getValue(), Path.SRC_MAIN_JAVA);
+        ObjexStateBeanMetadata stateMetadata = (ObjexStateBeanMetadata)metadataService.get(stateMetadataKey);
+        Assert.notNull(stateMetadata, "Error, cannot find the state bean metadata for the ObjexObj state bean class: " + values.getValue());
+        
+        return new ObjexObjMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, values, stateMetadata.getProperties());
     }
     
     public String getItdUniquenessFilenameSuffix() {
-        return "ObjexStateBean";
+        return "ObjexObj";
     }
     
     public String getProvidesType() {
-        return ObjexStateBeanMetadata.getMetadataIdentiferType();
+        return ObjexObjMetadata.getMetadataIdentiferType();
     }
     
     @Override
     protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
-        JavaType javaType = ObjexStateBeanMetadata.getJavaType(metadataIdentificationString);
-        Path path = ObjexStateBeanMetadata.getPath(metadataIdentificationString);
+        JavaType javaType = ObjexObjMetadata.getJavaType(metadataIdentificationString);
+        Path path = ObjexObjMetadata.getPath(metadataIdentificationString);
         String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(javaType, path);
         return physicalTypeIdentifier;
     }
     
     @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
-        return ObjexStateBeanMetadata.createIdentifier(javaType, path);
+        return ObjexObjMetadata.createIdentifier(javaType, path);
     }
 }

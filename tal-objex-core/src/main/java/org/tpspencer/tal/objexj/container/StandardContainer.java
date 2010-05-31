@@ -12,6 +12,7 @@ import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
 /**
@@ -101,7 +102,12 @@ public class StandardContainer implements Container {
 		if( objectStrategy == null ) throw new IllegalArgumentException("ID passed in does not appear to match a strategy: " + id);
 		
 		Object state = middleware.loadObject(objectStrategy.getStateClass(), realId);
-		return state != null ? createObjexObj(realId, state) : null;
+		if( state instanceof ObjexObjStateBean ) {
+		    return state != null ? createObjexObj(realId, (ObjexObjStateBean)state) : null;
+		}
+		else {
+		    throw new IllegalArgumentException("The simple container only supports ObjexObjStateBean instances: " + state);
+		}
 	}
 	
 	public <T> T getObject(Object id, Class<T> expected) {
@@ -148,7 +154,7 @@ public class StandardContainer implements Container {
 	 * @param state The state object
 	 * @return The ObjexObj instance
 	 */
-	protected ObjexObj createObjexObj(ObjexID id, Object state) {
+	protected ObjexObj createObjexObj(ObjexID id, ObjexObjStateBean state) {
 		if( state == null ) return null;
 		
 		ContainerStrategy strategy = getContainerStrategy();

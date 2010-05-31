@@ -3,11 +3,11 @@ package org.tpspencer.tal.objexj.sample.model.stock.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
-import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
+import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
 import org.tpspencer.tal.objexj.sample.api.stock.CategoryState;
@@ -15,17 +15,19 @@ import org.tpspencer.tal.objexj.sample.api.stock.Product;
 import org.tpspencer.tal.objexj.sample.beans.stock.CategoryBean;
 
 public class CategoryImpl extends SimpleObjexObj implements Category {
-
-    public CategoryImpl(ObjectStrategy strategy, Container container, ObjexID id, ObjexID parent, Object state) {
-        super(strategy, container, id, parent, state);
-    }
     
+    public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Category", CategoryImpl.class, CategoryBean.class);
+
+    public CategoryImpl(ObjexObjStateBean state) {
+        super(STRATEGY, state);
+    }
+
     public CategoryState getCategoryState() {
         return this;
     }
     
     public void setCategoryState(CategoryState category) {
-        checkUpdateable(true);
+        checkUpdateable();
         
         // TODO: Update the fields that have changed!?!
     }
@@ -35,7 +37,7 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     }
     
     public void setParentId(Object id) {
-        checkUpdateable(true);
+        checkUpdateable();
         // TODO: Not sure here!?!
     }
     
@@ -44,7 +46,7 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     }
     
     public void setName(String name) {
-        checkUpdateable(true);
+        checkUpdateable();
         getLocalState(CategoryBean.class).setName(name);
     }
     
@@ -53,7 +55,7 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     }
     
     public void setDescription(String description) {
-        checkUpdateable(true);
+        checkUpdateable();
         getLocalState(CategoryBean.class).setDescription(description);
     }
     
@@ -77,7 +79,7 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     }
     
     public void setCategories(String[] categories) {
-        checkUpdateable(true);
+        checkUpdateable();
         getLocalState(CategoryBean.class).setCategories(categories);
     }
     
@@ -102,12 +104,12 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     }
     
     public void setProducts(String[] products) {
-        checkUpdateable(true);
+        checkUpdateable();
         getLocalState(CategoryBean.class).setProducts(products);
     }
     
     public Category createNewCategory() {
-        checkUpdateable(true);
+        checkUpdateable();
         
         ObjexObj newCat = ((EditableContainer)getContainer()).newObject("Category", getId());
         String[] categories = getCategories();
@@ -125,7 +127,7 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     }
     
     public Product createNewProduct() {
-        checkUpdateable(true);
+        checkUpdateable();
         
         ObjexObj newProduct = ((EditableContainer)getContainer()).newObject("Product", getId());
         String[] products = getProducts();

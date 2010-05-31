@@ -31,10 +31,19 @@ public class ProductBean implements ObjexObjStateBean {
 	private int stockLevel;
 	private double price;
 	
+	public ProductBean() {
+        // TODO Auto-generated constructor stub
+    }
+	
+	public ProductBean(Object id, Object parentId) {
+        this.id = id != null ? id.toString() : null;
+        this.parentId = parentId != null ? parentId.toString() : null;
+    }
+	
 	/**
      * Hard-coded type
      */
-    public String getType() {
+    public String getObjexObjType() {
         return "Product";
     }
     

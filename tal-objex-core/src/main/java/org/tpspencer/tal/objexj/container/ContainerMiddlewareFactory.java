@@ -1,6 +1,5 @@
 package org.tpspencer.tal.objexj.container;
 
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
 
 
@@ -39,10 +38,9 @@ public interface ContainerMiddlewareFactory {
 	 * 
 	 * @param strategy The strategy for the container
      * @param id The ID of the container in question
-	 * @param rootBean The root object for the container
 	 * @return A new transaction middleware for the editable container to use
 	 */
-	public TransactionMiddleware createTransaction(ContainerStrategy strategy, String id, ObjexObjStateBean rootBean);
+	public TransactionMiddleware createContainer(ContainerStrategy strategy, String id);
 	
 	/**
 	 * Called to get an existing transaction middleware.

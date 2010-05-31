@@ -3,6 +3,7 @@ package org.tpspencer.tal.objexj.locator;
 import org.springframework.util.Assert;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerMiddleware;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
@@ -46,10 +47,15 @@ public final class SimpleContainerFactory implements ContainerFactory {
 	}
 	
 	public EditableContainer create(String id) {
-	    ObjectStrategy rootStrategy = strategy.getObjectStrategy(strategy.getRootObjectName());
-	    ObjexObjStateBean bean = rootStrategy.getNewStateInstance();
+	    TransactionMiddleware middleware = middlewareFactory.createContainer(strategy, id);
 	    
-	    TransactionMiddleware middleware = middlewareFactory.createTransaction(strategy, id, bean);
+	    // Add in the root object
+	    ObjectStrategy rootStrategy = strategy.getObjectStrategy(strategy.getRootObjectName());
+        ObjexID rootId = middleware.createNewId(rootStrategy.getTypeName());
+	    Object rawId = middleware.getRawId(rootId);
+	    ObjexObjStateBean rootBean = rootStrategy.getNewStateInstance(rawId, null);
+	    middleware.getCache().addNewObject(rootId, rootBean);
+	    
 	    return new SimpleTransaction(strategy, middleware, id, null);
 	}
 	

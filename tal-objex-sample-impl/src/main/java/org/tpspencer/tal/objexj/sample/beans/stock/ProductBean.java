@@ -29,11 +29,18 @@ public class ProductBean extends BaseBean implements ProductState {
 	/** The products price currency */
 	private String currency;
 	
+	public ProductBean() {
+    }
+    
+    public ProductBean(Object id, Object parentId) {
+        super(id, parentId);
+    }
+	
 	/*
      * (non-Javadoc)
-     * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getType()
+     * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getObjexObjType()
      */
-    public String getType() {
+    public String getObjexObjType() {
         return "Product";
     }
     

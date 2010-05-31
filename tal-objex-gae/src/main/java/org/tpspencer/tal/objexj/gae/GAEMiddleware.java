@@ -9,7 +9,6 @@ import javax.jdo.Transaction;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.container.SimpleTransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionCache;
@@ -103,7 +102,7 @@ public class GAEMiddleware implements TransactionMiddleware {
      * @param id The ID of the new container
      * @param root The root object to add to transaction
      */
-    public GAEMiddleware(ContainerStrategy strategy, String id, ObjexObjStateBean root) {
+    public GAEMiddleware(ContainerStrategy strategy, String id, boolean bCreate) {
         this.id = id;
         this.transactionId = null;
         this.rootKey = KeyFactory.createKey(ContainerBean.class.getSimpleName(), id);
@@ -116,12 +115,6 @@ public class GAEMiddleware implements TransactionMiddleware {
         // Create new root
         this.root = createNewRoot(strategy.getContainerName(), id);
         this.cache = new SimpleTransactionCache();
-        
-        // Prepare root
-        String rootType = strategy.getRootObjectName();
-        String rootKey = KeyFactory.createKeyString(this.rootKey, root.getClass().getSimpleName(), 1);
-        root.setId(rootKey);
-        this.cache.addNewObject(new GAEObjexID(rootType, 1), root);
     }
     
     private ContainerBean findExistingRoot(String id, boolean expectExists) {
@@ -155,7 +148,7 @@ public class GAEMiddleware implements TransactionMiddleware {
         ret.setCreated(new Date());
         UserService userService = UserServiceFactory.getUserService();
         if( userService.isUserLoggedIn() ) ret.setCreator(userService.getCurrentUser().getEmail());
-        ret.setLastId(1);
+        ret.setLastId(0); // So root obj is 1!
         
         return ret;
     }
@@ -219,7 +212,7 @@ public class GAEMiddleware implements TransactionMiddleware {
         return ret;
     }
     
-    public ObjexID createNewId(String type, ObjexObjStateBean bean) {
+    public ObjexID createNewId(String type) {
         long newId = this.root.getLastId();
         
         // Get block of id's if required
@@ -248,10 +241,17 @@ public class GAEMiddleware implements TransactionMiddleware {
         newId++;
         if( this.root.getId() == null ) this.root.setLastId(newId); // Otherwise the block id is fine!
         
-        // Set real key on the object
-        String k = KeyFactory.createKeyString(rootKey, bean.getClass().getSimpleName(), newId);
-        bean.setId(k);
+        // Return new ObjexID
         return new GAEObjexID(type, newId);
+    }
+    
+    /**
+     * Simply converts the ID to a GAEObjexID and forms a key based
+     * on the root, the type and the id.
+     */
+    public Object getRawId(ObjexID id) {
+        GAEObjexID realId = GAEObjexID.getId(id);
+        return KeyFactory.createKeyString(rootKey, realId.getType(), realId.getId());
     }
     
     /**

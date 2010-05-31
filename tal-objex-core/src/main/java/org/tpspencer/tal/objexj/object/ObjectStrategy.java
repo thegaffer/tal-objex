@@ -32,7 +32,7 @@ public interface ObjectStrategy {
 	 * @param state The state of the object
 	 * @return The objex obj instance
 	 */
-	public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, Object state);
+	public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, ObjexObjStateBean state);
 	
 	/**
 	 * Call to get the class that represents the objects
@@ -52,7 +52,15 @@ public interface ObjectStrategy {
 	 * 
 	 * @return A new instance of the state class
 	 */
-	public ObjexObjStateBean getNewStateInstance();
+	public ObjexObjStateBean getNewStateInstance(Object id, Object parentId);
+	
+	/**
+	 * Call to get a cloned instance of the state bean.
+	 * 
+	 * @param source The source instance
+	 * @return The copied instance
+	 */
+	public ObjexObjStateBean getClonedStateInstance(ObjexObjStateBean source);
 	
 	/**
 	 * @return The name of the property on state object holding the ID

@@ -13,7 +13,6 @@ import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.container.SimpleTransactionCache;
@@ -61,8 +60,8 @@ public class TestService {
 		final ProductBean product = new ProductBean();
 		product.setName("Product1");
 		
-		final ObjectStrategy categoryStrategy = new SimpleObjectStrategy(CategoryBean.class);
-		final ObjectStrategy productStrategy = new SimpleObjectStrategy(ProductBean.class);
+		final ObjectStrategy categoryStrategy = new SimpleObjectStrategy("Category", null, CategoryBean.class);
+		final ObjectStrategy productStrategy = new SimpleObjectStrategy("Product", null, ProductBean.class);
 		final Map<String, ObjectStrategy> objectStrategies = new HashMap<String, ObjectStrategy>();
 		objectStrategies.put("Category", categoryStrategy);
 		objectStrategies.put("Product", productStrategy);
@@ -75,21 +74,23 @@ public class TestService {
 			
 			allowing(middlewareFactory).getMiddleware(with(strategy), (String)with(anything())); will(returnValue(middleware));
 			allowing(middlewareFactory).createTransaction(with(strategy), (String)with(anything())); will(returnValue(middleware));
-			allowing(middlewareFactory).createTransaction(with(strategy), (String)with(anything()), with(any(ObjexObjStateBean.class))); will(returnValue(middleware));
+			allowing(middlewareFactory).createContainer(with(strategy), (String)with(anything())); will(returnValue(middleware));
 			allowing(middlewareFactory).getTransaction(strategy, "Stock/1", "1"); will(returnValue(middleware));
 			
 			allowing(middleware).init(with(any(Container.class)));
 			allowing(middleware).convertId(1); will(returnValue(idCategory));
 			allowing(middleware).convertId(null); will(returnValue(null));
 			allowing(middleware).convertId(20); will(returnValue(idCategory));
+			allowing(middleware).getRawId(idCategory); will(returnValue("c1"));
 			allowing(middleware).convertId(idCategory); will(returnValue(idCategory));
 			allowing(middleware).getObjectType(idCategory); will(returnValue("Category"));
 			allowing(middleware).convertId(21); will(returnValue(idProduct));
+			allowing(middleware).getRawId(idProduct); will(returnValue("p2"));
 			allowing(middleware).convertId(idProduct); will(returnValue(idProduct));
 			allowing(middleware).getObjectType(idProduct); will(returnValue("Product"));
-			allowing(middleware).convertId("CategoryBean|1"); will(returnValue(idCategory));
+			allowing(middleware).convertId("Category|1"); will(returnValue(idCategory));
 			
-			oneOf(middleware).createNewId(with("Category"), with(any(ObjexObjStateBean.class))); will(returnValue(idCategory));
+			oneOf(middleware).createNewId(with("Category")); will(returnValue(idCategory));
 			
 			allowing(middleware).init(with(any(Container.class)));
 			// allowing(transaction).init(with(any(Container.class)));
@@ -103,7 +104,10 @@ public class TestService {
 			atMost(1).of(middleware).clear(with(any(TransactionCache.class)));
 			allowing(middleware).getCache(); will(returnValue(cache));
 			
+			allowing(strategy).getRootObjectName(); will(returnValue("Category"));
 			allowing(strategy).getObjectStrategies(); will(returnValue(objectStrategies));
+			allowing(strategy).getObjectStrategy("Category"); will(returnValue(categoryStrategy));
+			allowing(strategy).getObjectStrategy("Product"); will(returnValue(productStrategy));
 			
 			allowing(middleware).save(with(any(TransactionCache.class)));
 		}});
@@ -139,12 +143,6 @@ public class TestService {
 	 */
 	@Test
 	public void createDocument() {
-	    context.checking(new Expectations(){{
-	        allowing(strategy).getRootObjectName(); will(returnValue("CategoryBean"));
-	        oneOf(strategy).getObjectStrategy("CategoryBean"); will(returnValue(new SimpleObjectStrategy(CategoryBean.class)));
-	        
-	    }});
-	    
 	    EditableContainer store = containerLocator.create("Stock/1");
 		
 		ObjexObj root = store.getRootObject();
@@ -157,7 +155,8 @@ public class TestService {
 		Container container = containerLocator.get(id);
 		Assert.assertNotNull(container);
 		Assert.assertNotNull(container.getObject(1));
-		Assert.assertEquals("Hi", container.getObject(1).getProperty("name"));
+		// Note: Because new root object is created, this is lost by mocked middleware
+		Assert.assertEquals("Cat1", container.getObject(1).getProperty("name"));
 	}
 	
 	/**

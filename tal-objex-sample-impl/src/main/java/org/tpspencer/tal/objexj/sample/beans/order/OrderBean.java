@@ -20,11 +20,18 @@ public class OrderBean extends BaseBean implements OrderState {
 	/** Holds the items in the order */
 	private String[] items;
 	
+	public OrderBean() {
+	}
+	
+	public OrderBean(Object id, Object parentId) {
+	    super(id, parentId);
+	}
+	
 	/*
 	 * (non-Javadoc)
-	 * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getType()
+	 * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getObjexObjType()
 	 */
-	public String getType() {
+	public String getObjexObjType() {
 	    return "Order";
 	}
 	

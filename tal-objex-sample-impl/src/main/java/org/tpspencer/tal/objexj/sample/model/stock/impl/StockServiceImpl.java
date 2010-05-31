@@ -7,12 +7,9 @@ import org.tpspencer.tal.objexj.container.SimpleContainerStrategy;
 import org.tpspencer.tal.objexj.locator.ContainerFactory;
 import org.tpspencer.tal.objexj.locator.SimpleContainerFactory;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
-import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.sample.api.repository.StockRepository;
 import org.tpspencer.tal.objexj.sample.api.repository.StockService;
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
-import org.tpspencer.tal.objexj.sample.beans.stock.CategoryBean;
-import org.tpspencer.tal.objexj.sample.beans.stock.ProductBean;
 
 public class StockServiceImpl implements StockService {
     
@@ -24,10 +21,7 @@ public class StockServiceImpl implements StockService {
     }
     
     public StockServiceImpl(ContainerMiddlewareFactory middlewareFactory) {
-        ObjectStrategy[] strategies = new ObjectStrategy[]{
-                new SimpleObjectStrategy("Category", CategoryImpl.class, CategoryBean.class),
-                new SimpleObjectStrategy("Product", ProductImpl.class, ProductBean.class),
-        };
+        ObjectStrategy[] strategies = new ObjectStrategy[]{CategoryImpl.STRATEGY, ProductImpl.STRATEGY};
         ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "Category", strategies);
         
         locator = new SimpleContainerFactory(strategy, middlewareFactory);
