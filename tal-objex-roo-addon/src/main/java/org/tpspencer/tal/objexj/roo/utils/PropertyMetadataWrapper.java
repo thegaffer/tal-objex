@@ -17,7 +17,6 @@ import org.springframework.roo.model.JavaType;
 
 public class PropertyMetadataWrapper {
 
-    private final FieldMetadata fieldMetadata;
     /** The name of the property */
     private final JavaSymbolName name;
     /** The type of the property */
@@ -30,13 +29,11 @@ public class PropertyMetadataWrapper {
     private List<AnnotationMetadata> annotations = null;
     
     public PropertyMetadataWrapper(FieldMetadata fm) {
-        this.fieldMetadata = fm;
         this.name = fm.getFieldName();
         this.type = fm.getFieldType();
     }
     
     public PropertyMetadataWrapper(JavaSymbolName name, JavaType type) {
-        this.fieldMetadata = null;
         this.name = name;
         this.type = type;
     }
@@ -128,7 +125,7 @@ public class PropertyMetadataWrapper {
     }
 
     /**
-     * Call to add the metadata to the builder for this field. 
+     * Adds this property to the state bean (if it does not exist)
      * 
      * @param builder The builder to add it
      * @param typeDetails The details of the type

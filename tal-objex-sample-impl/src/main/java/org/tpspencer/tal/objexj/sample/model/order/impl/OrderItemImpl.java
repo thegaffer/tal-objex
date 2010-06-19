@@ -2,13 +2,14 @@ package org.tpspencer.tal.objexj.sample.model.order.impl;
 
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
+import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItem;
-import org.tpspencer.tal.objexj.sample.api.order.OrderItemState;
+import org.tpspencer.tal.objexj.sample.api.stock.Product;
 import org.tpspencer.tal.objexj.sample.beans.order.OrderItemBean;
 
-public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderItemState {
+public class OrderItemImpl extends SimpleObjexObj implements OrderItem {
     
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class);
 
@@ -16,92 +17,85 @@ public class OrderItemImpl extends SimpleObjexObj implements OrderItem, OrderIte
         super(STRATEGY, state);
     }
 
-	public OrderItemState getOrderItemState() {
-		return getStateObject(OrderItemState.class);
-	}
-	
-	public void setOrderItemState(OrderItemState state) {
-		// TODO Auto-generated method stub
-	}
-	
-	public void setId(Object id) {
-		throw new IllegalStateException("Cannot set the ID on an object that already has an ID!");
-	}
-	
-	public void setParentId(Object id) {
-		checkUpdateable();
-		// TODO: Not sure here!?!
-	}
-	
 	public String getName() {
-		return getLocalState(OrderItemState.class).getName();
+		return getLocalState(OrderItemBean.class).getName();
 	}
 	
 	public void setName(String name) {
 		checkUpdateable();
-		getLocalState(OrderItemState.class).setName(name);
+		getLocalState(OrderItemBean.class).setName(name);
 	}
 	
 	public String getDescription() {
-		return getLocalState(OrderItemState.class).getDescription();
+		return getLocalState(OrderItemBean.class).getDescription();
 	}
 	
 	public void setDescription(String description) {
 		checkUpdateable();
-		getLocalState(OrderItemState.class).setDescription(description);
+		getLocalState(OrderItemBean.class).setDescription(description);
 	}
 	
-	public String getStockItem() {
-		return getLocalState(OrderItemState.class).getStockItem();
+	public Product getStockItem() {
+		String ref = getLocalState(OrderItemBean.class).getStockItem();
+		return ref != null ? getContainer().getObject(ref, Product.class) : null;
 	}
 	
-	public void setStockItem(String item) {
-		checkUpdateable();
-		getLocalState(OrderItemState.class).setStockItem(item);
+	public String getStockItemRef() {
+        return getLocalState(OrderItemBean.class).getStockItem();
+    }
+	
+	public void setStockItem(Product item) {
+		String ref = ObjectUtils.getObjectRef(item);
+		setStockItemRef(ref);
 	}
+	
+	public void setStockItemRef(String item) {
+        checkUpdateable();
+        getLocalState(OrderItemBean.class).setStockItem(item);
+    }
 	
 	public String getRef() {
-		return getLocalState(OrderItemState.class).getRef();
+		return getLocalState(OrderItemBean.class).getRef();
 	}
 	
 	public void setRef(String ref) {
 		checkUpdateable();
-		getLocalState(OrderItemState.class).setRef(ref);
+		getLocalState(OrderItemBean.class).setRef(ref);
 	}
 	
 	public double getQuantity() {
-		return getLocalState(OrderItemState.class).getQuantity();
+		return getLocalState(OrderItemBean.class).getQuantity();
 	}
 	
 	public void setQuantity(double quantity) {
 		checkUpdateable();
-		getLocalState(OrderItemState.class).setQuantity(quantity);
+		getLocalState(OrderItemBean.class).setQuantity(quantity);
 	}
 	
 	public String getMeasure() {
-		return getLocalState(OrderItemState.class).getMeasure();
+		return getLocalState(OrderItemBean.class).getMeasure();
 	}
 	
 	public void setMeasure(String measure) {
 		checkUpdateable();
-		getLocalState(OrderItemState.class).setMeasure(measure);
+		getLocalState(OrderItemBean.class).setMeasure(measure);
 	}
 	
 	public double getPrice() {
-		return getLocalState(OrderItemState.class).getPrice();
+		return getLocalState(OrderItemBean.class).getPrice();
 	}
 	
 	public void setPrice(double price) {
 		checkUpdateable();
-		getLocalState(OrderItemState.class).setPrice(price);
+		getLocalState(OrderItemBean.class).setPrice(price);
 	}
 	
 	public String getCurrency() {
-		return getLocalState(OrderItemState.class).getCurrency();
+		return getLocalState(OrderItemBean.class).getCurrency();
 	}
 	
 	public void setCurrency(String currency) {
 		checkUpdateable();
-		getLocalState(OrderItemState.class).setCurrency(currency);
+		getLocalState(OrderItemBean.class).setCurrency(currency);
 	}
 }

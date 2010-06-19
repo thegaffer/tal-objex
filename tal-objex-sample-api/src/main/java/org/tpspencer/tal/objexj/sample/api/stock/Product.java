@@ -1,5 +1,7 @@
 package org.tpspencer.tal.objexj.sample.api.stock;
 
+import java.util.Date;
+
 
 /**
  * Adds the business operations on to the core state.
@@ -7,25 +9,65 @@ package org.tpspencer.tal.objexj.sample.api.stock;
  * 
  * @author Tom Spencer
  */
-public interface Product extends ProductState {
+public interface Product {
 
 	/**
-	 * Call to get the products raw state. The return is
-	 * effectively a detached copy and no changes made to
-	 * the return will be persisted or remembered unless
-	 * a call is made to setProductState. 
-	 * 
-	 * @return The products core state
-	 */
-	public ProductState getProductState();
-	
-	/**
-	 * Call to set the products state. Every attempt is
-	 * made to set the state even if invalid.
-	 * 
-	 * @param product The new state to set
-	 */
-	public void setProductState(ProductState product);
-	
-	// TODO: Standard getErrors method
+     * @return the name
+     */
+    public String getName();
+    
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name);
+    
+    /**
+     * @return the description
+     */
+    public String getDescription();
+    
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description);
+    
+    /**
+     * @return the effectiveFrom
+     */
+    public Date getEffectiveFrom();
+    
+    /**
+     * @param effectiveFrom the effectiveFrom to set
+     */
+    public void setEffectiveFrom(Date effectiveFrom);
+    
+    /**
+     * @return the effectiveTo
+     */
+    public Date getEffectiveTo();
+    
+    /**
+     * @param effectiveTo the effectiveTo to set
+     */
+    public void setEffectiveTo(Date effectiveTo);
+    
+    /**
+     * @return the price
+     */
+    public double getPrice();
+    
+    /**
+     * @param price the price to set
+     */
+    public void setPrice(double price);
+    
+    /**
+     * @return the currency
+     */
+    public String getCurrency();
+    
+    /**
+     * @param currency the currency to set
+     */
+    public void setCurrency(String currency);
 }

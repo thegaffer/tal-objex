@@ -10,10 +10,13 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.tpspencer.tal.objexj.roo.fields.PropertyMetadataCompiler;
+import org.tpspencer.tal.objexj.roo.fields.CollectionPropHelper;
+import org.tpspencer.tal.objexj.roo.fields.ObjexObjProperty;
+import org.tpspencer.tal.objexj.roo.fields.PropHelper;
+import org.tpspencer.tal.objexj.roo.fields.ReferencePropHelper;
+import org.tpspencer.tal.objexj.roo.fields.SimplePropHelper;
 import org.tpspencer.tal.objexj.roo.utils.ConstructorMetadataWrapper;
 import org.tpspencer.tal.objexj.roo.utils.MethodMetadataWrapper;
-import org.tpspencer.tal.objexj.roo.utils.PropertyMetadataWrapper;
 import org.tpspencer.tal.objexj.roo.utils.TypeDetailsUtil;
 
 public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
@@ -22,11 +25,9 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
     
     private final ObjexObjAnnotationValues annotationValues;
-    private final List<PropertyMetadataWrapper> properties;
-
-    public ObjexObjMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjAnnotationValues values, List<PropertyMetadataWrapper> properties) {
+    
+    public ObjexObjMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjAnnotationValues values, List<ObjexObjProperty> properties) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        this.properties = properties;
         this.annotationValues = values;
         
         boolean baseObj = TypeDetailsUtil.isExtending(governorTypeDetails, "org.tpspencer.tal.objexj.object.BaseObjexObj");
@@ -56,15 +57,18 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
             addStateAccessors();
         }
         
-        // Compile the properties
-        PropertyMetadataCompiler compiler = new PropertyMetadataCompiler(governorTypeDetails, this.properties);
-        compiler.compileObjexObj();
-        List<MethodMetadataWrapper> methods = compiler.getPropertyMethods();
-        
-        // Write out each of the methods
-        Iterator<MethodMetadataWrapper> itMethods = methods.iterator();
-        while( itMethods.hasNext() ) {
-            itMethods.next().addMetadata(builder, governorTypeDetails, getId());
+        // Add in the methods for the properties
+        Iterator<ObjexObjProperty> it = properties.iterator();
+        while( it.hasNext() ) {
+            ObjexObjProperty prop = it.next();
+            
+            PropHelper helper = null;
+            if( prop.isMapReferenceProp() ) helper = new CollectionPropHelper(prop);
+            else if( prop.isListReferenceProp() ) helper = new CollectionPropHelper(prop);
+            else if( prop.isReferenceProp() ) helper = new ReferencePropHelper(prop);
+            else helper = new SimplePropHelper(prop);
+            
+            if( helper != null ) helper.build(builder, governorTypeDetails, getId());
         }
         
         itdTypeDetails = builder.build();
@@ -85,6 +89,17 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
     }
     
     private void addStrategy() {
+        
+        // Get name
+        
+        // Get state bean
+        
+        // Static create
+        
+        // Static clone
+        
+        
+        
         // TODO: Can't do this because Roo does not yet support non-default constructors on initialisers
         return;
         

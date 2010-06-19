@@ -89,6 +89,10 @@ public class StandardContainer implements Container {
 	    // TODO: This assumes a index based ID strategy, this may be incorrect!!
 	}
 	
+	public ObjexID getObjectId(Object id) {
+	    return middleware.convertId(id);
+	}
+	
 	public ObjexObj getObject(Object id) {
 	    if( id == null ) return null; // Just protect from a stupid call!!
 	    

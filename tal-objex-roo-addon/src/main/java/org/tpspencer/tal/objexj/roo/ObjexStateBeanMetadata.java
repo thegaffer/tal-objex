@@ -24,7 +24,8 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.tpspencer.tal.objexj.annotations.ObjexStateBean;
-import org.tpspencer.tal.objexj.roo.fields.PropertyMetadataCompiler;
+import org.tpspencer.tal.objexj.roo.fields.ObjexObjProperty;
+import org.tpspencer.tal.objexj.roo.fields.PropertyCompiler;
 import org.tpspencer.tal.objexj.roo.utils.ConstructorMetadataWrapper;
 import org.tpspencer.tal.objexj.roo.utils.MethodMetadataWrapper;
 import org.tpspencer.tal.objexj.roo.utils.PropertyMetadataWrapper;
@@ -45,7 +46,7 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
     
     private final ObjexObjStateBeanAnnotationValues annotationValues;
-    private List<PropertyMetadataWrapper> properties = null;
+    private List<ObjexObjProperty> properties = null;
     
     public ObjexStateBeanMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjStateBeanAnnotationValues annotationValues) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
@@ -59,31 +60,25 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         builder.addField(getSerialVersionField());
         
         // Build the list of properties on this object
-        PropertyMetadataCompiler compiler = new PropertyMetadataCompiler(governorTypeDetails);
-        compiler.compileStateBean();
-        this.properties = compiler.getProperties(); // So we can access them later
-        List<MethodMetadataWrapper> methods = compiler.getPropertyMethods();
-        addTypeGetter(methods);
+        PropertyCompiler compiler = new PropertyCompiler();
+        this.properties = compiler.compile(governorTypeDetails);
+        
+        // Add extra bits for the state bean
+        addIdField();
+        addParentIdField();
+        addTypeGetter();
         
         // Add in constructors
         addDefaultCons();
         addCopyCons();
         addNewCons(true); // TODO: Determine if we should have parent
         
-        // Write out each of the properties
-        Iterator<PropertyMetadataWrapper> it = properties.iterator();
+        // Write out each of the properties (could be done with JavaBean addon)
+        /*Iterator<ObjexObjProperty> it = properties.iterator();
         while( it.hasNext() ) {
-            it.next().addMetadata(builder, governorTypeDetails, getId());
-        }
-        
-        addIdField();
-        addParentIdField();
-        
-        // Write out each of the methods
-        Iterator<MethodMetadataWrapper> itMethods = methods.iterator();
-        while( itMethods.hasNext() ) {
-            itMethods.next().addMetadata(builder, governorTypeDetails, getId());
-        }
+            ObjexObjProperty prop = it.next();
+            addGetterSetter(prop);
+        }*/
         
         // Create the ITD Type
         itdTypeDetails = builder.build();
@@ -92,7 +87,7 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     /**
      * @return The properties against this type
      */
-    public List<PropertyMetadataWrapper> getProperties() {
+    public List<ObjexObjProperty> getProperties() {
         return properties;
     }
     
@@ -130,6 +125,10 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     private void addDefaultCons() {
         ConstructorMetadataWrapper con = new ConstructorMetadataWrapper();
         
+        con.addBody("super();");
+        if( TypeDetailsUtil.getMethod(governorTypeDetails, "init", null) != null ) {
+            con.addBody("init();");
+        }
         con.addBody("// Nothing");
         
         con.addMetadata(builder, governorTypeDetails, getId());
@@ -140,6 +139,10 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         newCon.addParameter("id", "java.lang.Object", null);
         newCon.addParameter("parentId", "java.lang.Object", null);
         
+        newCon.addBody("super();");
+        if( TypeDetailsUtil.getMethod(governorTypeDetails, "init", null) != null ) {
+            newCon.addBody("init();");
+        }
         newCon.addBody("this.id = id != null ? id.toString() : null;");
         if( includeParent ) newCon.addBody("this.parentId = parentId != null ? parentId.toString() : null;");
         
@@ -150,12 +153,17 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         ConstructorMetadataWrapper copyCon = new ConstructorMetadataWrapper();
         copyCon.addParameter(new JavaSymbolName("src"), governorTypeDetails.getName(), null);
         
+        copyCon.addBody("super();");
+        if( TypeDetailsUtil.getMethod(governorTypeDetails, "init", null) != null ) {
+            copyCon.addBody("init();");
+        }
+        
         boolean idFound = false;
         boolean parentFound = false;
         
-        Iterator<PropertyMetadataWrapper> it = properties.iterator();
+        Iterator<ObjexObjProperty> it = properties.iterator();
         while( it.hasNext() ) {
-            PropertyMetadataWrapper prop = it.next();
+            ObjexObjProperty prop = it.next();
             String name = prop.getName().getSymbolName();
             
             copyCon.addBody("this." + name + " = src." + name + ";");
@@ -168,6 +176,24 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         if( !parentFound ) copyCon.addBody("this.parentId = src.parentId;");
         
         copyCon.addMetadata(builder, governorTypeDetails, getId());
+    }
+    
+    /**
+     * Adds a getter/setter to the property
+     * 
+     * @param prop
+     */
+    public void addGetterSetter(ObjexObjProperty prop) {
+        JavaSymbolName name = new JavaSymbolName("get" + prop.getName().getSymbolNameCapitalisedFirstLetter());
+        MethodMetadataWrapper getter = new MethodMetadataWrapper(name, prop.getType());
+        getter.addBody("return this." + prop.getName().getSymbolName() + ";");
+        getter.addMetadata(builder, governorTypeDetails, getId());
+        
+        name = new JavaSymbolName("set" + prop.getName().getSymbolNameCapitalisedFirstLetter());
+        MethodMetadataWrapper setter = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
+        setter.addParameter(new JavaSymbolName("val"), prop.getType(), null);
+        setter.addBody("this." + prop.getName().getSymbolName() + " = val;");
+        setter.addMetadata(builder, governorTypeDetails, getId());
     }
     
     private void addIdField() {
@@ -195,7 +221,7 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         getter.addMetadata(builder, governorTypeDetails, getId());
     }
     
-    private void addTypeGetter(List<MethodMetadataWrapper> methods) {
+    private void addTypeGetter() {
         MethodMetadata mm = TypeDetailsUtil.getMethod(governorTypeDetails, "getObjexObjType", null);
         if( mm != null ) return;
         
@@ -210,7 +236,7 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         
         MethodMetadataWrapper typeMethod = new MethodMetadataWrapper(new JavaSymbolName("getObjexObjType"), JavaType.STRING_OBJECT);
         typeMethod.addBody("return \"" + type + "\";");
-        methods.add(typeMethod);
+        typeMethod.addMetadata(builder, governorTypeDetails, getId());
     }
     
     public static final String getMetadataIdentiferType() {

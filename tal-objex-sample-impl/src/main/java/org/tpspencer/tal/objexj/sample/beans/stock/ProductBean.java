@@ -4,7 +4,6 @@ import java.util.Date;
 
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.tpspencer.tal.objexj.sample.api.stock.ProductState;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -13,7 +12,7 @@ import org.tpspencer.tal.objexj.sample.beans.BaseBean;
  * @author Tom Spencer
  */
 @PersistenceCapable
-public class ProductBean extends BaseBean implements ProductState {
+public class ProductBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 
 	/** The name of the product */

@@ -7,7 +7,6 @@ import org.tpspencer.tal.objexj.object.ObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.stock.Product;
-import org.tpspencer.tal.objexj.sample.api.stock.ProductState;
 import org.tpspencer.tal.objexj.sample.beans.stock.ProductBean;
 
 public class ProductImpl extends SimpleObjexObj implements Product { 
@@ -16,25 +15,6 @@ public class ProductImpl extends SimpleObjexObj implements Product {
 
     public ProductImpl(ObjexObjStateBean state) {
         super(STRATEGY, state);
-    }
-    
-    public ProductState getProductState() {
-        return this;
-    }
-    
-    public void setProductState(ProductState category) {
-        checkUpdateable();
-        
-        // TODO: Update the fields that have changed!?!
-    }
-    
-    public void setId(Object id) {
-        throw new IllegalStateException("Cannot set the ID on an object that already has an ID!");
-    }
-    
-    public void setParentId(Object id) {
-        checkUpdateable();
-        // TODO: Not sure here!?!
     }
     
     public String getName() {

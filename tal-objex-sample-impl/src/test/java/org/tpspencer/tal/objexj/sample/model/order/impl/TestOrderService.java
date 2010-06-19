@@ -17,8 +17,6 @@ import org.tpspencer.tal.objexj.container.TransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionMiddleware;
 import org.tpspencer.tal.objexj.locator.ContainerFactory;
 import org.tpspencer.tal.objexj.sample.api.repository.OrderRepository;
-import org.tpspencer.tal.objexj.sample.beans.order.OrderBean;
-import org.tpspencer.tal.objexj.sample.model.order.impl.OrderServiceImpl;
 
 /**
  * Ensures the stock service will give us repository instances.

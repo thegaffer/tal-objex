@@ -1,16 +1,17 @@
 package org.tpspencer.tal.objexj.sample.model.stock.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.tpspencer.tal.objexj.EditableContainer;
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
-import org.tpspencer.tal.objexj.sample.api.stock.CategoryState;
 import org.tpspencer.tal.objexj.sample.api.stock.Product;
 import org.tpspencer.tal.objexj.sample.beans.stock.CategoryBean;
 
@@ -21,26 +22,12 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     public CategoryImpl(ObjexObjStateBean state) {
         super(STRATEGY, state);
     }
+    
+    public String getParentCategoryId() {
+        ObjexID parentId = getParentId();
+        return parentId != null ? parentId.toString() : null;
+    }
 
-    public CategoryState getCategoryState() {
-        return this;
-    }
-    
-    public void setCategoryState(CategoryState category) {
-        checkUpdateable();
-        
-        // TODO: Update the fields that have changed!?!
-    }
-    
-    public void setId(Object id) {
-        throw new IllegalStateException("Cannot set the ID on an object that already has an ID!");
-    }
-    
-    public void setParentId(Object id) {
-        checkUpdateable();
-        // TODO: Not sure here!?!
-    }
-    
     public String getName() {
         return getLocalState(CategoryBean.class).getName();
     }
@@ -59,16 +46,18 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
         getLocalState(CategoryBean.class).setDescription(description);
     }
     
-    public String[] getCategories() {
+    public List<String> getCategoryRefs() {
         return getLocalState(CategoryBean.class).getCategories();
     }
     
-    public List<Category> getCategoryList() {
+    public List<Category> getCategories() {
         List<Category> categories = null;
-        String[] cats = getCategories();
-        if( cats != null && cats.length > 0 ) {
-            for( int i = 0 ; i < cats.length ; i++ ) {
-                Category c = getContainer().getObject(cats[i], Category.class);
+        
+        List<String> cats = getCategoryRefs();
+        if( cats != null ) {
+            Iterator<String> it = cats.iterator();
+            while( it.hasNext() ) {
+                Category c = getContainer().getObject(it.next(), Category.class);
                 if( c != null ) {
                     if( categories == null ) categories = new ArrayList<Category>();
                     categories.add(c);
@@ -78,21 +67,22 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
         return categories;
     }
     
-    public void setCategories(String[] categories) {
+    public void setCategories(List<String> categories) {
         checkUpdateable();
         getLocalState(CategoryBean.class).setCategories(categories);
     }
     
-    public String[] getProducts() {
+    public List<String> getProductRefs() {
         return getLocalState(CategoryBean.class).getProducts();
     }
     
-    public List<Product> getProductList() {
+    public List<Product> getProducts() {
         List<Product> products = null;
-        String[] prods = getProducts();
-        if( prods != null && prods.length > 0 ) {
-            for( int i = 0 ; i < prods.length ; i++ ) {
-                Product p = getContainer().getObject(prods[i], Product.class);
+        List<String> prods = getProductRefs();
+        if( prods != null ) {
+            Iterator<String> it = prods.iterator();
+            while( it.hasNext() ) {
+                Product p = getContainer().getObject(it.next(), Product.class);
                 if( p != null ) {
                     if( products == null ) products = new ArrayList<Product>();
                     products.add(p);
@@ -103,43 +93,33 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
         return products;
     }
     
-    public void setProducts(String[] products) {
+    public void setProducts(List<String> products) {
         checkUpdateable();
         getLocalState(CategoryBean.class).setProducts(products);
     }
     
-    public Category createNewCategory() {
+    public Category createCategory() {
         checkUpdateable();
         
         ObjexObj newCat = ((EditableContainer)getContainer()).newObject("Category", getId());
-        String[] categories = getCategories();
-        int ln = categories != null ? categories.length : 0;
-        if( categories == null ) categories = new String[1];
-        else {
-            String[] cats = new String[ln + 1];
-            System.arraycopy(categories, 0, cats, 0, ln);
-            categories = cats;
-        }
-        categories[ln] = newCat.getId().toString();
-        setCategories(categories);
+        
+        List<String> cats = getCategoryRefs();
+        if( cats == null ) cats = new ArrayList<String>();
+        cats.add(newCat.getId().toString());
+        getLocalState(CategoryBean.class).setCategories(cats);
         
         return newCat.getBehaviour(Category.class);
     }
     
-    public Product createNewProduct() {
+    public Product createProduct() {
         checkUpdateable();
         
         ObjexObj newProduct = ((EditableContainer)getContainer()).newObject("Product", getId());
-        String[] products = getProducts();
-        int ln = products != null ? products.length : 0;
-        if( products == null ) products = new String[1];
-        else {
-            String[] prods = new String[ln + 1];
-            System.arraycopy(products, 0, prods, 0, ln);
-            products = prods;
-        }
-        products[ln] = newProduct.getId().toString();
-        setProducts(products);
+        
+        List<String> prods = getProductRefs();
+        if( prods == null ) prods = new ArrayList<String>();
+        prods.add(newProduct.getId().toString());
+        getLocalState(CategoryBean.class).setProducts(prods);
         
         return newProduct.getBehaviour(Product.class);
     }

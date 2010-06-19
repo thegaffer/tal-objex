@@ -1,20 +1,18 @@
 package org.tpspencer.tal.objexj.roo;
 
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.model.JavaType;
-import org.tpspencer.tal.objexj.annotations.ObjexRefProp;
 
-public class ObjexRefPropAnnotationValues extends AbstractAnnotationValues {
+public class ObjexRefPropAnnotationValues {
 
     @AutoPopulate private boolean owned = false;
     @AutoPopulate private JavaType type = null;
     @AutoPopulate private String newType = null;
+    @AutoPopulate private boolean settable = true;
     
-    public ObjexRefPropAnnotationValues(PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-        super(governorPhysicalTypeMetadata, new JavaType(ObjexRefProp.class.getName()));
+    public ObjexRefPropAnnotationValues(AnnotationMetadata annotationMetadata) {
         AutoPopulationUtils.populate(this, annotationMetadata);
     }
 
@@ -59,4 +57,19 @@ public class ObjexRefPropAnnotationValues extends AbstractAnnotationValues {
     public void setNewType(String newType) {
         this.newType = newType;
     }
+
+    /**
+     * @return the settable
+     */
+    public boolean isSettable() {
+        return settable;
+    }
+
+    /**
+     * @param settable the settable to set
+     */
+    public void setSettable(boolean settable) {
+        this.settable = settable;
+    }
+    
 }

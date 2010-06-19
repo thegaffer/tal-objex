@@ -1,8 +1,9 @@
 package org.tpspencer.tal.objexj.sample.beans.stock;
 
+import java.util.List;
+
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.tpspencer.tal.objexj.sample.api.stock.CategoryState;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -22,7 +23,7 @@ import org.tpspencer.tal.objexj.sample.beans.BaseBean;
  * @author Tom Spencer
  */
 @PersistenceCapable
-public class CategoryBean extends BaseBean implements CategoryState {
+public class CategoryBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 	
 	/** The name of the category */
@@ -30,9 +31,9 @@ public class CategoryBean extends BaseBean implements CategoryState {
 	/** The description of the category */
 	private String description;
 	/** The products in this category */
-	private String[] products;
+	private List<String> products;
 	/** The sub-cateogories */
-	private String[] categories;
+	private List<String> categories;
 	
 	public CategoryBean() {
     }
@@ -76,25 +77,25 @@ public class CategoryBean extends BaseBean implements CategoryState {
 	/**
 	 * @return the products
 	 */
-	public String[] getProducts() {
+	public List<String> getProducts() {
 		return products;
 	}
 	/**
 	 * @param products the products to set
 	 */
-	public void setProducts(String[] products) {
+	public void setProducts(List<String> products) {
 		this.products = products;
 	}
 	/**
 	 * @return the categories
 	 */
-	public String[] getCategories() {
+	public List<String> getCategories() {
 		return categories;
 	}
 	/**
 	 * @param categories the categories to set
 	 */
-	public void setCategories(String[] categories) {
+	public void setCategories(List<String> categories) {
 		this.categories = categories;
 	}
 }

@@ -1,9 +1,7 @@
 package org.tpspencer.tal.objexj.sample.api.repository;
 
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
-import org.tpspencer.tal.objexj.sample.api.stock.CategoryState;
 import org.tpspencer.tal.objexj.sample.api.stock.Product;
-import org.tpspencer.tal.objexj.sample.api.stock.ProductState;
 
 /**
  * This interface represents a domain-like service interface

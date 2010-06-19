@@ -54,6 +54,19 @@ public interface Container {
 	public ObjexObj getObject(Object id);
 	
 	/**
+     * Call to get the real ID of an object given the
+     * generic ID passed in (which may be the ID or a
+     * string ref). Getting a non-null return does not
+     * ensure the ID is a real object in the container,
+     * but it does ensure its a valid ID.
+     * 
+     * @param id The ID of the object (may be an ObjexID, may be a string)
+     * @return The ID of the object
+     * @throws IllegalArgumentException If a null object id is supplied
+     */
+    public ObjexID getObjectId(Object id);
+	
+	/**
 	 * Call to get a collection of objects given an array of IDs.
 	 * This function is primarily for internal use.
 	 *  

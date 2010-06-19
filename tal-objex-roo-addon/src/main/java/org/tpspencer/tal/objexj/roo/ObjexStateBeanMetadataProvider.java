@@ -1,5 +1,6 @@
 package org.tpspencer.tal.objexj.roo;
 
+import org.springframework.roo.addon.javabean.JavaBeanMetadataProvider;
 import org.springframework.roo.addon.tostring.ToStringMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -25,10 +26,14 @@ import org.tpspencer.tal.objexj.annotations.ObjexStateBean;
 @ScopeDevelopment
 public class ObjexStateBeanMetadataProvider extends AbstractItdMetadataProvider {
     
-    public ObjexStateBeanMetadataProvider(MetadataService metadataService, MetadataDependencyRegistry metadataDependencyRegistry, FileManager fileManager, ToStringMetadataProvider toStringProvider) {
+    public ObjexStateBeanMetadataProvider(MetadataService metadataService, MetadataDependencyRegistry metadataDependencyRegistry, FileManager fileManager, ToStringMetadataProvider toStringProvider, JavaBeanMetadataProvider beanProvider) {
         super(metadataService, metadataDependencyRegistry, fileManager);
-        addMetadataTrigger(new JavaType(ObjexStateBean.class.getName()));
-        toStringProvider.addMetadataTrigger(new JavaType(ObjexStateBean.class.getName()));
+        
+        JavaType trigger = new JavaType(ObjexStateBean.class.getName());
+        
+        beanProvider.addMetadataTrigger(trigger);
+        addMetadataTrigger(trigger);
+        toStringProvider.addMetadataTrigger(trigger);
     }
 
     @Override

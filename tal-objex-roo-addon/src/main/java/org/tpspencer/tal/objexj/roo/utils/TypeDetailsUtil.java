@@ -66,10 +66,21 @@ public class TypeDetailsUtil {
      * @return The metadata for the annotation if found
      */
     public static AnnotationMetadata getAnnotation(ClassOrInterfaceTypeDetails details, String annotation) {
+        return getAnnotation(details.getTypeAnnotations(), annotation);
+    }
+    
+    /**
+     * Call to find an particular annotation from a list of annotations
+     * 
+     * @param annotations The list of annotations to check
+     * @param annotation The annotation (fully qualified) to get
+     * @return The metadata for the annotation if found
+     */
+    public static AnnotationMetadata getAnnotation(List<? extends AnnotationMetadata> annotations, String annotation) {
         AnnotationMetadata ret = null;
+        if( annotations == null || annotations.size() == 0 ) return ret;
         
         JavaType annotationType = new JavaType(annotation);
-        List<? extends AnnotationMetadata> annotations = details.getTypeAnnotations();
         Iterator<? extends AnnotationMetadata> it = annotations.iterator();
         while( it.hasNext() && ret == null ) {
             AnnotationMetadata am = it.next();

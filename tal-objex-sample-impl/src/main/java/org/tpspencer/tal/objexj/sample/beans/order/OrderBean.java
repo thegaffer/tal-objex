@@ -1,8 +1,9 @@
 package org.tpspencer.tal.objexj.sample.beans.order;
 
+import java.util.List;
+
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.tpspencer.tal.objexj.sample.api.order.OrderState;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -12,13 +13,13 @@ import org.tpspencer.tal.objexj.sample.beans.BaseBean;
  * @author Tom Spencer
  */
 @PersistenceCapable
-public class OrderBean extends BaseBean implements OrderState {
+public class OrderBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 	
 	/** Holds the account number for the order (effectively a ref to customer) */
 	private long account;
 	/** Holds the items in the order */
-	private String[] items;
+	private List<String> items;
 	
 	public OrderBean() {
 	}
@@ -51,13 +52,13 @@ public class OrderBean extends BaseBean implements OrderState {
 	/**
 	 * @return the items
 	 */
-	public String[] getItems() {
+	public List<String> getItems() {
 		return items;
 	}
 	/**
 	 * @param items the items to set
 	 */
-	public void setItems(String[] items) {
+	public void setItems(List<String> items) {
 		this.items = items;
 	}
 }

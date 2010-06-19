@@ -15,4 +15,5 @@ import java.lang.annotation.Target;
 public @interface ObjexRefProp {
     boolean owned() default true;
     Class<?> type();
+    String newType() default "";
 }

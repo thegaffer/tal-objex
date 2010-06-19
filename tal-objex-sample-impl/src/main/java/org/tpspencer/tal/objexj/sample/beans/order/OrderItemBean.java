@@ -2,7 +2,6 @@ package org.tpspencer.tal.objexj.sample.beans.order;
 
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.tpspencer.tal.objexj.sample.api.order.OrderItemState;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -13,7 +12,7 @@ import org.tpspencer.tal.objexj.sample.beans.BaseBean;
  * @author Tom Spencer
  */
 @PersistenceCapable
-public class OrderItemBean extends BaseBean implements OrderItemState {
+public class OrderItemBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 
 	/** A reference number for this */

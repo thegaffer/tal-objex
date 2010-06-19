@@ -8,45 +8,61 @@ import java.util.List;
  * 
  * @author Tom Spencer
  */
-public interface Category extends CategoryState {
+public interface Category {
+    
+    public abstract String getParentCategoryId();
 
-	/**
-	 * Call to get the current state of the cateogry.
-	 * The return is detached and any changes made are
-	 * not remembered.
-	 * 
-	 * @return The state of the category
-	 */
-	public CategoryState getCategoryState();
-	
-	/**
-	 * Call to set the category state.
-	 * 
-	 * @param category The state to set
-	 */
-	public void setCategoryState(CategoryState category);
-	
-	/**
-	 * @return The categories under this one
-	 */
-	public List<Category> getCategoryList();
-	
-	/**
-	 * @return The products under this category
-	 */
-	public List<Product> getProductList();
-	
+    /**
+     * @return the name
+     */
+    public abstract String getName();
+
+    /**
+     * @param name the name to set
+     */
+    public abstract void setName(String name);
+
+    /**
+     * @return the description
+     */
+    public abstract String getDescription();
+
+    /**
+     * @param description the description to set
+     */
+    public abstract void setDescription(String description);
+    
+    /**
+     * @return The sub-categories
+     */
+    public abstract List<Category> getCategories();
+    
+    /**
+     * @return The sub-categories
+     */
+    public abstract List<String> getCategoryRefs();
+    
     /**
      * Call to create a new category inside this category
      * 
-     * @return The new categry
+     * @return The new category
      */
-    public Category createNewCategory();
-	
-	/**
-	 * Call to create a new product inside this category
-	 * 
-	 * @return The new product
-	 */
-	public Product createNewProduct();
+    public Category createCategory();
+    
+    /**
+     * @return The products in the category
+     */
+    public abstract List<Product> getProducts();
+    
+    /**
+     * @return The products in the category
+     */
+    public abstract List<String> getProductRefs();
+    
+    /**
+     * Call to create a new product inside this category
+     * 
+     * @return The new product
+     */
+    public Product createProduct();
 }

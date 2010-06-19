@@ -1,6 +1,5 @@
 package org.tpspencer.tal.objexj.sample.model.stock.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.tpspencer.tal.objexj.Container;
@@ -29,14 +28,14 @@ public class StockRepositoryImpl implements StockRepository {
         Category cat = editableContainer.getObject(parentCategoryId, Category.class);
         if( cat == null ) throw new IllegalArgumentException("Cannot create category if not parent!");
         
-        return cat.createNewCategory();
+        return cat.createCategory();
     }
     
     public Product createNewProduct(Object parentCategoryId) {
         Category cat = editableContainer.getObject(parentCategoryId, Category.class);
         if( cat == null ) throw new IllegalArgumentException("Cannot create category if not parent!");
         
-        return cat.createNewProduct();
+        return cat.createProduct();
     }
     
     public Category findCategory(String id) {
@@ -67,19 +66,9 @@ public class StockRepositoryImpl implements StockRepository {
         Product[] ret = null;
         
         Category cat = findCategory(categoryId);
-        if( cat != null && cat.getProducts() != null ) {
-            // FUTURE: This would be more efficient to get in a batch!
-            
-            List<Product> products = new ArrayList<Product>();
-            String[] prods = cat.getProducts();
-            for( int i = 0 ; i < prods.length ; i++ ) {
-                Product p = container.getObject(prods[i], Product.class);
-                if( p != null ) products.add(p);
-            }
-            
-            if( products.size() > 0 ) ret = products.toArray(new Product[products.size()]);
-        }
-
+        List<Product> products = cat != null ? cat.getProducts() : null;
+        ret = products != null ? products.toArray(new Product[products.size()]) : null;
+    
         return ret;
     }
     

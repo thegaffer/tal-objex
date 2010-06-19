@@ -1,6 +1,7 @@
 package org.tpspencer.tal.objexj.sample.model.order.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.tpspencer.tal.objexj.EditableContainer;
@@ -11,35 +12,14 @@ import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.order.Order;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItem;
-import org.tpspencer.tal.objexj.sample.api.order.OrderState;
 import org.tpspencer.tal.objexj.sample.beans.order.OrderBean;
 
-public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
+public class OrderImpl extends SimpleObjexObj implements Order {
     
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Order", OrderImpl.class, OrderBean.class);
 
 	public OrderImpl(ObjexObjStateBean state) {
 		super(STRATEGY, state);
-	}
-	
-	public OrderState getOrderState() {
-		return this;
-	}
-	
-	public void setOrderState(OrderState state) {
-		checkUpdateable();
-		// TODO: obj.setStateObject(state);
-		EditableContainer container = (EditableContainer)getContainer();
-		container.updateObject(super.getId(), this);
-	}
-	
-	public void setId(Object id) {
-		throw new IllegalStateException("Cannot set the ID on an object that already has an ID!");
-	}
-	
-	public void setParentId(Object id) {
-		checkUpdateable();
-		// TODO: Not sure here!?!
 	}
 	
 	public long getAccount() {
@@ -51,21 +31,22 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
 		getLocalState(OrderBean.class).setAccount(account);
 	}
 	
-	public String[] getItems() {
+	public List<String> getItemRefs() {
 		return getLocalState(OrderBean.class).getItems();
 	}
 	
-	public void setItems(String[] items) {
+	public void setItemRefs(List<String> items) {
 		checkUpdateable();
 		getLocalState(OrderBean.class).setItems(items);
 	}
 	
-	public List<OrderItem> getItemsList() {
+	public List<OrderItem> getItems() {
         List<OrderItem> itemList = null;
-        String[] items = getItems();
-        if( items != null && items.length > 0 ) {
-            for( int i = 0 ; i < items.length ; i++ ) {
-                OrderItem item = getContainer().getObject(items[i], OrderItem.class);
+        List<String> items = getItemRefs();
+        if( items != null && items.size() > 0 ) {
+            Iterator<String> it = items.iterator();
+            while( it.hasNext() ) {
+                OrderItem item = getContainer().getObject(it.next(), OrderItem.class);
                 if( item != null ) {
                     if( itemList == null ) itemList = new ArrayList<OrderItem>();
                     itemList.add(item);
@@ -75,29 +56,20 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
         return itemList;
     }
 	
-	public OrderItem createNewItem() {
+	public OrderItem createItem() {
 		checkUpdateable();
 		
 		EditableContainer container = (EditableContainer)getContainer();
 		ObjexObj item = container.newObject("OrderItem", getId());
 		
-		String ref = null;
-		
 		// Add to list of items
-		String[] items = getItems();
-		if( items == null || items.length == 0 ) {
-		    ref = "#1";
-		    items = new String[]{item.getId().toString()};
-		}
-		else {
-		    ref = "#" + Integer.toString(items.length);
-		    String[] temp = new String[items.length + 1];
-		    System.arraycopy(items, 0, temp, 0, items.length);
-		    temp[items.length] = item.getId().toString();
-		}
+		List<String> items = getItemRefs();
+		if( items == null ) items = new ArrayList<String>();
+		items.add(item.getId().toString());
+		setItemRefs(items);
 		
-		item.getBehaviour(OrderItem.class).setRef(ref);
-		setItems(items);
+		String ref = "#" + items.size();
+        item.getBehaviour(OrderItem.class).setRef(ref);
 		
 		return item.getBehaviour(OrderItem.class);
 	}
@@ -105,12 +77,13 @@ public class OrderImpl extends SimpleObjexObj implements Order, OrderState {
 	/**
 	 * Simply uses the container to get the item
 	 */
-	public OrderItem getItem(Object id) {
+	public OrderItem getItemById(Object id) {
 	    // TODO: Check that is is owned by this order!!!
 	    return getContainer().getObject(id, OrderItem.class);
 	}
 	
-	public void removeItem(Object id) {
+	public void removeItemById(Object id) {
 	    checkUpdateable();
+	    // TODO:
 	}
 }
