@@ -25,7 +25,7 @@ import org.tpspencer.tal.objexj.sample.beans.order.OrderItemBean;
 public class OrderServiceImpl implements OrderService {
     
     public static final ObjectStrategy ORDER_STRATEGY = new ObjectStrategy() {
-        public String getTypeName() { return "Order"; }
+        public String getTypeName() { return "OrderBean"; }
         public String getIdProp() { return "id"; }
         public String getParentIdProp() { return "parentId"; }
         public Class<?> getStateClass() { return OrderBean.class; }
@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
     }; 
     
     public static final ObjectStrategy ITEM_STRATEGY = new ObjectStrategy() {
-        public String getTypeName() { return "OrderItem"; }
+        public String getTypeName() { return "OrderItemBean"; }
         public String getIdProp() { return "id"; }
         public String getParentIdProp() { return "parentId"; }
         public Class<?> getStateClass() { return OrderItemBean.class; }
@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
     
     public OrderServiceImpl(ContainerMiddlewareFactory middlewareFactory) {
         ObjectStrategy[] strategies = new ObjectStrategy[]{ORDER_STRATEGY, ITEM_STRATEGY};
-        ContainerStrategy strategy = new SimpleContainerStrategy("Order", "Order", strategies);
+        ContainerStrategy strategy = new SimpleContainerStrategy("Order", "OrderBean", strategies);
         
         locator = new SimpleContainerFactory(strategy, middlewareFactory);
     }

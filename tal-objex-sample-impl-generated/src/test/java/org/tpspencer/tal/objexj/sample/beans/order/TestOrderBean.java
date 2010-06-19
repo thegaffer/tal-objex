@@ -25,6 +25,7 @@ public class TestOrderBean extends BeanTestCase {
         OrderBean bean = new OrderBean("123", "456");
         Assert.assertEquals("123", bean.getId());
         Assert.assertEquals("456", bean.getParentId());
+        // Assert.assertEquals(123, bean.getAccount());
         
         bean.setAccount(987);
         

@@ -66,12 +66,12 @@ public class TestOrderService {
         context.checking(new Expectations() {{
             oneOf(middlewareFactory).createContainer(with(any(ContainerStrategy.class)), with(any(String.class))); 
               will(returnValue(middleware));
-            oneOf(middleware).createNewId("Order"); will(returnValue(id));
+            oneOf(middleware).createNewId("OrderBean"); will(returnValue(id));
             oneOf(middleware).getRawId(id); will(returnValue("o1"));
             oneOf(middleware).init(with(any(Container.class)));
             allowing(middleware).getCache(); will(returnValue(cache));
             // allowing(id).isNull(); will(returnValue(false));
-            allowing(middleware).convertId("Order|1"); will(returnValue(id));
+            allowing(middleware).convertId("OrderBean|1"); will(returnValue(id));
             //oneOf(middleware).getObjectType(id); will(returnValue("Order"));
         }});
         

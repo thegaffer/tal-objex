@@ -20,7 +20,7 @@ import org.tpspencer.tal.objexj.sample.beans.stock.ProductBean;
 public class StockServiceImpl implements StockService {
     
     public static final ObjectStrategy CATEGORY_STRATEGY = new ObjectStrategy() {
-        public String getTypeName() { return "Category"; }
+        public String getTypeName() { return "CategoryBean"; }
         public String getIdProp() { return "id"; }
         public String getParentIdProp() { return "parentId"; }
         public Class<?> getStateClass() { return CategoryBean.class; }
@@ -41,7 +41,7 @@ public class StockServiceImpl implements StockService {
     }; 
     
     public static final ObjectStrategy PRODUCT_STRATEGY = new ObjectStrategy() {
-        public String getTypeName() { return "Product"; }
+        public String getTypeName() { return "ProductBean"; }
         public String getIdProp() { return "id"; }
         public String getParentIdProp() { return "parentId"; }
         public Class<?> getStateClass() { return ProductBean.class; }
@@ -70,7 +70,7 @@ public class StockServiceImpl implements StockService {
     
     public StockServiceImpl(ContainerMiddlewareFactory middlewareFactory) {
         ObjectStrategy[] strategies = new ObjectStrategy[]{CATEGORY_STRATEGY, PRODUCT_STRATEGY};
-        ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "Category", strategies);
+        ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "CategoryBean", strategies);
         
         locator = new SimpleContainerFactory(strategy, middlewareFactory);
     }

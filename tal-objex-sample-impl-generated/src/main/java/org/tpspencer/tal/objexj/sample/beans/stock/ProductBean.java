@@ -15,14 +15,19 @@ public class ProductBean {
 
 	/** The name of the product */
 	private String name;
+	
 	/** The description of the product */
 	private String description;
+	
 	/** The products start date */
 	private Date effectiveFrom;
+	
 	/** The products end date */
 	private Date effectiveTo;
+	
 	/** The products price */
 	private double price;
+	
 	/** The products price currency */
 	private String currency;
 }

@@ -1,6 +1,11 @@
 package org.tpspencer.tal.objexj.sample.beans.stock;
 
+import java.util.List;
+
+import org.tpspencer.tal.objexj.annotations.ObjexRefProp;
 import org.tpspencer.tal.objexj.annotations.ObjexStateBean;
+import org.tpspencer.tal.objexj.sample.api.stock.Category;
+import org.tpspencer.tal.objexj.sample.api.stock.Product;
 
 /**
  * Represents a category of product, which can hold
@@ -24,10 +29,15 @@ public class CategoryBean {
 	
 	/** The name of the category */
 	private String name;
+	
 	/** The description of the category */
 	private String description;
+	
 	/** The products in this category */
-	private String[] products;
+	@ObjexRefProp(owned=true, type=Product.class, newType="ProductBean")
+	private List<String> products;
+	
 	/** The sub-cateogories */
-	private String[] categories;
+	@ObjexRefProp(owned=true, type=Category.class, newType="CategoryBean")
+	private List<String> categories;
 }

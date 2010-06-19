@@ -24,10 +24,12 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     private String CategoryBean.parentId;
     
     public CategoryBean.new() {
+        super();
         // Nothing
     }
 
     public CategoryBean.new(CategoryBean src) {
+        super();
         this.name = src.name;
         this.description = src.description;
         this.products = src.products;
@@ -37,6 +39,7 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     }
 
     public CategoryBean.new(Object id, Object parentId) {
+        super();
         this.id = id != null ? id.toString() : null;
         this.parentId = parentId != null ? parentId.toString() : null;
     }
@@ -47,38 +50,6 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     
     public String CategoryBean.getParentId() {
         return this.parentId;
-    }
-    
-    public String CategoryBean.getName() {
-        return this.name;
-    }
-    
-    public void CategoryBean.setName(String val) {
-        this.name = val;
-    }
-    
-    public String CategoryBean.getDescription() {
-        return this.description;
-    }
-    
-    public void CategoryBean.setDescription(String val) {
-        this.description = val;
-    }
-    
-    public String[] CategoryBean.getProducts() {
-        return this.products;
-    }
-    
-    public void CategoryBean.setProducts(String[] val) {
-        this.products = val;
-    }
-    
-    public String[] CategoryBean.getCategories() {
-        return this.categories;
-    }
-    
-    public void CategoryBean.setCategories(String[] val) {
-        this.categories = val;
     }
     
     public String CategoryBean.getObjexObjType() {

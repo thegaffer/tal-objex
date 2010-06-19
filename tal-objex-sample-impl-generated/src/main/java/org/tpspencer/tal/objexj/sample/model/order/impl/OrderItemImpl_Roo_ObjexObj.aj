@@ -1,7 +1,10 @@
 package org.tpspencer.tal.objexj.sample.model.order.impl;
 
 import java.lang.String;
+import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.object.BaseObjexObj;
+import org.tpspencer.tal.objexj.object.ObjectUtils;
+import org.tpspencer.tal.objexj.sample.api.stock.Product;
 import org.tpspencer.tal.objexj.sample.beans.order.OrderItemBean;
 
 privileged aspect OrderItemImpl_Roo_ObjexObj {
@@ -44,11 +47,21 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
         bean.setDescription(val);
     }
     
-    public String OrderItemImpl.getStockItem() {
+    public Product OrderItemImpl.getStockItem() {
+        return ObjectUtils.getObject(this, bean.getStockItem(), Product.class);
+    }
+    
+    public String OrderItemImpl.getStockItemRef() {
         return bean.getStockItem();
     }
     
-    public void OrderItemImpl.setStockItem(String val) {
+    public void OrderItemImpl.setStockItem(Product val) {
+        checkUpdateable();
+        String ref = ObjectUtils.getObjectRef(val);
+        bean.setStockItem(ref);
+    }
+    
+    public void OrderItemImpl.setStockItemRef(String val) {
         checkUpdateable();
         bean.setStockItem(val);
     }
