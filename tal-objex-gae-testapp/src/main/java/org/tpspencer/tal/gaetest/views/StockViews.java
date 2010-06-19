@@ -18,21 +18,13 @@ public class StockViews {
             StockService stockService = StockServiceFactory.getInstance().getService();
             StockRepository repository = stockService.getRepository();
             
-            Category currentCategory = null;
             List<Category> categories = null;
             List<Product> products = null;
             
-            if( state == null || state.getCurrentCategory() == null ) {
-                // TODO: Fix this is not right - should not have knowledge of IDs!!!
-                currentCategory = repository.findCategory("Category|1");
-            }
-            else {
-                currentCategory = repository.findCategory(state.getCurrentCategory());
-            }
-            
+            Category currentCategory = repository.findCategory(state != null ? state.getCurrentCategory() : null);
             if( currentCategory != null ) {
-                categories = currentCategory.getCategoryList();
-                products = currentCategory.getProductList();
+                categories = currentCategory.getCategories();
+                products = currentCategory.getProducts();
             }
             
             if( currentCategory != null ) model.put("currentCategory", currentCategory);

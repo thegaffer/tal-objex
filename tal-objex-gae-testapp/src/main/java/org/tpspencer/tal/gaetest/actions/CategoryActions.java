@@ -63,7 +63,7 @@ public class CategoryActions {
             repository.persist();
             
             // Show parent (can only edit/create from parent)
-            if( c.getParentId() != null ) state.setCurrentCategory(c.getParentId().toString());
+            if( c.getParentCategoryId() != null ) state.setCurrentCategory(c.getParentCategoryId().toString());
             
             // Back to stock view
             return "/viewStock";

@@ -63,7 +63,7 @@ public class OrderViews {
             OrderRepository repo = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
             
             model.put("order", repo.getOrder());
-            model.put("item", repo.getOrder().getItem(state.getCurrentOrderItem()));
+            model.put("item", repo.getOrder().getItemById(state.getCurrentOrderItem()));
             
             return "/html/order/orderItemForm.jsp";
         }

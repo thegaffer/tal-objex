@@ -98,8 +98,8 @@ public class OrderActions {
             String itemId = RequestUtil.getParameter(request, "id");
             
             OrderItem item = null;
-            if( itemId == null ) item = order.createNewItem();
-            else item = order.getItem(itemId);
+            if( itemId == null ) item = order.createItem();
+            else item = order.getItemById(itemId);
             
             // Bind
             item.setName(RequestUtil.getParameter(request, "name"));

@@ -25,7 +25,7 @@
   	</dependency>
   	<dependency>
   		<groupId>org.talframework.objex</groupId>
-  		<artifactId>tal-objex-sample-impl</artifactId>
+  		<artifactId>tal-objex-sample-impl-generated</artifactId>
   		<version>${project.version}</version>
   		<!-- <scope>runtime</scope> -->
   	</dependency>

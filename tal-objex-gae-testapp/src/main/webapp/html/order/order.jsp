@@ -24,7 +24,7 @@
 		<c:if test="${not empty state.currentOrderTransaction}"><th>Actions</th></c:if>
 	</tr>
 	
-	<c:forEach var="item" items="${order.itemsList}">
+	<c:forEach var="item" items="${order.items}">
 		<tr>
 			<td>${item.ref}</td>
 			<td>${item.name}</td>
