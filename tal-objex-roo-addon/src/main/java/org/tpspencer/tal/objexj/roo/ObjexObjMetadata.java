@@ -19,6 +19,14 @@ import org.tpspencer.tal.objexj.roo.utils.ConstructorMetadataWrapper;
 import org.tpspencer.tal.objexj.roo.utils.MethodMetadataWrapper;
 import org.tpspencer.tal.objexj.roo.utils.TypeDetailsUtil;
 
+/**
+ * Metadata Item for an Objex Object. This object in the code contains
+ * the real business behaviour.
+ * 
+ * TODO: Set methods on owned members that copy fields into existing (creating first as necc)
+ * 
+ * @author Tom Spencer
+ */
 public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
     
     private static final String PROVIDES_TYPE_STRING = ObjexObjMetadata.class.getName();

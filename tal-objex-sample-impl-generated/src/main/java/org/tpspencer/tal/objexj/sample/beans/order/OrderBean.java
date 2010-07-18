@@ -2,10 +2,12 @@ package org.tpspencer.tal.objexj.sample.beans.order;
 
 import java.util.List;
 
+import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.tpspencer.tal.objexj.annotations.ObjexRefProp;
 import org.tpspencer.tal.objexj.annotations.ObjexStateBean;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItem;
 
+@RooJavaBean
 @ObjexStateBean(name="Order")
 public class OrderBean {
     private static final long serialVersionUID = 1L;

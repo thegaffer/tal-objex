@@ -40,7 +40,7 @@ public class ObjexObjMetadataProvider extends AbstractItdMetadataProvider {
         
         String stateMetadataKey = ObjexStateBeanMetadata.createIdentifier(values.getValue(), Path.SRC_MAIN_JAVA);
         ObjexStateBeanMetadata stateMetadata = (ObjexStateBeanMetadata)metadataService.get(stateMetadataKey);
-        Assert.notNull(stateMetadata, "Error, cannot find the state bean metadata for the ObjexObj state bean class: " + values.getValue());
+        Assert.notNull(stateMetadata, "Error, cannot find the state bean metadata for the ObjexObj state bean class: " + values.getValue() + " [" + stateMetadataKey + "]");
         
         return new ObjexObjMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, values, stateMetadata.getProperties());
     }
