@@ -3,6 +3,7 @@ package org.tpspencer.tal.objexj.sample.model.order.impl;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
@@ -26,9 +27,7 @@ public class OrderServiceImpl implements OrderService {
     
     public static final ObjectStrategy ORDER_STRATEGY = new ObjectStrategy() {
         public String getTypeName() { return "OrderBean"; }
-        public String getIdProp() { return "id"; }
-        public String getParentIdProp() { return "parentId"; }
-        public Class<?> getStateClass() { return OrderBean.class; }
+        public Class<? extends ObjexObjStateBean> getStateClass() { return OrderBean.class; }
         
         public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, ObjexObjStateBean state) {
             OrderImpl ret = new OrderImpl((OrderBean)state);
@@ -36,20 +35,22 @@ public class OrderServiceImpl implements OrderService {
             return ret;
         }
         
-        public ObjexObjStateBean getNewStateInstance(Object id, Object parentId) {
-            return new OrderBean(id, parentId);
+        public ObjexObjStateBean getNewStateInstance(ObjexID parentId) {
+            return new OrderBean(parentId);
         }
         
         public ObjexObjStateBean getClonedStateInstance(ObjexObjStateBean source) {
             return new OrderBean((OrderBean)source);
         }
+        
+        public ObjexIDStrategy getIdStrategy() {
+            return null;
+        }
     }; 
     
     public static final ObjectStrategy ITEM_STRATEGY = new ObjectStrategy() {
         public String getTypeName() { return "OrderItemBean"; }
-        public String getIdProp() { return "id"; }
-        public String getParentIdProp() { return "parentId"; }
-        public Class<?> getStateClass() { return OrderItemBean.class; }
+        public Class<? extends ObjexObjStateBean> getStateClass() { return OrderItemBean.class; }
         
         public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, ObjexObjStateBean state) {
             OrderItemImpl ret = new OrderItemImpl((OrderItemBean)state);
@@ -57,12 +58,16 @@ public class OrderServiceImpl implements OrderService {
             return ret;
         }
         
-        public ObjexObjStateBean getNewStateInstance(Object id, Object parentId) {
-            return new OrderItemBean(id, parentId);
+        public ObjexObjStateBean getNewStateInstance(ObjexID parentId) {
+            return new OrderItemBean(parentId);
         }
         
         public ObjexObjStateBean getClonedStateInstance(ObjexObjStateBean source) {
             return new OrderItemBean((OrderItemBean)source);
+        }
+        
+        public ObjexIDStrategy getIdStrategy() {
+            return null;
         }
     }; 
 	
@@ -92,29 +97,18 @@ public class OrderServiceImpl implements OrderService {
 	}
 	
 	/**
-     * Simply gets the container from the container factory
-     * and wraps it inside a new {@link OrderRepositoryImpl}
-     * instance.
-     */
-    public OrderRepository openRepository(String id) {
-        EditableContainer container = locator.open(id);
-        if( container == null ) throw new IllegalArgumentException("Container does not exist: " + id);
-        return new OrderRepositoryImpl(container);
-    }
-	
-	/**
 	 * Simply gets the container from the container factory
 	 * and wraps it inside a new {@link OrderRepositoryImpl}
 	 * instance. 
 	 */
-	public OrderRepository getOpenRepository(String id, String transactionId) {
-		EditableContainer container = locator.getTransaction(id, transactionId);
-		if( container == null ) throw new IllegalArgumentException("Container or transaction does not exist: " + id + ", " + transactionId);
+	public OrderRepository getOpenRepository(String id) {
+		EditableContainer container = locator.open(id);
+		if( container == null ) throw new IllegalArgumentException("Container or transaction does not exist: " + id);
 		return new OrderRepositoryImpl(container);
 	}
 	
-	public OrderRepository createNewOrder(String id) {
-	    EditableContainer container = locator.create(id);
+	public OrderRepository createNewOrder() {
+	    EditableContainer container = locator.create();
 	    
 	    return new OrderRepositoryImpl(container);
 	}

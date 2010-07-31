@@ -32,8 +32,8 @@ public class ObjexStateBeanMetadataProvider extends AbstractItdMetadataProvider 
         JavaType trigger = new JavaType(ObjexStateBean.class.getName());
         
         beanProvider.addMetadataTrigger(trigger);
-        addMetadataTrigger(trigger);
         toStringProvider.addMetadataTrigger(trigger);
+        addMetadataTrigger(trigger);
     }
 
     @Override

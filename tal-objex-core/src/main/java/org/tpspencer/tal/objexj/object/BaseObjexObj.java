@@ -117,12 +117,6 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	}
 	
 	/**
-	 * Returns either the state object directly or a copy
-	 * depending on if in open editable container.
-	 */
-	public abstract Object getStateObject();
-	
-	/**
      * Returns either the state object directly or a copy
      * depending on if in open editable container.
      */

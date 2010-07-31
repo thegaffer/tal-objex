@@ -3,6 +3,7 @@ package org.tpspencer.tal.objexj.sample.model.stock.impl;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
@@ -21,9 +22,7 @@ public class StockServiceImpl implements StockService {
     
     public static final ObjectStrategy CATEGORY_STRATEGY = new ObjectStrategy() {
         public String getTypeName() { return "CategoryBean"; }
-        public String getIdProp() { return "id"; }
-        public String getParentIdProp() { return "parentId"; }
-        public Class<?> getStateClass() { return CategoryBean.class; }
+        public Class<? extends ObjexObjStateBean> getStateClass() { return CategoryBean.class; }
         
         public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, ObjexObjStateBean state) {
             CategoryImpl ret = new CategoryImpl((CategoryBean)state);
@@ -31,20 +30,22 @@ public class StockServiceImpl implements StockService {
             return ret;
         }
         
-        public ObjexObjStateBean getNewStateInstance(Object id, Object parentId) {
-            return new CategoryBean(id, parentId);
+        public ObjexObjStateBean getNewStateInstance(ObjexID parentId) {
+            return new CategoryBean(parentId);
         }
         
         public ObjexObjStateBean getClonedStateInstance(ObjexObjStateBean source) {
             return new CategoryBean((CategoryBean)source);
         }
+        
+        public ObjexIDStrategy getIdStrategy() {
+            return null;
+        }
     }; 
     
     public static final ObjectStrategy PRODUCT_STRATEGY = new ObjectStrategy() {
         public String getTypeName() { return "ProductBean"; }
-        public String getIdProp() { return "id"; }
-        public String getParentIdProp() { return "parentId"; }
-        public Class<?> getStateClass() { return ProductBean.class; }
+        public Class<? extends ObjexObjStateBean> getStateClass() { return ProductBean.class; }
         
         public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, ObjexObjStateBean state) {
             ProductImpl ret = new ProductImpl((ProductBean)state);
@@ -52,12 +53,16 @@ public class StockServiceImpl implements StockService {
             return ret;
         }
         
-        public ObjexObjStateBean getNewStateInstance(Object id, Object parentId) {
-            return new ProductBean(id, parentId);
+        public ObjexObjStateBean getNewStateInstance(ObjexID parentId) {
+            return new ProductBean(parentId);
         }
         
         public ObjexObjStateBean getClonedStateInstance(ObjexObjStateBean source) {
             return new ProductBean((ProductBean)source);
+        }
+        
+        public ObjexIDStrategy getIdStrategy() {
+            return null;
         }
     }; 
     
@@ -70,25 +75,25 @@ public class StockServiceImpl implements StockService {
     
     public StockServiceImpl(ContainerMiddlewareFactory middlewareFactory) {
         ObjectStrategy[] strategies = new ObjectStrategy[]{CATEGORY_STRATEGY, PRODUCT_STRATEGY};
-        ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "CategoryBean", strategies);
+        ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "Stock", "CategoryBean", strategies);
         
         locator = new SimpleContainerFactory(strategy, middlewareFactory);
     }
 
     public StockRepository getRepository() {
-        return new StockRepositoryImpl(locator.get("Stock/Stock"));
+        return new StockRepositoryImpl(locator.get("Stock"));
     }
     
     public StockRepository getOpenRepository() {
-        return new StockRepositoryImpl(locator.open("Stock/Stock"));
+        return new StockRepositoryImpl(locator.open("Stock"));
     }
     
     public StockRepository getOpenRepository(String id) {
-        return new StockRepositoryImpl(locator.getTransaction("Stock/Stock", id));
+        return new StockRepositoryImpl(locator.open(id));
     }
 
     public void ensureCreated() {
-        EditableContainer container = locator.create("Stock/Stock");
+        EditableContainer container = locator.create();
         if( container.isNew() ) {
             Category rootCat = container.getRootObject().getBehaviour(Category.class);
             rootCat.setName("Root");

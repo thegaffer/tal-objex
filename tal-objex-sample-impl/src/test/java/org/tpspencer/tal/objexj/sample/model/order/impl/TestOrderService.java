@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
-import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.container.ContainerMiddleware;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
@@ -45,11 +44,11 @@ public class TestOrderService {
         // final ObjexObj obj = context.mock(ObjexObj.class);
         
         context.checking(new Expectations() {{
-            oneOf(containerFactory).create(with(any(String.class)));
+            oneOf(containerFactory).create();
               will(returnValue(container));
         }});
         
-        OrderRepository repo = service.createNewOrder("123");
+        OrderRepository repo = service.createNewOrder();
         Assert.assertNotNull(repo);
         // Assert.assertNotNull(repo.getOrder());
         context.assertIsSatisfied();
@@ -60,21 +59,15 @@ public class TestOrderService {
         OrderServiceImpl service = new OrderServiceImpl(middlewareFactory);
         final TransactionMiddleware middleware = context.mock(TransactionMiddleware.class);
         final TransactionCache cache = new SimpleTransactionCache();
-        final ObjexID id = context.mock(ObjexID.class);
             
         context.checking(new Expectations() {{
-            oneOf(middlewareFactory).createContainer(with(any(ContainerStrategy.class)), with(any(String.class))); 
+            oneOf(middlewareFactory).createContainer(with(any(ContainerStrategy.class))); 
               will(returnValue(middleware));
-            oneOf(middleware).createNewId("Order"); will(returnValue(id));
-            oneOf(middleware).getRawId(id); will(returnValue("o1"));
             oneOf(middleware).init(with(any(Container.class)));
             allowing(middleware).getCache(); will(returnValue(cache));
-            // allowing(id).isNull(); will(returnValue(false));
-            allowing(middleware).convertId("Order|1"); will(returnValue(id));
-            //oneOf(middleware).getObjectType(id); will(returnValue("Order"));
         }});
         
-        OrderRepository repo = service.createNewOrder("123");
+        OrderRepository repo = service.createNewOrder();
         Assert.assertNotNull(repo);
         //Assert.assertNotNull(repo.getOrder());
         context.assertIsSatisfied();
@@ -101,6 +94,7 @@ public class TestOrderService {
         
         context.checking(new Expectations() {{
             oneOf(middlewareFactory).getMiddleware(with(any(ContainerStrategy.class)), with("123")); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("123"));
             oneOf(middleware).init(with(any(Container.class)));
         }});
         
@@ -115,10 +109,10 @@ public class TestOrderService {
         final EditableContainer container = context.mock(EditableContainer.class);
         
         context.checking(new Expectations() {{
-            oneOf(containerFactory).getTransaction("123", "321"); will(returnValue(container));
+            oneOf(containerFactory).open("321"); will(returnValue(container));
         }});
         
-        OrderRepository repo = service.getOpenRepository("123", "321");
+        OrderRepository repo = service.getOpenRepository("321");
         Assert.assertNotNull(repo);
         context.assertIsSatisfied();
     }
@@ -130,12 +124,13 @@ public class TestOrderService {
         final TransactionCache cache = context.mock(TransactionCache.class);
         
         context.checking(new Expectations() {{
-            oneOf(middlewareFactory).getTransaction(with(any(ContainerStrategy.class)), with("123"), with("321")); will(returnValue(middleware));
+            oneOf(middlewareFactory).getTransaction(with(any(ContainerStrategy.class)), with("321")); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("123"));
             oneOf(middleware).init(with(any(EditableContainer.class)));
             oneOf(middleware).getCache(); will(returnValue(cache));
         }});
         
-        OrderRepository repo = service.getOpenRepository("123", "321");
+        OrderRepository repo = service.getOpenRepository("321");
         Assert.assertNotNull(repo);
         context.assertIsSatisfied();
     }

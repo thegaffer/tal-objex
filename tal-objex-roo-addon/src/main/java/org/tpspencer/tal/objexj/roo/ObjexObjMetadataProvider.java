@@ -25,8 +25,10 @@ public class ObjexObjMetadataProvider extends AbstractItdMetadataProvider {
     
     public ObjexObjMetadataProvider(MetadataService metadataService, MetadataDependencyRegistry metadataDependencyRegistry, FileManager fileManager, ToStringMetadataProvider toStringProvider) {
         super(metadataService, metadataDependencyRegistry, fileManager);
-        addMetadataTrigger(new JavaType(ObjexObj.class.getName()));
-        toStringProvider.addMetadataTrigger(new JavaType(ObjexObj.class.getName()));
+        
+        JavaType type = new JavaType(ObjexObj.class.getName());
+        toStringProvider.addMetadataTrigger(type); // Not sure about this, what about base!!
+        addMetadataTrigger(type);
     }
 
     @Override

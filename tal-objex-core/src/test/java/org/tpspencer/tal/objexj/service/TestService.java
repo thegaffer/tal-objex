@@ -20,7 +20,7 @@ import org.tpspencer.tal.objexj.container.TransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionMiddleware;
 import org.tpspencer.tal.objexj.locator.ContainerFactory;
 import org.tpspencer.tal.objexj.locator.SimpleContainerFactory;
-import org.tpspencer.tal.objexj.locator.SimpleContainerLocator;
+import org.tpspencer.tal.objexj.object.DefaultObjexID;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
 import org.tpspencer.tal.objexj.service.beans.CategoryBean;
@@ -39,26 +39,24 @@ public class TestService {
 	private Mockery context = new JUnit4Mockery();
 	private ContainerFactory containerLocator;
 	private ContainerStrategy strategy;
+	private ContainerMiddlewareFactory middlewareFactory;
+	private TransactionMiddleware middleware;
 	
 	@Before
 	public void setup() {
 		strategy = context.mock(ContainerStrategy.class);
-		final ContainerMiddlewareFactory middlewareFactory = context.mock(ContainerMiddlewareFactory.class);
-		final TransactionMiddleware middleware = context.mock(TransactionMiddleware.class);
+		middlewareFactory = context.mock(ContainerMiddlewareFactory.class);
+		middleware = context.mock(TransactionMiddleware.class);
 		
-		Map<String, ContainerFactory> factories = new HashMap<String, ContainerFactory>();
-		SimpleContainerFactory factory = new SimpleContainerFactory(strategy, middlewareFactory);
-		factories.put("Stock", factory);
+		containerLocator = new SimpleContainerFactory(strategy, middlewareFactory);
 		
-		final ObjexID idCategory = context.mock(ObjexID.class, "categoryId");
-		final ObjexID idProduct = context.mock(ObjexID.class, "productId");
-		
-		containerLocator = new SimpleContainerLocator(factories);
-
+		/*
 		final CategoryBean category = new CategoryBean();
 		category.setName("Cat1");
 		final ProductBean product = new ProductBean();
 		product.setName("Product1");
+		*/
+		final ObjexID rootId = new DefaultObjexID("Category", "1");
 		
 		final ObjectStrategy categoryStrategy = new SimpleObjectStrategy("Category", null, CategoryBean.class);
 		final ObjectStrategy productStrategy = new SimpleObjectStrategy("Product", null, ProductBean.class);
@@ -66,50 +64,23 @@ public class TestService {
 		objectStrategies.put("Category", categoryStrategy);
 		objectStrategies.put("Product", productStrategy);
 		
-		final TransactionCache cache = new SimpleTransactionCache();
+		// final TransactionCache cache = new SimpleTransactionCache();
 		
 		context.checking(new Expectations() {{
-			allowing(idCategory).isNull(); will(returnValue(false));
-			allowing(idProduct).isNull(); will(returnValue(false));
+		    allowing(strategy).getObjectStrategy("Category"); will(returnValue(categoryStrategy));
+            allowing(strategy).getObjectStrategy("Product"); will(returnValue(productStrategy));
+            allowing(strategy).getRootObjectName(); will(returnValue("Category"));
+            allowing(strategy).getRootObjectID(); will(returnValue(rootId));
+            
+            /*
+			allowing(middlewareFactory).createContainer(with(strategy)); will(returnValue(middleware));
+			allowing(middlewareFactory).getTransaction(strategy, "1"); will(returnValue(middleware));
 			
-			allowing(middlewareFactory).getMiddleware(with(strategy), (String)with(anything())); will(returnValue(middleware));
-			allowing(middlewareFactory).createTransaction(with(strategy), (String)with(anything())); will(returnValue(middleware));
-			allowing(middlewareFactory).createContainer(with(strategy), (String)with(anything())); will(returnValue(middleware));
-			allowing(middlewareFactory).getTransaction(strategy, "Stock/1", "1"); will(returnValue(middleware));
-			
-			allowing(middleware).init(with(any(Container.class)));
-			allowing(middleware).convertId(1); will(returnValue(idCategory));
-			allowing(middleware).convertId(null); will(returnValue(null));
-			allowing(middleware).convertId(20); will(returnValue(idCategory));
-			allowing(middleware).getRawId(idCategory); will(returnValue("c1"));
-			allowing(middleware).convertId(idCategory); will(returnValue(idCategory));
-			allowing(middleware).getObjectType(idCategory); will(returnValue("Category"));
-			allowing(middleware).convertId(21); will(returnValue(idProduct));
-			allowing(middleware).getRawId(idProduct); will(returnValue("p2"));
-			allowing(middleware).convertId(idProduct); will(returnValue(idProduct));
-			allowing(middleware).getObjectType(idProduct); will(returnValue("Product"));
-			allowing(middleware).convertId("Category|1"); will(returnValue(idCategory));
-			
-			oneOf(middleware).createNewId(with("Category")); will(returnValue(idCategory));
-			
-			allowing(middleware).init(with(any(Container.class)));
-			// allowing(transaction).init(with(any(Container.class)));
-			
-			allowing(middleware).loadObject(CategoryBean.class, idCategory);
-			  will(returnValue(category));
-			allowing(middleware).loadObject(ProductBean.class, idProduct);
-			  will(returnValue(product));
-			  
-			atMost(1).of(middleware).suspend(with(any(TransactionCache.class))); will(returnValue("1"));
-			atMost(1).of(middleware).clear(with(any(TransactionCache.class)));
-			allowing(middleware).getCache(); will(returnValue(cache));
-			
-			allowing(strategy).getRootObjectName(); will(returnValue("Category"));
-			allowing(strategy).getObjectStrategies(); will(returnValue(objectStrategies));
-			allowing(strategy).getObjectStrategy("Category"); will(returnValue(categoryStrategy));
-			allowing(strategy).getObjectStrategy("Product"); will(returnValue(productStrategy));
-			
-			allowing(middleware).save(with(any(TransactionCache.class)));
+			atMost(1).of(middleware).suspend(); will(returnValue("1"));
+            atMost(1).of(middleware).clear();
+            allowing(middleware).getCache(); will(returnValue(cache));
+            allowing(middleware).save();
+			*/
 		}});
 	}
 
@@ -123,19 +94,35 @@ public class TestService {
 	 */
 	@Test
 	public void createAggregateResponse() {
+	    final ObjexID idCategory = new DefaultObjexID("Category", 20);
+        final ObjexID idProduct = new DefaultObjexID("Product", 21);
+        final CategoryBean currentCategory = new CategoryBean("Cat1");
+        final ProductBean currentProduct = new ProductBean("Product1");
+        
+	    context.checking(new Expectations() {{
+	        oneOf(middlewareFactory).getMiddleware(strategy, "Stock/1"); will(returnValue(middleware));
+	        oneOf(middleware).getContainerId(); will(returnValue("Stock/1"));
+	        oneOf(middleware).init(with(any(Container.class)));
+	        oneOf(middleware).loadObject(CategoryBean.class, idCategory);
+                will(returnValue(currentCategory));
+            oneOf(middleware).loadObject(ProductBean.class, idProduct);
+                will(returnValue(currentProduct));
+	    }});
+	    
 		Container container = containerLocator.get("Stock/1");
 		
-		ObjexObj obj1 = container.getObject(20);
-		ObjexObj obj2 = container.getObject(21);
+		ObjexObj obj1 = container.getObject("Category/20");
+		ObjexObj obj2 = container.getObject("Product/21");
 		
-		CategoryBean category = obj1.getStateObject(CategoryBean.class);
-		ProductBean product = obj2.getStateObject(ProductBean.class);
+		CategoryBean obtainedCategory = obj1.getStateObject(CategoryBean.class);
+		ProductBean obtainedProduct = obj2.getStateObject(ProductBean.class);
 		
 		// You could now form and return you aggregate object, we are going to test it though!
-		Assert.assertNotNull(category);
-		Assert.assertEquals("Cat1", category.getName());
-		Assert.assertNotNull(product);
-		Assert.assertEquals("Product1", product.getName());
+		Assert.assertNotNull(obtainedCategory);
+		Assert.assertEquals("Cat1", obtainedCategory.getName());
+		Assert.assertNotNull(obtainedProduct);
+		Assert.assertEquals("Product1", obtainedProduct.getName());
+		context.assertIsSatisfied();
 	}
 	
 	/**
@@ -143,20 +130,30 @@ public class TestService {
 	 */
 	@Test
 	public void createDocument() {
-	    EditableContainer store = containerLocator.create("Stock/1");
-		
+	    // Setup
+	    final TransactionCache cache = new SimpleTransactionCache();
+	    final ObjexID rootId = new DefaultObjexID("Category", "1");
+	    
+	    context.checking(new Expectations() {{
+	        oneOf(middlewareFactory).createContainer(with(strategy)); will(returnValue(middleware));
+	        oneOf(middleware).getCache(); will(returnValue(cache));
+	        oneOf(middleware).init(with(any(Container.class)));
+	        oneOf(middleware).getCache(); will(returnValue(cache));
+	        oneOf(middleware).save(); will(returnValue("Stock/1"));
+	    }});
+        
+	    // Test
+        EditableContainer store = containerLocator.create();
 		ObjexObj root = store.getRootObject();
         root.getStateObject(CategoryBean.class).setName("Hi");
-        
-		store.saveContainer();
+        String id = store.saveContainer();
 		
-		// End of simple example, now test
-		String id = store.getId();
-		Container container = containerLocator.get(id);
-		Assert.assertNotNull(container);
-		Assert.assertNotNull(container.getObject(1));
-		// Note: Because new root object is created, this is lost by mocked middleware
-		Assert.assertEquals("Cat1", container.getObject(1).getProperty("name"));
+		// Asserts
+        Assert.assertEquals("Stock/1", id);
+		CategoryBean bean = (CategoryBean)cache.getNewObjects().get(rootId);
+		Assert.assertNotNull(bean);
+		Assert.assertEquals("Hi", bean.getName());
+		context.assertIsSatisfied();
 	}
 	
 	/**
@@ -165,32 +162,40 @@ public class TestService {
 	 */
 	@Test
 	public void update() {
-		EditableContainer store = containerLocator.open("Stock/1");
+	    // Setup
+	    final ObjexID idCategory = new DefaultObjexID("Category", 20);
+        final CategoryBean currentCategory = new CategoryBean("Cat1");
+        final TransactionCache cache = new SimpleTransactionCache();
+        
+	    context.checking(new Expectations() {{
+	        oneOf(middlewareFactory).getTransaction(strategy, "Stock/1"); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("Stock/1"));
+            oneOf(middleware).init(with(any(Container.class)));
+            oneOf(middleware).getCache(); will(returnValue(cache));
+            oneOf(middleware).loadObject(CategoryBean.class, idCategory);
+                will(returnValue(currentCategory));
+            oneOf(middleware).save(); will(returnValue("Stock/1"));
+            
+            oneOf(middlewareFactory).getMiddleware(strategy, "Stock/1"); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("Stock/1"));
+            oneOf(middleware).init(with(any(Container.class)));
+            oneOf(middleware).loadObject(CategoryBean.class, idCategory);
+                will(returnValue(currentCategory));
+        }});
+        
+	    // Test
+        EditableContainer store = containerLocator.open("Stock/1");
 		
-		ObjexObj obj1 = store.getObject(20);
+		ObjexObj obj1 = store.getObject("Category/20");
 		CategoryBean category = obj1.getStateObject(CategoryBean.class);
 		category.setName("Cat1_edited");
 		
 		store.saveContainer();
 		
-		// Example ends, Test
+		// Asserts
 		Container store1 = containerLocator.get("Stock/1");
-		category = store1.getObject(20).getStateObject(CategoryBean.class);
+		category = store1.getObject("Category/20").getStateObject(CategoryBean.class);
 		Assert.assertEquals("Cat1_edited", category.getName());
-	}
-	
-	/**
-	 * This method describes how to start a long lived
-	 * edit
-	 */
-	@Test
-	public void startLongLivedEdit() {
-		EditableContainer store = containerLocator.open("Stock/1");
-		Assert.assertNotNull(store.suspend());
-		
-		// Example ends, Close is so this test is isolated
-		store.closeContainer();
-		Assert.assertFalse(store.isOpen());
 	}
 	
 	/**
@@ -199,26 +204,62 @@ public class TestService {
 	 */
 	@Test
 	public void updateLongLivedEdit() {
-		EditableContainer store = containerLocator.open("Stock/1");
+	    // Setup
+	    final ObjexID idCategory = new DefaultObjexID("Category", 20);
+        final CategoryBean currentCategory = new CategoryBean("Cat1");
+	    final TransactionCache cache = new SimpleTransactionCache();
+	    
+	    context.checking(new Expectations() {{
+	        // Initial Open
+	        oneOf(middlewareFactory).getTransaction(strategy, "Stock/1"); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("Stock/1"));
+            oneOf(middleware).init(with(any(Container.class)));
+            oneOf(middleware).getCache(); will(returnValue(cache));
+            oneOf(middleware).suspend(); will(returnValue("Stock/trans:123"));
+            oneOf(middleware).clear();
+            
+            // Open transaction, make an edit and save
+            oneOf(middlewareFactory).getTransaction(strategy, "Stock/trans:123"); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("Stock/1"));
+            oneOf(middleware).init(with(any(Container.class)));
+            oneOf(middleware).getCache(); will(returnValue(cache));
+            oneOf(middleware).loadObject(CategoryBean.class, idCategory);
+                will(returnValue(currentCategory));
+            oneOf(middleware).loadObject(CategoryBean.class, idCategory);
+                will(returnValue(currentCategory));
+            oneOf(middleware).save(); will(returnValue("Stock/1"));
+            
+            // Get container and query
+            oneOf(middlewareFactory).getMiddleware(strategy, "Stock/1"); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("Stock/1"));
+            oneOf(middleware).init(with(any(Container.class)));
+            oneOf(middleware).loadObject(CategoryBean.class, idCategory);
+                will(returnValue(currentCategory));
+        }});
+        
+	    // Test I
+        EditableContainer store = containerLocator.open("Stock/1");
 		String transId = store.suspend();
+		Assert.assertEquals("Stock/trans:123", transId);
+		store.closeContainer();
 		
-		// Example Starts
-		store = containerLocator.getTransaction("Stock/1", transId);
+		// Asserts I
+		store = containerLocator.open(transId);
 		Assert.assertNotNull(store);
 		
-		ObjexObj obj1 = store.getObject(20);
+		ObjexObj obj1 = store.getObject("Category/20");
 		CategoryBean category = obj1.getStateObject(CategoryBean.class);
 		category.setName("Cat1_edited_again");
 		
-		Assert.assertEquals("Cat1_edited_again", store.getObject(20).getProperty("name"));
+		Assert.assertEquals("Cat1_edited_again", store.getObject("Category/20").getProperty("name"));
 		
-		// Store this transaction away
+		// Test II
 		store.saveContainer();
 		Assert.assertFalse(store.isOpen());
 		
-		// Example ends, Test
+		// Asserts II
 		Container store1 = containerLocator.get("Stock/1");
-		category = store1.getObject(20).getStateObject(CategoryBean.class);
+		category = store1.getObject("Category/20").getStateObject(CategoryBean.class);
 		Assert.assertEquals("Cat1_edited_again", category.getName());
 	}
 }

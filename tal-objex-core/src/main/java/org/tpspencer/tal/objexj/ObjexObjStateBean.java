@@ -1,6 +1,7 @@
 package org.tpspencer.tal.objexj;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * This interface is a representative interface marking
@@ -22,36 +23,30 @@ import java.io.Serializable;
 public interface ObjexObjStateBean extends Serializable {
     
     /**
+     * Called in the transaction before save to set the
+     * runtime ID of the object
+     * 
+     * @param id The underlying runtime environment ID
+     */
+    public void init(Object id);
+    
+    /**
+     * Called to update any temporary references this
+     * object may be holding. This is done as the transaction
+     * commits to turn any temp IDs into real IDs.
+     * 
+     * @param refs A map holding the original temp ID and its new real ID
+     */
+    public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs);
+    
+    /**
      * @return The ObjexObj type that this bean represents
      */
     public String getObjexObjType();
 
 	/**
-	 * @return The ID of the object this is the state bean for
-	 */
-	public Object getId();
-	
-	/**
-	 * Call to set the objects ID. This can only be done
-	 * if the ID is currently null (so assumed to be part
-	 * of loading process) or if the ID is a 'new' ID. The
-	 * later requires support in the beans which may not
-	 * be present so ideally the ID of the object is
-	 * constructed at creation time.
-	 * 
-	 * @param id The id of the parent object
-	 */
-	//public void setId(Object id);
-	
-	/**
 	 * @return The ID of the parent object to this one (if any) 
 	 */
-	public Object getParentId();
+	public String getParentId();
 	
-	/**
-	 * Call to set the parent objects ID.
-	 * 
-	 * @param parentId The ID of the parent object
-	 */
-	//public void setParentId(Object parentId);
 }

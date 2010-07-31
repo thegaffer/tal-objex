@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.BaseObjexObj;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItem;
@@ -19,7 +20,7 @@ privileged aspect OrderImpl_Roo_ObjexObj {
         return bean;
     }
     
-    public OrderBean OrderImpl.getStateObject() {
+    public ObjexObjStateBean OrderImpl.getStateObject() {
         if( isUpdateable() ) return bean;
         else return new OrderBean(bean);
     }

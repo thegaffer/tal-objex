@@ -5,14 +5,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.util.Assert;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.object.DefaultObjexID;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
 /**
@@ -25,7 +24,7 @@ import org.tpspencer.tal.objexj.object.ObjectStrategy;
 public class StandardContainer implements Container {
 
 	/** Holds the ID of the container */
-	private final String id;
+	private String id;
 	
 	/** Holds the strategy for this container */
 	private final ContainerStrategy strategy;
@@ -63,6 +62,14 @@ public class StandardContainer implements Container {
 	}
 	
 	/**
+	 * @param id The ID of the container (set after a save)
+	 */
+	protected void setId(String id) {
+	    if( this.id != null && !id.equals(this.id) ) throw new IllegalArgumentException("Cannot change a containers id [" + this.id + "]: " + id);
+	    this.id = id;
+	}
+	
+	/**
 	 * Returns the strategies name
 	 */
 	public String getType() {
@@ -84,33 +91,35 @@ public class StandardContainer implements Container {
 	}
 	
 	public ObjexObj getRootObject() {
-	    String rootType = strategy.getRootObjectName();
-	    return getObject(rootType + "|1");
-	    // TODO: This assumes a index based ID strategy, this may be incorrect!!
+	    ObjexID rootId = strategy.getRootObjectID();
+	    return getObject(rootId);
 	}
 	
 	public ObjexID getObjectId(Object id) {
-	    return middleware.convertId(id);
+	    return DefaultObjexID.getId(id);
 	}
 	
 	public ObjexObj getObject(Object id) {
 	    if( id == null ) return null; // Just protect from a stupid call!!
 	    
-		ObjexID realId = middleware.convertId(id);
+		ObjexID realId = DefaultObjexID.getId(id);
 		if( realId == null ) throw new IllegalArgumentException("ID passed in does not appear to be valid: " + id);
 		
-		String type = middleware.getObjectType(realId);
-		if( type == null ) throw new IllegalArgumentException("ID passed in does not appear to be of a valid type: " + id);
-		
-		ObjectStrategy objectStrategy = strategy.getObjectStrategies().get(type);
-		if( objectStrategy == null ) throw new IllegalArgumentException("ID passed in does not appear to match a strategy: " + id);
-		
+		ObjectStrategy objectStrategy = strategy.getObjectStrategy(realId.getType());
 		Object state = middleware.loadObject(objectStrategy.getStateClass(), realId);
+		
 		if( state instanceof ObjexObjStateBean ) {
-		    return state != null ? createObjexObj(realId, (ObjexObjStateBean)state) : null;
+		    return createObjexObj(objectStrategy, realId, (ObjexObjStateBean)state);
+		}
+		else if( state instanceof ObjexObj ) {
+		    return (ObjexObj)state;
+		}
+		else if( state != null ) {
+		    throw new IllegalArgumentException("The simple container only supports ObjexObjStateBean or direct ObjexObj instances from middleware: " + state);
 		}
 		else {
-		    throw new IllegalArgumentException("The simple container only supports ObjexObjStateBean instances: " + state);
+		    // TODO: Or should this be Object not found??
+		    return null;
 		}
 	}
 	
@@ -146,7 +155,7 @@ public class StandardContainer implements Container {
 	}
 	
 	public EditableContainer openContainer() {
-		// TODO Auto-generated method stub
+		// TODO: Remove when no longer deprecated and removed
 		return null;
 	}
 	
@@ -154,27 +163,15 @@ public class StandardContainer implements Container {
 	 * Helper to actually return the ObjexObj instance. This instance
 	 * is formed from details on the objects strategy.
 	 * 
+	 * @param objectStrategy The strategy for the object we want
 	 * @param id The ID of the object
 	 * @param state The state object
 	 * @return The ObjexObj instance
 	 */
-	protected ObjexObj createObjexObj(ObjexID id, ObjexObjStateBean state) {
+	protected ObjexObj createObjexObj(ObjectStrategy objectStrategy, ObjexID id, ObjexObjStateBean state) {
 		if( state == null ) return null;
 		
-		ContainerStrategy strategy = getContainerStrategy();
-		ObjectStrategy objectStrategy = strategy.getObjectStrategies().get(middleware.getObjectType(id));
-		if( objectStrategy == null ) throw new IllegalArgumentException("Container [" + objectStrategy + "] is not configured to use the type of state object passed in: " + id); 
-		
-		// Extract parent if there is one
-		ObjexID realParentId = null;
-		if( objectStrategy.getParentIdProp() != null ) {
-			BeanWrapper wrapper = new BeanWrapperImpl(state);
-			if( wrapper.isReadableProperty(objectStrategy.getParentIdProp()) ) {
-				Object parentId = wrapper.getPropertyValue(objectStrategy.getParentIdProp());
-				realParentId = parentId != null ? middleware.convertId(parentId) : null;
-			}
-		}
-		
-		return objectStrategy.getObjexObjInstance(this, realParentId, id, state);
+		ObjexID parentId = DefaultObjexID.getId(state.getParentId());
+		return objectStrategy.getObjexObjInstance(this, parentId, id, state);
 	}
 }

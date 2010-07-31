@@ -26,31 +26,15 @@ public interface ContainerMiddleware {
 	 * @param container The container
 	 */
 	public void init(Container container);
+	
+	/**
+	 * Call to get the containers ID. This is done because a
+	 * middleware is often created based on a transaction ID.
+	 * 
+	 * @return The containers ID
+	 */
+	public String getContainerId();
 
-	/**
-	 * Called to convert some object that represents the ID
-	 * of an object into a real ObjexID. If the ID is null
-	 * in then no error is thrown, but it is an implementation
-	 * choice over a null return or an actual return that
-	 * represents a Null ID.
-	 * 
-	 * @param id The id to convert
-	 * @return The ObjexID
-	 * @throws IllegalArgumentException If the ID is not a real ID.
-	 */
-	public ObjexID convertId(Object id);
-	
-	/**
-	 * Called to determine the type from the ObjexID. This 
-	 * used internally by the container and is no supported
-	 * in all cases. However, typically the type of an 
-	 * object is encoded into the type.
-	 * 
-	 * @param id The ID we want the type from
-	 * @return The type
-	 */
-	public String getObjectType(ObjexID id);
-	
 	/**
 	 * Called to actually load an object from the persistent
 	 * store.

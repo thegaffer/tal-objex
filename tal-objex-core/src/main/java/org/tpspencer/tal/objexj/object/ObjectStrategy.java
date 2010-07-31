@@ -2,6 +2,7 @@ package org.tpspencer.tal.objexj.object;
 
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
@@ -24,6 +25,17 @@ public interface ObjectStrategy {
 	public String getTypeName();
 	
 	/**
+	 * Some objects have a custom ID strategy instead of a 
+	 * middleware assigned strategy. These objects should
+	 * have an ID strategy and return a temp ID when it is
+	 * first created. The ID strategy will then be re-used 
+	 * when the object is saved.
+	 * 
+	 * @return The ID strategy for the object
+	 */
+	public ObjexIDStrategy getIdStrategy();
+	
+	/**
 	 * Call to create an ObjexObj instance for this object.
 	 * 
 	 * @param container The container initialising this object
@@ -42,7 +54,7 @@ public interface ObjectStrategy {
 	 * 
 	 * @return The objects state class
 	 */
-	public Class<?> getStateClass();
+	public Class<? extends ObjexObjStateBean> getStateClass();
 	
 	/**
 	 * Call for the strategy to create a new instance of the
@@ -52,7 +64,7 @@ public interface ObjectStrategy {
 	 * 
 	 * @return A new instance of the state class
 	 */
-	public ObjexObjStateBean getNewStateInstance(Object id, Object parentId);
+	public ObjexObjStateBean getNewStateInstance(ObjexID parentId);
 	
 	/**
 	 * Call to get a cloned instance of the state bean.
@@ -61,14 +73,4 @@ public interface ObjectStrategy {
 	 * @return The copied instance
 	 */
 	public ObjexObjStateBean getClonedStateInstance(ObjexObjStateBean source);
-	
-	/**
-	 * @return The name of the property on state object holding the ID
-	 */
-	public String getIdProp();
-	
-	/**
-	 * @return The name of the property on state object holding parent ID
-	 */
-	public String getParentIdProp();
 }

@@ -13,14 +13,7 @@ public class OrderViews {
     public static class OrderView implements GAEObjexSampleApp.View {
         public String prepare(SampleAppState state, Map<String, Object> model) {
             OrderService service = OrderServiceFactory.getInstance().getService();
-            OrderRepository repository = null;
-            
-            if( state.getCurrentOrderTransaction() != null ) {
-                repository = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
-            }
-            else {
-                repository = service.getRepository(state.getCurrentOrder());
-            }
+            OrderRepository repository = service.getRepository(state.getCurrentOrder());
             
             model.put("order", repository.getOrder());
             
@@ -37,7 +30,7 @@ public class OrderViews {
     public static class OrderFormView implements GAEObjexSampleApp.View {
         public String prepare(SampleAppState state, Map<String, Object> model) {
             OrderService service = OrderServiceFactory.getInstance().getService();
-            OrderRepository repo = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
+            OrderRepository repo = service.getOpenRepository(state.getCurrentOrder());
             
             model.put("order", repo.getOrder());
             
@@ -48,7 +41,7 @@ public class OrderViews {
     public static class NewOrderItemView implements GAEObjexSampleApp.View {
         public String prepare(SampleAppState state, Map<String, Object> model) {
             OrderService service = OrderServiceFactory.getInstance().getService();
-            OrderRepository repo = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
+            OrderRepository repo = service.getOpenRepository(state.getCurrentOrder());
             
             model.put("order", repo.getOrder());
             model.put("newOrderItem", true);
@@ -60,7 +53,7 @@ public class OrderViews {
     public static class EditOrderItemView implements GAEObjexSampleApp.View {
         public String prepare(SampleAppState state, Map<String, Object> model) {
             OrderService service = OrderServiceFactory.getInstance().getService();
-            OrderRepository repo = service.getOpenRepository(state.getCurrentOrder(), state.getCurrentOrderTransaction());
+            OrderRepository repo = service.getOpenRepository(state.getCurrentOrder());
             
             model.put("order", repo.getOrder());
             model.put("item", repo.getOrder().getItemById(state.getCurrentOrderItem()));

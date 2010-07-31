@@ -10,6 +10,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.roo.fields.CollectionPropHelper;
 import org.tpspencer.tal.objexj.roo.fields.ObjexObjProperty;
 import org.tpspencer.tal.objexj.roo.fields.PropHelper;
@@ -90,7 +91,7 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
         localGetter.addBody("return bean;");
         localGetter.addMetadata(builder, governorTypeDetails, getId());
         
-        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName("getStateObject"), annotationValues.getValue());
+        MethodMetadataWrapper getter = new MethodMetadataWrapper("getStateObject", ObjexObjStateBean.class.getName());
         getter.addBody("if( isUpdateable() ) return bean;");
         getter.addBody("else return new " + annotationValues.getValue().getSimpleTypeName() + "(bean);");
         getter.addMetadata(builder, governorTypeDetails, getId());

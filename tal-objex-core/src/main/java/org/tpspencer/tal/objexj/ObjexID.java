@@ -19,7 +19,17 @@ public interface ObjexID extends Serializable {
 	public boolean isNull();
 	
 	/**
-	 * @return True if the ID points to a root object
+	 * @return True if the ID is a temporary ID inside a transaction
 	 */
-	public boolean isRoot();
+	public boolean isTemp();
+
+	/**
+	 * @return The type of object represented by the ID
+	 */
+	public String getType();
+	
+	/**
+	 * @return The ID of the object, either a Long or a String
+	 */
+	public Object getId();
 }

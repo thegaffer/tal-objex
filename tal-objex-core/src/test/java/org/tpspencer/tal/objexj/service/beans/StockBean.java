@@ -1,21 +1,32 @@
 package org.tpspencer.tal.objexj.service.beans;
 
+import java.util.Map;
+
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
 public class StockBean implements ObjexObjStateBean {
+    private static final long serialVersionUID = 1L;
+    
 	private String id = null;
 	
 	private String[] categories = null;
 	
 	public StockBean() {
-	    
 	}
 	
-	public StockBean(Object id, Object parentId) {
-        this.id = id != null ? id.toString() : null;
+	public StockBean(ObjexID parentId) {
     }
 
-	/**
+	public void init(Object id) {
+        this.id = id != null ? id.toString() : null;
+    }
+    
+    public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
+        // No-op in this test bean
+    }
+    
+    /**
      * Hard-coded type
      */
     public String getObjexObjType() {
@@ -36,11 +47,11 @@ public class StockBean implements ObjexObjStateBean {
 		this.id = id != null ? id.toString() : null;
 	}
 	
-	public Object getParentId() {
+	public String getParentId() {
 	    return null;
 	}
 	
-	public void setParentId(Object parentId) {
+	public void setParentId(String parentId) {
 	    // no-op
 	}
 

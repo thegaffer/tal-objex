@@ -1,5 +1,8 @@
 package org.tpspencer.tal.objexj.service.beans;
 
+import java.util.Map;
+
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
 /**
@@ -23,6 +26,8 @@ import org.tpspencer.tal.objexj.ObjexObjStateBean;
  * @author Tom Spencer
  */
 public class ProductBean implements ObjexObjStateBean {
+    private static final long serialVersionUID = 1L;
+    
 	private String id;
 	private String parentId;
 	
@@ -32,15 +37,25 @@ public class ProductBean implements ObjexObjStateBean {
 	private double price;
 	
 	public ProductBean() {
-        // TODO Auto-generated constructor stub
     }
 	
-	public ProductBean(Object id, Object parentId) {
-        this.id = id != null ? id.toString() : null;
+	public ProductBean(String name) {
+	    this.name = name;
+	}
+	
+	public ProductBean(ObjexID parentId) {
         this.parentId = parentId != null ? parentId.toString() : null;
     }
 	
-	/**
+	public void init(Object id) {
+        this.id = id != null ? id.toString() : null;
+    }
+    
+    public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
+        // No-op in this test bean
+    }
+    
+    /**
      * Hard-coded type
      */
     public String getObjexObjType() {

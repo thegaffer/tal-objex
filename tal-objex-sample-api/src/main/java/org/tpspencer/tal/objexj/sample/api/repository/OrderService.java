@@ -21,22 +21,22 @@ public interface OrderService {
 	public OrderRepository getRepository(String id);
 	
 	/**
-	 * Gets a previously opened order repository 
+	 * Opens an order repository given its ID or re-gets a 
+	 * suspended transaction (depending on ID).
 	 * 
-	 * @param id The ID of the repository
-	 * @param transactionId The ID of the transaction upob that repository
+	 * @param transactionId The ID of the transaction
 	 * @return The repository
 	 */
-	public OrderRepository getOpenRepository(String id, String transactionId);
+	public OrderRepository getOpenRepository(String id);
 	
 	/**
 	 * Call to create a new order. The order is not actually
-	 * saved until persisted.
+	 * saved until persisted (at which point it will get an
+	 * ID).
 	 * 
-	 * @param id The id of the new order
 	 * @return The order
 	 */
-	public OrderRepository createNewOrder(String id);
+	public OrderRepository createNewOrder();
 	
 	/**
 	 * Call to search for all orders using a particular 

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
 /**
  * Simple implementation of the TransactionCache which just
@@ -17,11 +18,11 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 	private static final long serialVersionUID = 1L;
 
 	/** Holds any objects added in this transaction */
-	private Map<ObjexID, Object> newObjects;
+	private Map<ObjexID, ObjexObjStateBean> newObjects;
 	/** Holds any objects updated in this transaction */
-	private Map<ObjexID, Object> updatedObjects;
+	private Map<ObjexID, ObjexObjStateBean> updatedObjects;
 	/** Holds any objects removed in this transaction */
-	private Map<ObjexID, Object> removedObjects;
+	private Map<ObjexID, ObjexObjStateBean> removedObjects;
 	
 	public void clear() {
 		newObjects = null;
@@ -29,8 +30,8 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 		removedObjects = null;
 	}
 	
-	public Object findObject(ObjexID id) {
-		Object ret = null;
+	public ObjexObjStateBean findObject(ObjexID id) {
+		ObjexObjStateBean ret = null;
 		if( isDeleted(id) ) {
 		    ret = null;
 		}
@@ -57,8 +58,8 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 	 * 
 	 * @param id The ID of the object
 	 */
-	public void addNewObject(ObjexID id, Object state) {
-		if( newObjects == null ) newObjects = new HashMap<ObjexID, Object>();
+	public void addNewObject(ObjexID id, ObjexObjStateBean state) {
+		if( newObjects == null ) newObjects = new HashMap<ObjexID, ObjexObjStateBean>();
 		newObjects.put(id, state);
 	}
 	
@@ -67,11 +68,11 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 	 * 
 	 * @param obj The existing object we are updating
 	 */
-	public void addUpdatedObject(ObjexID id, Object state) {
+	public void addUpdatedObject(ObjexID id, ObjexObjStateBean state) {
 	    if( newObjects != null && newObjects.containsKey(id) ) return;
 	    if( removedObjects != null && removedObjects.containsKey(id) ) return;
 	    
-		if( updatedObjects == null ) updatedObjects = new HashMap<ObjexID, Object>();
+		if( updatedObjects == null ) updatedObjects = new HashMap<ObjexID, ObjexObjStateBean>();
 		updatedObjects.put(id, state);
 	}
 	
@@ -80,7 +81,7 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 	 * 
 	 * @param obj The object we are removing
 	 */
-	public void addRemovedObject(ObjexID id, Object state) {
+	public void addRemovedObject(ObjexID id, ObjexObjStateBean state) {
 	    if( newObjects != null && newObjects.containsKey(id) ) {
 	        newObjects.remove(id);
 	        return; // never existed
@@ -90,19 +91,19 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
 	        updatedObjects.remove(id);
 	    }
 	    
-		if( removedObjects == null ) removedObjects = new HashMap<ObjexID, Object>();
+		if( removedObjects == null ) removedObjects = new HashMap<ObjexID, ObjexObjStateBean>();
 		removedObjects.put(id, state);
 	}
 	
-	public Map<ObjexID, Object> getNewObjects() {
+	public Map<ObjexID, ObjexObjStateBean> getNewObjects() {
 		return newObjects;
 	}
 	
-	public Map<ObjexID, Object> getRemovedObjects() {
+	public Map<ObjexID, ObjexObjStateBean> getRemovedObjects() {
 		return removedObjects;
 	}
 	
-	public Map<ObjexID, Object> getUpdatedObjects() {
+	public Map<ObjexID, ObjexObjStateBean> getUpdatedObjects() {
 		return updatedObjects;
 	}
 }

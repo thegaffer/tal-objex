@@ -15,6 +15,7 @@ import org.tpspencer.tal.objexj.container.TransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionMiddleware;
 import org.tpspencer.tal.objexj.locator.ContainerFactory;
 import org.tpspencer.tal.objexj.sample.api.repository.StockRepository;
+import org.tpspencer.tal.objexj.sample.model.stock.impl.StockServiceImpl;
 
 /**
  * Ensures the stock service will give us repository instances.
@@ -42,7 +43,7 @@ public class TestStockService {
         final Container container = context.mock(Container.class);
         
         context.checking(new Expectations() {{
-            oneOf(containerFactory).get("Stock/Stock"); will(returnValue(container));
+            oneOf(containerFactory).get("Stock"); will(returnValue(container));
         }});
         
         StockRepository repo = service.getRepository();
@@ -56,7 +57,8 @@ public class TestStockService {
         final ContainerMiddleware middleware = context.mock(ContainerMiddleware.class);
         
         context.checking(new Expectations() {{
-            oneOf(middlewareFactory).getMiddleware(with(any(ContainerStrategy.class)), with("Stock/Stock")); will(returnValue(middleware));
+            oneOf(middlewareFactory).getMiddleware(with(any(ContainerStrategy.class)), with("Stock")); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("Stock"));
             oneOf(middleware).init(with(any(Container.class)));
         }});
         
@@ -71,7 +73,7 @@ public class TestStockService {
         final EditableContainer container = context.mock(EditableContainer.class);
         
         context.checking(new Expectations() {{
-            oneOf(containerFactory).open("Stock/Stock"); will(returnValue(container));
+            oneOf(containerFactory).open("Stock"); will(returnValue(container));
         }});
         
         StockRepository repo = service.getOpenRepository();
@@ -86,7 +88,8 @@ public class TestStockService {
         final TransactionCache cache = context.mock(TransactionCache.class);
         
         context.checking(new Expectations() {{
-            oneOf(middlewareFactory).createTransaction(with(any(ContainerStrategy.class)), with("Stock/Stock")); will(returnValue(middleware));
+            oneOf(middlewareFactory).getTransaction(with(any(ContainerStrategy.class)), with("Stock")); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("Stock"));
             oneOf(middleware).init(with(any(EditableContainer.class)));
             oneOf(middleware).getCache(); will(returnValue(cache));
         }});
@@ -102,7 +105,7 @@ public class TestStockService {
         final EditableContainer container = context.mock(EditableContainer.class);
         
         context.checking(new Expectations() {{
-            oneOf(containerFactory).getTransaction("Stock/Stock", "123"); will(returnValue(container));
+            oneOf(containerFactory).open("123"); will(returnValue(container));
         }});
         
         StockRepository repo = service.getOpenRepository("123");
@@ -117,12 +120,13 @@ public class TestStockService {
         final TransactionCache cache = context.mock(TransactionCache.class);
         
         context.checking(new Expectations() {{
-            oneOf(middlewareFactory).getTransaction(with(any(ContainerStrategy.class)), with("Stock/Stock"), with("123")); will(returnValue(middleware));
+            oneOf(middlewareFactory).getTransaction(with(any(ContainerStrategy.class)), with("Stock/trans:123")); will(returnValue(middleware));
+            oneOf(middleware).getContainerId(); will(returnValue("Stock"));
             oneOf(middleware).init(with(any(EditableContainer.class)));
             oneOf(middleware).getCache(); will(returnValue(cache));
         }});
         
-        StockRepository repo = service.getOpenRepository("123");
+        StockRepository repo = service.getOpenRepository("Stock/trans:123");
         Assert.assertNotNull(repo);
         context.assertIsSatisfied();
     }

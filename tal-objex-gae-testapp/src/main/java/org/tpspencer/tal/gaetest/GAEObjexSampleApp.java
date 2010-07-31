@@ -138,8 +138,8 @@ public class GAEObjexSampleApp extends HttpServlet {
         private String currentOrder;
         /** The ID of the current order */
         private String currentOrderItem;
-        /** ID of the open transaction against the order */
-        private String currentOrderTransaction;
+        /** If true then the order is open */
+        private boolean inTransaction = false;
         
         /**
          * @return the currentCategory
@@ -193,20 +193,19 @@ public class GAEObjexSampleApp extends HttpServlet {
             if( "".equals(currentOrderItem) ) currentOrderItem = null;
             this.currentOrderItem = currentOrderItem;
         }
-        /**
-         * @return the currentOrderTransaction
-         */
-        public String getCurrentOrderTransaction() {
-            return currentOrderTransaction;
-        }
-        /**
-         * @param currentOrderTransaction the currentOrderTransaction to set
-         */
-        public void setCurrentOrderTransaction(String currentOrderTransaction) {
-            if( "".equals(currentOrderTransaction) ) currentOrderTransaction = null;
-            this.currentOrderTransaction = currentOrderTransaction;
-        }
         
+        /**
+         * @return the inTransaction
+         */
+        public boolean isInTransaction() {
+            return inTransaction;
+        }
+        /**
+         * @param inTransaction the inTransaction to set
+         */
+        public void setInTransaction(boolean inTransaction) {
+            this.inTransaction = inTransaction;
+        }
         /**
          * Call to 'save' the state of the app into cookies.
          * 
@@ -217,7 +216,7 @@ public class GAEObjexSampleApp extends HttpServlet {
             resp.addCookie(new Cookie("product", currentProduct));
             resp.addCookie(new Cookie("order", currentOrder));
             resp.addCookie(new Cookie("orderItem", currentOrderItem));
-            resp.addCookie(new Cookie("orderTransaction", currentOrderTransaction));
+            resp.addCookie(new Cookie("inTransaction", Boolean.toString(inTransaction)));
         }
         
         /**
@@ -236,7 +235,7 @@ public class GAEObjexSampleApp extends HttpServlet {
                     else if( "product".equals(cookies[i].getName()) ) ret.setCurrentProduct(cookies[i].getValue());
                     else if( "order".equals(cookies[i].getName()) ) ret.setCurrentOrder(cookies[i].getValue());
                     else if( "orderItem".equals(cookies[i].getName()) ) ret.setCurrentOrderItem(cookies[i].getValue());
-                    else if( "orderTransaction".equals(cookies[i].getName()) ) ret.setCurrentOrderTransaction(cookies[i].getValue());
+                    else if( "inTransaction".equals(cookies[i].getName()) ) ret.setInTransaction(Boolean.parseBoolean(cookies[i].getValue()));
                 }
             }
             

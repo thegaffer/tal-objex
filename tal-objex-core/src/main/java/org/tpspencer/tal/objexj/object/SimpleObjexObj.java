@@ -36,7 +36,7 @@ public class SimpleObjexObj extends BaseObjexObj {
 	 * Returns either the state object directly or a copy
 	 * depending on if in open editable container.
 	 */
-	public Object getStateObject() {
+	public ObjexObjStateBean getStateObject() {
 		if( isUpdateable() )
 			return state;
 		else
@@ -71,7 +71,7 @@ public class SimpleObjexObj extends BaseObjexObj {
 	 * 
 	 * @return The cloned version
 	 */
-	protected Object cloneState() {
+	protected ObjexObjStateBean cloneState() {
 		return strategy.getClonedStateInstance(state);
 	}
 }

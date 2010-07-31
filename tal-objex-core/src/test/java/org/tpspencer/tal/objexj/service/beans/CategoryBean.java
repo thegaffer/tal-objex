@@ -1,5 +1,8 @@
 package org.tpspencer.tal.objexj.service.beans;
 
+import java.util.Map;
+
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
 /**
@@ -23,6 +26,8 @@ import org.tpspencer.tal.objexj.ObjexObjStateBean;
  * @author Tom Spencer
  */
 public class CategoryBean implements ObjexObjStateBean {
+    private static final long serialVersionUID = 1L;
+    
 	/** Represents the ID of this object */
 	private String id;
 	/** Represents the id of parent object of this object */
@@ -40,9 +45,20 @@ public class CategoryBean implements ObjexObjStateBean {
 	    
 	}
 	
-	public CategoryBean(Object id, Object parentId) {
-	    this.id = id != null ? id.toString() : null;
+	public CategoryBean(String name) {
+        this.name = name;
+    }
+	
+	public CategoryBean(ObjexID parentId) {
 	    this.parentId = parentId != null ? parentId.toString() : null;
+	}
+	
+	public void init(Object id) {
+	    this.id = id != null ? id.toString() : null;
+	}
+	
+	public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
+	    // No-op in this test bean
 	}
 	
 	/**

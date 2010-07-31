@@ -1,16 +1,16 @@
 package org.tpspencer.tal.objexj.gae;
 
-import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 
 import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexIDStrategy;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.SimpleTransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionMiddleware;
 import org.tpspencer.tal.objexj.gae.object.ContainerBean;
@@ -20,166 +20,104 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
 /**
  * The unified middleware for Google App Engine environments.
  * 
  * @author Tom Spencer
  */
-public class GAEMiddleware implements TransactionMiddleware {
+public final class GAEMiddleware implements TransactionMiddleware {
 
-    /** The ID of the container we are a middlware for */
-    private final String id;
-    /** The ID of the transaction (if known) */
-    private String transactionId;
+    /** The root bean for this container */
+    private final ContainerBean root;
+    
+    /** Holds the ID strategy for the container */
+    private final ObjexIDStrategy idStrategy;
     
     /** Holds the container (set in the init method) */
     private Container container;
     
-    /** The key for the container */
-    private final Key rootKey;
-    /** The root type for this container */
-    private final ContainerBean root;
-    
-    /** The transaction cache if we are a transaction */
+    /** The ID of the transaction (if known, if not and we are in a transaction this is generated in suspend) */
+    private String transactionId;
+    /** The transaction cache if we are a transaction (if not we are read-only) */
     private TransactionCache cache;
     
-    /** Holds the last ID we reserved in persisted root entity */
-    private long lastBlockId = -1;
-    
     /**
-     * Constructs a read-only middleware against an existing container.
+     * Constructs a middleware against an existing container.
      * 
      * @param strategy The strategy for the container
      * @param id The ID of the container
      */
-    public GAEMiddleware(ContainerStrategy strategy, String id) {
-        this.id = id;
-        this.transactionId = null;
-        this.rootKey = KeyFactory.createKey(ContainerBean.class.getSimpleName(), id);
+    public GAEMiddleware(ContainerStrategy strategy, ContainerBean bean) {
+        this.root = bean;
         
-        this.root = findExistingRoot(id, true);
+        this.transactionId = null;
+        this.cache = null;
+        
+        idStrategy = GAEAllocateObjexIDStrategy.getInstance();
     }
     
     /**
-     * Constructs a transaction middleware against either an existing
-     * transaction or a new transaction against an exist container.
+     * Constructs a new GAEMiddleware a transaction. This may be a
+     * new container (containerId is null) or a new transaction over 
+     * an existing container.
      * 
-     * @param strategy The strategy for the container
-     * @param id The ID of the container
-     * @param transactionId The ID of the transaction (if null, container must exist)
+     * @param strategy The strategy of the container we are serving
+     * @param transaction The transaction
      */
-    public GAEMiddleware(ContainerStrategy strategy, String id, String transactionId) {
-        this.id = id;
-        this.transactionId = transactionId;
-        this.rootKey = KeyFactory.createKey(ContainerBean.class.getSimpleName(), id);
+    public GAEMiddleware(ContainerStrategy strategy, GAETransaction transaction) {
+        this.root = transaction.getContainerBean();
         
-        if( transactionId != null ) {
-            MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
-            GAETransaction trans = (GAETransaction)cache.get(transactionId);
-            if( trans != null ) {
-                this.root = trans.getContainerBean();
-                this.cache = trans.getCache();
-            }
-            else {
-                throw new IllegalArgumentException("The transaction does not exist or has expired: " + transactionId);
-            }
-        }
-        else {
-            this.root = findExistingRoot(id, true);
-            this.cache = new SimpleTransactionCache();
-            this.lastBlockId = this.root.getLastId();
-        }
+        this.transactionId = transaction.getId();
+        this.cache = transaction.getCache();
+        
+        if( this.root.getId() == null ) idStrategy = new GAENewObjexIDStrategy(transaction.getLastId());
+        else idStrategy = GAEAllocateObjexIDStrategy.getInstance();
     }
     
     /**
-     * Constructs a transaction middleware for a new container.
-     * The container is not persisted until saved though.
-     * 
-     * @param strategy The strategy for the container
-     * @param id The ID of the new container
-     * @param root The root object to add to transaction
+     * Internal helper to ensure the middleware is initialised
      */
-    public GAEMiddleware(ContainerStrategy strategy, String id, boolean bCreate) {
-        this.id = id;
-        this.transactionId = null;
-        this.rootKey = KeyFactory.createKey(ContainerBean.class.getSimpleName(), id);
-        
-        // Make sure does not already exist
-        if( findExistingRoot(id, false) != null ) {
-            throw new IllegalArgumentException("Container already exists");
-        }
-        
-        // Create new root
-        this.root = createNewRoot(strategy.getContainerName(), id);
-        this.cache = new SimpleTransactionCache();
+    private void checkInitialised() {
+        if( this.container == null ) throw new IllegalStateException("The middleware is not initialisaed, it must be initialised before use");
     }
     
-    private ContainerBean findExistingRoot(String id, boolean expectExists) {
-        ContainerBean ret = null;
-        
-        PersistenceManager pm = PersistenceManagerFactorySingleton.getManager();
-        try {
-            ret = pm.getObjectById(ContainerBean.class, this.rootKey);
-            pm.detachCopy(ret);
-        }
-        catch( JDOObjectNotFoundException e ) {
-            if( expectExists ) throw new IllegalArgumentException("The container does not exist: " + id, e);
-        }
-        finally {
-            pm.close();
-        }
-        
-        return ret;
+    /**
+     * Internal helper to ensure the middleware is initialised
+     */
+    private void checkTransaction() {
+        checkInitialised();
+        if( this.transactionId == null ) throw new IllegalStateException("The middleware is not in a transaction so write operations are not possible");
     }
     
-    private ContainerBean createNewRoot(String type, String id) {
-        ContainerBean ret = new ContainerBean();
-        // this.root.setId(rootKey);
-        ret.setContainerId(id);
-        ret.setType(type);
-        // TODO: this.root.setName(name);
-        // this.root.setDescription(description);
-        // this.root.setStatus(status);
-        
-        // User and status
-        ret.setCreated(new Date());
-        UserService userService = UserServiceFactory.getUserService();
-        if( userService.isUserLoggedIn() ) ret.setCreator(userService.getCurrentUser().getEmail());
-        ret.setLastId(0); // So root obj is 1!
-        
-        return ret;
+    private Key getKey(Key rootKey, String type, ObjexID id) {
+        Object val = id.getId();
+        if( val instanceof Long ) return KeyFactory.createKey(rootKey, type, ((Long)val).longValue());
+        else return KeyFactory.createKey(rootKey, type, val.toString());
     }
+    
+    private String getKeyString(Key rootKey, String type, ObjexID id) {
+        Object val = id.getId();
+        if( val instanceof Long ) return KeyFactory.createKeyString(rootKey, type, ((Long)val).longValue());
+        else return KeyFactory.createKeyString(rootKey, type, val.toString());
+    }
+    
+    ////////////////////////////////////////////////////
+    // Standard Middleware
     
     /**
      * Ensures the container matches our id
      */
     public void init(Container container) {
-        if( !container.getId().equals(id) ) throw new IllegalArgumentException("Container id [" + container.getId() + "] does not match expected id: " + id);
         this.container = container;
     }
     
     /**
-     * @return True if the container is a new one
+     * Returns the full container ID only if it has
+     * been assigned an ID - if not returns null
      */
-    public boolean isNew() {
-        return root.getId() == null;
-    }
-    
-    /**
-     * Casts the GAEObjexID or converts as necc
-     */
-    public ObjexID convertId(Object id) {
-        return GAEObjexID.getId(id);
-    }
-    
-    /**
-     * Simply casts to a GAEObjexID and returns the type
-     */
-    public String getObjectType(ObjexID id) {
-        return GAEObjexID.getId(id).getType();
+    public String getContainerId() {
+        return root.getFullContainerId();
     }
     
     /**
@@ -191,67 +129,48 @@ public class GAEMiddleware implements TransactionMiddleware {
      * @return The persisted state of the object
      */
     public Object loadObject(Class<?> type, ObjexID id) {
-        if( container == null ) throw new IllegalStateException("Cannot load an object from an uninitialised middleware");
-        
-        // If new container cannot load anything!
-        if( root.getId() == null ) return null;
+        checkInitialised();
         
         Object ret = null;
-        GAEObjexID gaeId = GAEObjexID.getId(id);
         
-        PersistenceManager pm = PersistenceManagerFactorySingleton.getManager();
-        try {
-            String k = KeyFactory.createKeyString(rootKey, type.getSimpleName(), gaeId.getId());
-            ret = pm.getObjectById(type, k);
-            if( ret != null ) pm.detachCopy(ret); // Detach so any changes are not persisted
+        // a. Try the cache first
+        if( cache != null ) {
+            ret = cache.findObject(id);
         }
-        finally {
-            pm.close();
+        
+        // b. Otherwise load if we are a real container
+        if( ret == null && !isNew() ) {
+            PersistenceManager pm = PersistenceManagerFactorySingleton.getManager();
+            try {
+                Key k = getKey(root.getId(), type.getSimpleName(), id);
+                ret = pm.getObjectById(type, k);
+                if( ret != null ) pm.detachCopy(ret); // Detach so any changes are not persisted
+            }
+            finally {
+                pm.close();
+            }
+            
+            // SUGGEST: Should we add to the cache at this point or perhaps record version?
         }
         
         return ret;
     }
     
-    public ObjexID createNewId(String type) {
-        long newId = this.root.getLastId();
-        
-        // Get block of id's if required
-        if( this.root.getId() != null && (lastBlockId < 1 || lastBlockId >= newId) ) {
-            PersistenceManager pm = PersistenceManagerFactorySingleton.getManager();
-            Transaction tx = pm.currentTransaction();
-            try {
-                tx.begin();
-                
-                // FUTURE: I hate this mechanism - revisit later
-                ContainerBean root = pm.getObjectById(ContainerBean.class, rootKey);
-                newId = root.getLastId();
-                this.lastBlockId = root.getLastId() + 10; // TODO: Make '10' configurable
-                root.setLastId(this.lastBlockId);
-                this.root.setLastId(this.lastBlockId);
-                
-                tx.commit();
-            }
-            finally {
-                if( tx.isActive() ) tx.rollback();
-                pm.close();
-            }
-        }
-        
-        // Increment on ID
-        newId++;
-        if( this.root.getId() == null ) this.root.setLastId(newId); // Otherwise the block id is fine!
-        
-        // Return new ObjexID
-        return new GAEObjexID(type, newId);
+    ////////////////////////////////////////////////////
+    // Transaction Middleware
+    
+    /**
+     * @return True if the container is a new one
+     */
+    public boolean isNew() {
+        return this.root.getId() == null;
     }
     
     /**
-     * Simply converts the ID to a GAEObjexID and forms a key based
-     * on the root, the type and the id.
+     * Simply returns the ID strategy
      */
-    public Object getRawId(ObjexID id) {
-        GAEObjexID realId = GAEObjexID.getId(id);
-        return KeyFactory.createKeyString(rootKey, realId.getType(), realId.getId());
+    public ObjexIDStrategy getIdStrategy() {
+        return idStrategy;
     }
     
     /**
@@ -259,12 +178,13 @@ public class GAEMiddleware implements TransactionMiddleware {
      * creates a new one
      */
     public TransactionCache getCache() {
-        if( cache == null && container instanceof EditableContainer ) cache = new SimpleTransactionCache();
         return cache;
     }
     
-    public void save(TransactionCache cache) {
-        // TODO: Update container name, desc and status
+    public String save() {
+        checkTransaction();
+        
+        // FUTURE: Update container name, desc and status
         
         PersistenceManager pm = PersistenceManagerFactorySingleton.getManager();
         Transaction tx = pm.currentTransaction();
@@ -273,11 +193,35 @@ public class GAEMiddleware implements TransactionMiddleware {
             tx.begin();
             
             // Make the root persistent (only if changed!!)
-            if( root.getId() == null ) root.setId(rootKey);
+            Key rootKey = root.getId();
+            if( rootKey == null ) {
+                // Creating a doc
+                if( root.getContainerId() == null ) {
+                    rootKey = GAEAllocateObjexIDStrategy.getInstance().createContainerId(root.getContainerId());
+                    root.setContainerId(Long.toString(rootKey.getId()));
+                }
+                
+                // Creating a store
+                else {
+                    rootKey = GAEAllocateObjexIDStrategy.getInstance().createContainerId(root.getContainerId());
+                }
+                
+                root.setId(rootKey);
+            }
             pm.makePersistent(root);
             
             // Save or create objects
-            if( cache.getNewObjects() != null ) pm.makePersistentAll(cache.getNewObjects().values());
+            if( cache.getNewObjects() != null ) {
+                Map<ObjexID, ObjexObjStateBean> newObjects = cache.getNewObjects();
+                Iterator<ObjexID> it = newObjects.keySet().iterator();
+                while( it.hasNext() ) {
+                    ObjexID id = it.next();
+                    ObjexObjStateBean bean = newObjects.get(id);
+                    String k = getKeyString(rootKey, bean.getClass().getSimpleName(), id);
+                    bean.init(k);
+                }
+                pm.makePersistentAll(cache.getNewObjects().values());
+            }
             if( cache.getUpdatedObjects() != null ) pm.makePersistentAll(cache.getUpdatedObjects().values());
             if( cache.getRemovedObjects() != null ) pm.deletePersistentAll(cache.getRemovedObjects().values());
             
@@ -287,18 +231,22 @@ public class GAEMiddleware implements TransactionMiddleware {
             if( tx.isActive() ) tx.rollback();
             pm.close();
         }
+        
+        return root.getFullContainerId();
     }
     
-    public String suspend(TransactionCache cache) {
-        if( transactionId == null ) {
-            // TODO: Create a new transaction ID !?!
-            transactionId = id;
-        }
+    public String suspend() {
+        checkTransaction();
         
+        // Create and save the transaction
         GAETransaction trans = new GAETransaction();
         trans.setId(transactionId);
         trans.setContainerBean(root);
         trans.setCache(cache);
+        
+        if( idStrategy instanceof GAENewObjexIDStrategy ) {
+            trans.setLastId(((GAENewObjexIDStrategy)idStrategy).getLastId());
+        }
         
         MemcacheService cacheService = MemcacheServiceFactory.getMemcacheService();
         cacheService.put(transactionId, trans);
@@ -306,8 +254,7 @@ public class GAEMiddleware implements TransactionMiddleware {
         return transactionId;
     }
     
-    public void clear(TransactionCache cache) {
-        String transactionId = ((EditableContainer)container).getTransactionId();
+    public void clear() {
         if( transactionId != null ) {
             MemcacheService cacheService = MemcacheServiceFactory.getMemcacheService();
             cacheService.delete(transactionId);

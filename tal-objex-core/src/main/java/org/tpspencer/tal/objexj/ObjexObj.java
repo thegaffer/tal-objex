@@ -49,7 +49,7 @@ public interface ObjexObj {
 	 * 
 	 * @return The state object
 	 */
-	public Object getStateObject();
+	public ObjexObjStateBean getStateObject();
 	
 	/**
 	 * Call to get a behaviour interface from this object. We 

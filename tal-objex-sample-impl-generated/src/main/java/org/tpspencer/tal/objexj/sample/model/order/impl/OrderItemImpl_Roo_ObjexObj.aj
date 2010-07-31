@@ -2,6 +2,7 @@ package org.tpspencer.tal.objexj.sample.model.order.impl;
 
 import java.lang.String;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.BaseObjexObj;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.api.stock.Product;
@@ -15,7 +16,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
         return bean;
     }
     
-    public OrderItemBean OrderItemImpl.getStateObject() {
+    public ObjexObjStateBean OrderItemImpl.getStateObject() {
         if( isUpdateable() ) return bean;
         else return new OrderItemBean(bean);
     }

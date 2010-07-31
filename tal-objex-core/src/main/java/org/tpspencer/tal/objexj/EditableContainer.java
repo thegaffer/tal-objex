@@ -29,11 +29,6 @@ public interface EditableContainer extends Container {
 	public boolean isOpen();
 	
 	/**
-	 * @return The ID of this transaction - only present if its a long-lived edit
-	 */
-	public String getTransactionId();
-	
-	/**
 	 * Called to update an existing object.
 	 * 
 	 * @param id The ID of the object to update
@@ -45,9 +40,9 @@ public interface EditableContainer extends Container {
 	 * Called to add an object to the container 
 	 * 
 	 * @param type The type of the new object
-	 * @param parent The ID of the parent object (if any)
+	 * @param parent The parent object (if any)
 	 */
-	public ObjexObj newObject(String type, Object parent);
+	public ObjexObj newObject(String type, ObjexObj parent);
 	
 	/**
 	 * Called to remove an object from the container.
@@ -60,8 +55,10 @@ public interface EditableContainer extends Container {
 	 * Call to save the container. Once this is done the
 	 * no further changes can be made via this editable
 	 * container.
+	 * 
+	 * @return The ID of the container
 	 */
-	public void saveContainer();
+	public String saveContainer();
 	
 	/**
 	 * Call to close the container without saving any

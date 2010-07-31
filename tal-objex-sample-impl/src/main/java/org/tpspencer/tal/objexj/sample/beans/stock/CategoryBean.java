@@ -1,9 +1,12 @@
 package org.tpspencer.tal.objexj.sample.beans.stock;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.jdo.annotations.PersistenceCapable;
 
+import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -38,16 +41,23 @@ public class CategoryBean extends BaseBean {
 	public CategoryBean() {
     }
     
-    public CategoryBean(Object id, Object parentId) {
-        super(id, parentId);
+    public CategoryBean(ObjexID parentId) {
+        super(parentId);
     }
-	
-	/*
+    
+    /*
      * (non-Javadoc)
      * @see org.tpspencer.tal.objexj.ObjexObjStateBean#getObjexObjType()
      */
     public String getObjexObjType() {
         return "Category";
+    }
+    
+    @Override
+    public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
+        super.updateTemporaryReferences(refs);
+        products = ObjectUtils.updateTempReferences(products, refs);
+        categories = ObjectUtils.updateTempReferences(categories, refs);
     }
     
     /* (non-Javadoc)

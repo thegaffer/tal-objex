@@ -1,9 +1,12 @@
 package org.tpspencer.tal.objexj.sample.beans.order;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.jdo.annotations.PersistenceCapable;
 
+import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -24,8 +27,8 @@ public class OrderBean extends BaseBean {
 	public OrderBean() {
 	}
 	
-	public OrderBean(Object id, Object parentId) {
-	    super(id, parentId);
+	public OrderBean(ObjexID parentId) {
+	    super(parentId);
 	}
 	
 	/*
@@ -34,6 +37,12 @@ public class OrderBean extends BaseBean {
 	 */
 	public String getObjexObjType() {
 	    return "Order";
+	}
+	
+	@Override
+	public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
+	    super.updateTemporaryReferences(refs);
+	    items = ObjectUtils.updateTempReferences(items, refs);
 	}
 	
 	/* (non-Javadoc)

@@ -7,6 +7,7 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 
@@ -23,25 +24,23 @@ public class SimpleObjectStrategy implements ObjectStrategy {
 	
 	/** Holds the name of the object */
 	private final String name;
-	/** Holds the name of the id property inside state object */
-	private final String idProp;
-	/** Holds the name of the parentId property inside state object */
-	private final String parentIdProp;
+	/** Holds the ID Strategy */
+	private ObjexIDStrategy idStrategy; // TODO: Should this be a constructor arg!?!
 	/** Holds the class that holds the state */
-	private final Class<? extends ObjexObjStateBean> stateClass;
+    private final Class<? extends ObjexObjStateBean> stateClass;
+    /** Holds the raw class for the main objex object */
+    private final Class<? extends InternalObjexObj> objexClass;
+    /** Holds the constructor for the object object to instantiate */
+    private final Constructor<? extends InternalObjexObj> objexClassConstructor;
+	
 	/** Holds the constructor for the object object to instantiate */
     private final Constructor<? extends ObjexObjStateBean> stateClassConstructor;
     /** Holds the constructor for the object object to instantiate */
     private final Constructor<? extends ObjexObjStateBean> stateCopyConstructor;
-	/** Holds the raw class for the main objex object */
-	private final Class<? extends InternalObjexObj> objexClass;
-	/** Holds the constructor for the object object to instantiate */
-	private final Constructor<? extends InternalObjexObj> objexClassConstructor;
+	
 	
 	public SimpleObjectStrategy(Class<? extends ObjexObjStateBean> stateClass) {
 		this.name = stateClass.getSimpleName();
-		this.idProp = "id";
-		this.parentIdProp = "parentId";
 		this.stateClass = stateClass;
 		this.stateClassConstructor = determineStateConstructor(stateClass);
 		this.stateCopyConstructor = determineCopyConstructor(stateClass);
@@ -51,9 +50,7 @@ public class SimpleObjectStrategy implements ObjectStrategy {
 	
 	public SimpleObjectStrategy(String name, Class<? extends InternalObjexObj> objexClass, Class<? extends ObjexObjStateBean> stateClass) {
 	    this.name = name;
-	    this.idProp = "id";
-        this.parentIdProp = "parentId";
-        this.stateClass = stateClass;
+	    this.stateClass = stateClass;
         this.stateClassConstructor = determineStateConstructor(stateClass);
         this.stateCopyConstructor = determineCopyConstructor(stateClass);
         this.objexClass = objexClass;
@@ -62,7 +59,7 @@ public class SimpleObjectStrategy implements ObjectStrategy {
 	
 	private Constructor<? extends ObjexObjStateBean> determineStateConstructor(Class<? extends ObjexObjStateBean> stateClass) {
 	    try {
-            Constructor<? extends ObjexObjStateBean> ret = stateClass.getConstructor(Object.class, Object.class);
+            Constructor<? extends ObjexObjStateBean> ret = stateClass.getConstructor(ObjexID.class);
             if( ret == null ) throw new IllegalArgumentException("Cannot use the object state class provided has it has no valid constructor: " + stateClass);
             return ret;
         }
@@ -102,18 +99,20 @@ public class SimpleObjectStrategy implements ObjectStrategy {
 	}
 	
 	/**
-	 * Simply returns the configured id property name
+	 * Returns the ID strategy
 	 */
-	public String getIdProp() {
-		return idProp;
+	public ObjexIDStrategy getIdStrategy() {
+	    return idStrategy;
 	}
 	
 	/**
-	 * Returns the configured parentId property name
+	 * Call to set the ID strategy
+	 * 
+	 * @param idStrategy
 	 */
-	public String getParentIdProp() {
-		return parentIdProp;
-	}
+	public void setIdStrategy(ObjexIDStrategy idStrategy) {
+        this.idStrategy = idStrategy;
+    }
 	
 	/**
 	 * Returns an instance of SimpleObjexObj around this class
@@ -142,16 +141,16 @@ public class SimpleObjectStrategy implements ObjectStrategy {
 	/**
 	 * Simply returns the configured state class
 	 */
-	public Class<?> getStateClass() {
+	public Class<? extends ObjexObjStateBean> getStateClass() {
 		return stateClass;
 	}
 	
 	/**
 	 * Simply creates a new instance from the stateClass member
 	 */
-	public ObjexObjStateBean getNewStateInstance(Object id, Object parentId) {
+	public ObjexObjStateBean getNewStateInstance(ObjexID parentId) {
 		try {
-			return stateClassConstructor.newInstance(id, parentId);
+			return stateClassConstructor.newInstance(parentId);
 		}
 		catch( RuntimeException e ) {
 			throw e;

@@ -101,7 +101,7 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     public Category createCategory() {
         checkUpdateable();
         
-        ObjexObj newCat = ((EditableContainer)getContainer()).newObject("Category", getId());
+        ObjexObj newCat = ((EditableContainer)getContainer()).newObject("Category", this);
         
         List<String> cats = getCategoryRefs();
         if( cats == null ) cats = new ArrayList<String>();
@@ -114,7 +114,7 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     public Product createProduct() {
         checkUpdateable();
         
-        ObjexObj newProduct = ((EditableContainer)getContainer()).newObject("Product", getId());
+        ObjexObj newProduct = ((EditableContainer)getContainer()).newObject("Product", this);
         
         List<String> prods = getProductRefs();
         if( prods == null ) prods = new ArrayList<String>();

@@ -7,7 +7,9 @@ import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.beans.order.OrderBean;
 
 privileged aspect OrderBean_Roo_ObjexStateBean {
@@ -25,13 +27,11 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
     
     public OrderBean.new() {
         super();
-        init();
         // Nothing
     }
 
     public OrderBean.new(OrderBean src) {
         super();
-        init();
         this.account = src.account;
         this.items = src.items;
         this.test = src.test;
@@ -39,10 +39,8 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
         this.parentId = src.parentId;
     }
 
-    public OrderBean.new(Object id, Object parentId) {
+    public OrderBean.new(ObjexID parentId) {
         super();
-        init();
-        this.id = id != null ? id.toString() : null;
         this.parentId = parentId != null ? parentId.toString() : null;
     }
 
@@ -56,6 +54,16 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
     
     public String OrderBean.getObjexObjType() {
         return "Order";
+    }
+    
+    public void OrderBean.init(Object id) {
+        this.id = id != null ? id.toString() : null;
+    }
+    
+    public void OrderBean.updateTemporaryReferences(java.util.Map<ObjexID, ObjexID> refs) {
+        parentId = ObjectUtils.updateTempReferences(parentId, refs);
+        items = ObjectUtils.updateTempReferences(items, refs);
+        test = ObjectUtils.updateTempReferences(test, refs);
     }
     
 }

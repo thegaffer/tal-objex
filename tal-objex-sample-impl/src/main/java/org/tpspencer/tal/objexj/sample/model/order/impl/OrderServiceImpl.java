@@ -45,29 +45,18 @@ public class OrderServiceImpl implements OrderService {
 	}
 	
 	/**
-     * Simply gets the container from the container factory
-     * and wraps it inside a new {@link OrderRepositoryImpl}
-     * instance.
-     */
-    public OrderRepository openRepository(String id) {
-        EditableContainer container = locator.open(id);
-        if( container == null ) throw new IllegalArgumentException("Container does not exist: " + id);
-        return new OrderRepositoryImpl(container);
-    }
-	
-	/**
 	 * Simply gets the container from the container factory
 	 * and wraps it inside a new {@link OrderRepositoryImpl}
 	 * instance. 
 	 */
-	public OrderRepository getOpenRepository(String id, String transactionId) {
-		EditableContainer container = locator.getTransaction(id, transactionId);
-		if( container == null ) throw new IllegalArgumentException("Container or transaction does not exist: " + id + ", " + transactionId);
+	public OrderRepository getOpenRepository(String id) {
+		EditableContainer container = locator.open(id);
+		if( container == null ) throw new IllegalArgumentException("Container or transaction does not exist: " + id);
 		return new OrderRepositoryImpl(container);
 	}
 	
-	public OrderRepository createNewOrder(String id) {
-	    EditableContainer container = locator.create(id);
+	public OrderRepository createNewOrder() {
+	    EditableContainer container = locator.create();
 	    
 	    return new OrderRepositoryImpl(container);
 	}

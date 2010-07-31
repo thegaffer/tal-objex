@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.BaseObjexObj;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
@@ -20,7 +21,7 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
         return bean;
     }
     
-    public CategoryBean CategoryImpl.getStateObject() {
+    public ObjexObjStateBean CategoryImpl.getStateObject() {
         if( isUpdateable() ) return bean;
         else return new CategoryBean(bean);
     }

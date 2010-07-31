@@ -1,5 +1,7 @@
 package org.tpspencer.tal.objexj.sample.beans;
 
+import java.util.Map;
+
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.Inheritance;
@@ -8,7 +10,9 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.object.ObjectUtils;
 
 /**
  * Base class for any bean class. Holds the objects
@@ -33,9 +37,16 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	public BaseBean() {
 	}
 	
-	public BaseBean(Object id, Object parentId) {
-	    this.id = id != null ? id.toString() : null;
+	public BaseBean(ObjexID parentId) {
 	    this.parentId = parentId != null ? parentId.toString() : null;
+	}
+	
+	public void init(Object id) {
+        this.id = id.toString();
+    }
+	
+	public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
+	    parentId = ObjectUtils.updateTempReferences(parentId, refs);
 	}
 	
 	/**

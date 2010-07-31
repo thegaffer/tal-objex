@@ -7,7 +7,9 @@ import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.beans.stock.CategoryBean;
 
 privileged aspect CategoryBean_Roo_ObjexStateBean {
@@ -38,9 +40,8 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         this.parentId = src.parentId;
     }
 
-    public CategoryBean.new(Object id, Object parentId) {
+    public CategoryBean.new(ObjexID parentId) {
         super();
-        this.id = id != null ? id.toString() : null;
         this.parentId = parentId != null ? parentId.toString() : null;
     }
 
@@ -54,6 +55,16 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     
     public String CategoryBean.getObjexObjType() {
         return "Category";
+    }
+    
+    public void CategoryBean.init(Object id) {
+        this.id = id != null ? id.toString() : null;
+    }
+    
+    public void CategoryBean.updateTemporaryReferences(java.util.Map<ObjexID, ObjexID> refs) {
+        parentId = ObjectUtils.updateTempReferences(parentId, refs);
+        products = ObjectUtils.updateTempReferences(products, refs);
+        categories = ObjectUtils.updateTempReferences(categories, refs);
     }
     
 }

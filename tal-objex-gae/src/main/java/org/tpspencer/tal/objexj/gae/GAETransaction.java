@@ -6,19 +6,22 @@ import org.tpspencer.tal.objexj.container.TransactionCache;
 import org.tpspencer.tal.objexj.gae.object.ContainerBean;
 
 /**
- * This class represents the transaction
+ * This class represents the transaction that is stored inside the
+ * GAE MemCache service.
  * 
  * @author Tom Spencer
  */
-public class GAETransaction implements Serializable {
+public final class GAETransaction implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Holds the ID of the transaction */
-    public String id;
+    private String id;
     /** Holds the root container bean */
-    public ContainerBean containerBean;
-    /** Holds the traditional cache */
-    public TransactionCache cache;
+    private ContainerBean containerBean;
+    /** Holds the actual cache of objects */
+    private TransactionCache cache;
+    /** Holds the last ID used to create object in the transaction (only used if container is new) */
+    private long lastId = 1;
     
     /**
      * @return the id
@@ -55,5 +58,17 @@ public class GAETransaction implements Serializable {
      */
     public void setCache(TransactionCache cache) {
         this.cache = cache;
+    }
+    /**
+     * @return the lastId
+     */
+    public long getLastId() {
+        return lastId;
+    }
+    /**
+     * @param lastId the lastId to set
+     */
+    public void setLastId(long lastId) {
+        this.lastId = lastId;
     }
 }

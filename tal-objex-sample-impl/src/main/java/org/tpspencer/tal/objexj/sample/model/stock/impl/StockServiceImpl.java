@@ -22,25 +22,26 @@ public class StockServiceImpl implements StockService {
     
     public StockServiceImpl(ContainerMiddlewareFactory middlewareFactory) {
         ObjectStrategy[] strategies = new ObjectStrategy[]{CategoryImpl.STRATEGY, ProductImpl.STRATEGY};
-        ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "Category", strategies);
+        ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "Stock", "Category", strategies);
         
         locator = new SimpleContainerFactory(strategy, middlewareFactory);
     }
 
     public StockRepository getRepository() {
-        return new StockRepositoryImpl(locator.get("Stock/Stock"));
+        return new StockRepositoryImpl(locator.get("Stock"));
     }
     
     public StockRepository getOpenRepository() {
-        return new StockRepositoryImpl(locator.open("Stock/Stock"));
+        return new StockRepositoryImpl(locator.open("Stock"));
     }
     
     public StockRepository getOpenRepository(String id) {
-        return new StockRepositoryImpl(locator.getTransaction("Stock/Stock", id));
+        return new StockRepositoryImpl(locator.open(id));
     }
 
     public void ensureCreated() {
-        EditableContainer container = locator.create("Stock/Stock");
+        // TODO: Not sure this will work!!
+        EditableContainer container = locator.create();
         if( container.isNew() ) {
             Category rootCat = container.getRootObject().getBehaviour(Category.class);
             rootCat.setName("Root");

@@ -2,6 +2,7 @@ package org.tpspencer.tal.objexj.sample.model.stock.impl;
 
 import java.lang.String;
 import java.util.Date;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.BaseObjexObj;
 import org.tpspencer.tal.objexj.sample.beans.stock.ProductBean;
 
@@ -13,7 +14,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
         return bean;
     }
     
-    public ProductBean ProductImpl.getStateObject() {
+    public ObjexObjStateBean ProductImpl.getStateObject() {
         if( isUpdateable() ) return bean;
         else return new ProductBean(bean);
     }

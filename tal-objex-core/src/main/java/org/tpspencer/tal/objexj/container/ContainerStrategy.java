@@ -1,7 +1,7 @@
 package org.tpspencer.tal.objexj.container;
 
-import java.util.Map;
-
+import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.exceptions.ObjectTypeNotFoundException;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
 /**
@@ -22,20 +22,38 @@ public interface ContainerStrategy {
 	public String getContainerName();
 	
 	/**
+	 * @return The ID of the container if it is a fixed container (i.e. a store)
+	 */
+	public String getContainerId();
+	
+	/**
 	 * @return The name of the root object type
 	 */
 	public String getRootObjectName();
 	
 	/**
-	 * Call to get the object strategy for a type of object.
-	 * 
-	 * @param name The name of the object we want strategy for
-	 * @return The strategy for the given object
+	 * @return The ID of the root object which is always fixed
 	 */
-	public ObjectStrategy getObjectStrategy(String name);
+	public ObjexID getRootObjectID();
 	
 	/**
-	 * @return The map of all object strategies of allowed objects in the container
+	 * Call to get the object strategy for a type of object.
+	 * 
+	 * @param type The name of the object we want strategy for
+	 * @return The strategy for the given object
+	 * @throws ObjectTypeNotFoundException If the type if not known
 	 */
-	public Map<String, ObjectStrategy> getObjectStrategies();
+	public ObjectStrategy getObjectStrategy(String type);
+	
+	/**
+     * Call to get the object strategy for a type of object 
+     * given its state class type.
+     * 
+     * FUTURE: This is not currently needed, leaving for now, but we may want to remove
+     * 
+     * @param stateType The type of state object we want the strategy for
+     * @return The strategy for the given object
+     * @throws ObjectTypeNotFoundException If the type if not known
+     */
+    public ObjectStrategy getObjectStrategyForState(String stateType);
 }

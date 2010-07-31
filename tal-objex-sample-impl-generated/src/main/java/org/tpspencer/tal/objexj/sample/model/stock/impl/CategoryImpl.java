@@ -1,5 +1,6 @@
 package org.tpspencer.tal.objexj.sample.model.stock.impl;
 
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.annotations.ObjexObj;
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
 import org.tpspencer.tal.objexj.sample.beans.stock.CategoryBean;
@@ -14,6 +15,7 @@ public class CategoryImpl implements Category {
     }
 
     public String getParentCategoryId() {
-        return bean.getParentId();
+        ObjexID parent = super.getParentId();
+        return parent != null ? parent.toString() : null;
     }
 }

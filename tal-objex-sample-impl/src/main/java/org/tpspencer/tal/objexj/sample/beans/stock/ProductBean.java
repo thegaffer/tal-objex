@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.jdo.annotations.PersistenceCapable;
 
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -31,8 +32,8 @@ public class ProductBean extends BaseBean {
 	public ProductBean() {
     }
     
-    public ProductBean(Object id, Object parentId) {
-        super(id, parentId);
+    public ProductBean(ObjexID parentId) {
+        super(parentId);
     }
 	
 	/*

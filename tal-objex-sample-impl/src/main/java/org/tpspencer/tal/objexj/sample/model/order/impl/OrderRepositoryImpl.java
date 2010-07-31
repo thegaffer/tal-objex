@@ -30,7 +30,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 	}
 	
 	public void open() {
-		if( editableContainer != null ) throw new IllegalArgumentException("The container is already open: " + container.getId() + ", " + editableContainer.getTransactionId());
+		if( editableContainer != null ) throw new IllegalArgumentException("The container is already open: " + container.getId());
 		
 		editableContainer = container.openContainer();
 	}

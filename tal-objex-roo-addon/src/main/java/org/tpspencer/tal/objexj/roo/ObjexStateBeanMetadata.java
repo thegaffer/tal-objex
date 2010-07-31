@@ -23,6 +23,7 @@ import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.annotations.ObjexStateBean;
 import org.tpspencer.tal.objexj.roo.fields.ObjexObjProperty;
 import org.tpspencer.tal.objexj.roo.fields.PropertyCompiler;
@@ -67,18 +68,13 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         addIdField();
         addParentIdField();
         addTypeGetter();
+        addInit();
+        addTempRefs();
         
         // Add in constructors
         addDefaultCons();
         addCopyCons();
         addNewCons(true); // TODO: Determine if we should have parent
-        
-        // Write out each of the properties (could be done with JavaBean addon)
-        /*Iterator<ObjexObjProperty> it = properties.iterator();
-        while( it.hasNext() ) {
-            ObjexObjProperty prop = it.next();
-            addGetterSetter(prop);
-        }*/
         
         // Create the ITD Type
         itdTypeDetails = builder.build();
@@ -126,9 +122,6 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         ConstructorMetadataWrapper con = new ConstructorMetadataWrapper();
         
         con.addBody("super();");
-        if( TypeDetailsUtil.getMethod(governorTypeDetails, "init", null) != null ) {
-            con.addBody("init();");
-        }
         con.addBody("// Nothing");
         
         con.addMetadata(builder, governorTypeDetails, getId());
@@ -136,14 +129,9 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     
     private void addNewCons(boolean includeParent) {
         ConstructorMetadataWrapper newCon = new ConstructorMetadataWrapper();
-        newCon.addParameter("id", "java.lang.Object", null);
-        newCon.addParameter("parentId", "java.lang.Object", null);
+        newCon.addParameter("parentId", ObjexID.class.getName(), null);
         
         newCon.addBody("super();");
-        if( TypeDetailsUtil.getMethod(governorTypeDetails, "init", null) != null ) {
-            newCon.addBody("init();");
-        }
-        newCon.addBody("this.id = id != null ? id.toString() : null;");
         if( includeParent ) newCon.addBody("this.parentId = parentId != null ? parentId.toString() : null;");
         
         newCon.addMetadata(builder, governorTypeDetails, getId());
@@ -154,9 +142,6 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         copyCon.addParameter(new JavaSymbolName("src"), governorTypeDetails.getName(), null);
         
         copyCon.addBody("super();");
-        if( TypeDetailsUtil.getMethod(governorTypeDetails, "init", null) != null ) {
-            copyCon.addBody("init();");
-        }
         
         boolean idFound = false;
         boolean parentFound = false;
@@ -236,6 +221,42 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         
         MethodMetadataWrapper typeMethod = new MethodMetadataWrapper(new JavaSymbolName("getObjexObjType"), JavaType.STRING_OBJECT);
         typeMethod.addBody("return \"" + type + "\";");
+        typeMethod.addMetadata(builder, governorTypeDetails, getId());
+    }
+    
+    private void addInit() {
+        MethodMetadata mm = TypeDetailsUtil.getMethod(governorTypeDetails, "init", null);
+        if( mm != null ) return;
+        
+        MethodMetadataWrapper typeMethod = new MethodMetadataWrapper(new JavaSymbolName("init"), JavaType.VOID_PRIMITIVE);
+        typeMethod.addParameter("id", "java.lang.Object", null);
+        typeMethod.addBody("this.id = id != null ? id.toString() : null;");
+        typeMethod.addMetadata(builder, governorTypeDetails, getId());
+    }
+    
+    private void addTempRefs() {
+        MethodMetadata mm = TypeDetailsUtil.getMethod(governorTypeDetails, "updateTemporaryReferences", null);
+        if( mm != null ) return;
+        
+        List<JavaType> enclosingTypeParams = new ArrayList<JavaType>();
+        enclosingTypeParams.add(new JavaType(ObjexID.class.getName()));
+        enclosingTypeParams.add(new JavaType(ObjexID.class.getName()));
+        JavaType refMap = new JavaType("java.util.Map", 0, null, null, enclosingTypeParams); // List<MyInterface>
+        
+        MethodMetadataWrapper typeMethod = new MethodMetadataWrapper(new JavaSymbolName("updateTemporaryReferences"), JavaType.VOID_PRIMITIVE);
+        typeMethod.addParameter(new JavaSymbolName("refs"), refMap, null);
+        
+        // Update all reference properties
+        builder.getImportRegistrationResolver().addImport(new JavaType("org.tpspencer.tal.objexj.object.ObjectUtils"));
+        typeMethod.addBody("parentId = ObjectUtils.updateTempReferences(parentId, refs);");
+        Iterator<ObjexObjProperty> it = this.properties.iterator();
+        while( it.hasNext() ) {
+            ObjexObjProperty prop = it.next();
+            if( prop.isReferenceProp() || prop.isListReferenceProp() || prop.isMapReferenceProp() ) {
+                typeMethod.addBody(prop.getName() + " = ObjectUtils.updateTempReferences(" + prop.getName() + ", refs);");
+            }
+        }
+        
         typeMethod.addMetadata(builder, governorTypeDetails, getId());
     }
     

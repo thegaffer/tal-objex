@@ -90,6 +90,7 @@ public interface Container {
 	 * you should now interact with instead of this instance.
 	 * 
 	 * @return An editable container to start working with 
+	 * @deprecated
 	 */
 	public EditableContainer openContainer();
 }

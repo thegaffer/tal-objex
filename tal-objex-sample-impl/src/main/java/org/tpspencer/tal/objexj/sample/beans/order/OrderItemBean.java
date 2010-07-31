@@ -2,6 +2,7 @@ package org.tpspencer.tal.objexj.sample.beans.order;
 
 import javax.jdo.annotations.PersistenceCapable;
 
+import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -35,8 +36,8 @@ public class OrderItemBean extends BaseBean {
 	public OrderItemBean() {
     }
     
-    public OrderItemBean(Object id, Object parentId) {
-        super(id, parentId);
+    public OrderItemBean(ObjexID parentId) {
+        super(parentId);
     }
 	
 	/*

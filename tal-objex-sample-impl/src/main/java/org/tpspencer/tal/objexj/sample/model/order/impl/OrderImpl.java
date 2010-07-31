@@ -60,7 +60,7 @@ public class OrderImpl extends SimpleObjexObj implements Order {
 		checkUpdateable();
 		
 		EditableContainer container = (EditableContainer)getContainer();
-		ObjexObj item = container.newObject("OrderItem", getId());
+		ObjexObj item = container.newObject("OrderItem", this);
 		
 		// Add to list of items
 		List<String> items = getItemRefs();

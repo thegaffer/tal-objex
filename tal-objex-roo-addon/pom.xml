@@ -21,6 +21,11 @@
   		<artifactId>tal-objex-annotations</artifactId>
   		<version>${project.version}</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-core</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
   	
   	<dependency>
 		<groupId>org.springframework.roo</groupId>

@@ -25,14 +25,14 @@ public class StockRepositoryImpl implements StockRepository {
     }
 
     public Category createNewCategory(Object parentCategoryId) {
-        Category cat = editableContainer.getObject(parentCategoryId, Category.class);
+        Category cat = findCategory(parentCategoryId != null ? parentCategoryId.toString() : null);
         if( cat == null ) throw new IllegalArgumentException("Cannot create category if not parent!");
         
         return cat.createCategory();
     }
     
     public Product createNewProduct(Object parentCategoryId) {
-        Category cat = editableContainer.getObject(parentCategoryId, Category.class);
+        Category cat = findCategory(parentCategoryId != null ? parentCategoryId.toString() : null);
         if( cat == null ) throw new IllegalArgumentException("Cannot create category if not parent!");
         
         return cat.createProduct();
@@ -68,7 +68,7 @@ public class StockRepositoryImpl implements StockRepository {
         Category cat = findCategory(categoryId);
         List<Product> products = cat != null ? cat.getProducts() : null;
         ret = products != null ? products.toArray(new Product[products.size()]) : null;
-
+    
         return ret;
     }
     

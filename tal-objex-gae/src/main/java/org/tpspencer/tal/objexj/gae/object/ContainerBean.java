@@ -26,7 +26,7 @@ public final class ContainerBean implements Serializable {
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key id;
-    // private Key id;
+    
     /** Holds the last ID used for objects inside the container */
     private long lastId;
     
@@ -96,6 +96,16 @@ public final class ContainerBean implements Serializable {
     public void setContainerId(String containerId) {
         this.containerId = containerId;
     }
+    
+    /**
+     * @return The full container ID in type/id form
+     */
+    public String getFullContainerId() {
+        if( containerId == null ) return null;
+        if( type.equals(containerId) ) return containerId;
+        else return type + "/" + containerId;
+    }
+    
     /**
      * @return the name
      */

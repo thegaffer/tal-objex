@@ -27,7 +27,7 @@
   		<groupId>org.talframework.objex</groupId>
   		<artifactId>tal-objex-sample-impl-generated</artifactId>
   		<version>${project.version}</version>
-  		<!-- <scope>runtime</scope> -->
+  		<scope>runtime</scope>
   	</dependency>
   	
   	<!-- Google App Engine -->

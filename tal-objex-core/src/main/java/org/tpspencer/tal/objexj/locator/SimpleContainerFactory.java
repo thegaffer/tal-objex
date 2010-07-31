@@ -22,6 +22,7 @@ import org.tpspencer.tal.objexj.object.ObjectStrategy;
  * @author Tom Spencer
  */
 public final class SimpleContainerFactory implements ContainerFactory {
+    
 	/** Describes the overall strategy for the container */
 	private final ContainerStrategy strategy;
 	/** Holds the class for the object cache */
@@ -37,35 +38,33 @@ public final class SimpleContainerFactory implements ContainerFactory {
 		this.middlewareFactory = middlewareFactory;
 	}
 	
-	/**
+	public EditableContainer create() {
+        TransactionMiddleware middleware = middlewareFactory.createContainer(strategy);
+        
+        // Add in the root object
+        ObjectStrategy rootStrategy = strategy.getObjectStrategy(strategy.getRootObjectName());
+        ObjexID rootId = strategy.getRootObjectID();
+        ObjexObjStateBean rootBean = rootStrategy.getNewStateInstance(null);
+        middleware.getCache().addNewObject(rootId, rootBean);
+        
+        return new SimpleTransaction(strategy, middleware, null);
+    }
+    
+    /**
 	 * Simply constructs an instance of the standard container
 	 * with plugins configured.
 	 */
 	public Container get(String id) {
-		ContainerMiddleware middleware = middlewareFactory.getMiddleware(strategy, id);
-		return new StandardContainer(strategy, middleware, id);
+	    ContainerMiddleware middleware = middlewareFactory.getMiddleware(strategy, id);
+	    return new StandardContainer(strategy, middleware, middleware.getContainerId());
 	}
 	
-	public EditableContainer create(String id) {
-	    TransactionMiddleware middleware = middlewareFactory.createContainer(strategy, id);
-	    
-	    // Add in the root object
-	    ObjectStrategy rootStrategy = strategy.getObjectStrategy(strategy.getRootObjectName());
-        ObjexID rootId = middleware.createNewId(rootStrategy.getTypeName());
-	    Object rawId = middleware.getRawId(rootId);
-	    ObjexObjStateBean rootBean = rootStrategy.getNewStateInstance(rawId, null);
-	    middleware.getCache().addNewObject(rootId, rootBean);
-	    
-	    return new SimpleTransaction(strategy, middleware, id, null);
-	}
-	
+	/**
+	 * Simply constructs an instance of the basic editable 
+	 * container.
+	 */
 	public EditableContainer open(String id) {
-	    TransactionMiddleware middleware = middlewareFactory.createTransaction(strategy, id);
-        return new SimpleTransaction(strategy, middleware, id, null);
-	}
-	
-	public EditableContainer getTransaction(String id, String transactionId) {
-	    TransactionMiddleware middleware = middlewareFactory.getTransaction(strategy, id, transactionId);
-        return new SimpleTransaction(strategy, middleware, id, transactionId);
+	    TransactionMiddleware middleware = middlewareFactory.getTransaction(strategy, id);
+	    return new SimpleTransaction(strategy, middleware, middleware.getContainerId());
 	}
 }

@@ -10,8 +10,18 @@ package org.tpspencer.tal.objexj.container;
  * @author Tom Spencer
  */
 public interface ContainerMiddlewareFactory {
-	
-	/**
+    
+    /**
+     * Called to get a new {@link TransactionMiddleware} instance for
+     * a new container of the given type. The container will not be 
+     * persisted as a result of this call.
+     * 
+     * @param strategy The strategy for the container
+     * @return A new transaction middleware for the editable container to use
+     */
+    public TransactionMiddleware createContainer(ContainerStrategy strategy);
+    
+    /**
 	 * Called to get a new {@link ContainerMiddleware} instance for
 	 * the given container.
 	 * 
@@ -22,33 +32,11 @@ public interface ContainerMiddlewareFactory {
 	public ContainerMiddleware getMiddleware(ContainerStrategy strategy, String id);
 	
 	/**
-     * Called to get a new {@link TransactionMiddleware} instance for
-     * the given container. The container must exist already.
-     * 
-     * @param strategy The strategy for the container
-     * @param id The ID of the container in question
-     * @return A new transaction middleware for the editable container to use
-     */
-    public TransactionMiddleware createTransaction(ContainerStrategy strategy, String id);
-	
-	/**
-	 * Called to get a new {@link TransactionMiddleware} instance for
-	 * a new container with the given ID. The container must not already
-	 * exist.
-	 * 
-	 * @param strategy The strategy for the container
-     * @param id The ID of the container in question
-	 * @return A new transaction middleware for the editable container to use
-	 */
-	public TransactionMiddleware createContainer(ContainerStrategy strategy, String id);
-	
-	/**
 	 * Called to get an existing transaction middleware.
 	 * 
 	 * @param strategy The strategy for the container
-     * @param id The ID of the container
-	 * @param transactionId The ID of the transaction
+     * @param id The ID of the existing transaction or container for a new transaction
 	 * @return A new transaction middleware
 	 */
-	public TransactionMiddleware getTransaction(ContainerStrategy strategy, String id, String transactionId);
+	public TransactionMiddleware getTransaction(ContainerStrategy strategy, String transactionId);
 }

@@ -19,7 +19,4 @@ public class OrderBean {
     
     @ObjexRefProp(owned=true, type=OrderItem.class)
     private String test;
-    
-    private void init() {
-    }
 }
