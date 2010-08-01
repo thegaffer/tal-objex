@@ -20,44 +20,73 @@ import org.tpspencer.tal.objexj.ObjexObjStateBean;
  * 
  * @author Tom Spencer
  */
-public class SimpleObjectStrategy implements ObjectStrategy {
+public final class SimpleObjectStrategy implements ObjectStrategy {
 	
 	/** Holds the name of the object */
-	private final String name;
+	private String name;
 	/** Holds the ID Strategy */
-	private ObjexIDStrategy idStrategy; // TODO: Should this be a constructor arg!?!
+	private ObjexIDStrategy idStrategy;
 	/** Holds the class that holds the state */
-    private final Class<? extends ObjexObjStateBean> stateClass;
+    private Class<? extends ObjexObjStateBean> stateClass;
     /** Holds the raw class for the main objex object */
-    private final Class<? extends InternalObjexObj> objexClass;
+    private Class<? extends InternalObjexObj> objexClass;
+    
     /** Holds the constructor for the object object to instantiate */
-    private final Constructor<? extends InternalObjexObj> objexClassConstructor;
-	
+    private Constructor<? extends InternalObjexObj> objexClassConstructor;
 	/** Holds the constructor for the object object to instantiate */
-    private final Constructor<? extends ObjexObjStateBean> stateClassConstructor;
+    private Constructor<? extends ObjexObjStateBean> stateClassConstructor;
     /** Holds the constructor for the object object to instantiate */
-    private final Constructor<? extends ObjexObjStateBean> stateCopyConstructor;
+    private Constructor<? extends ObjexObjStateBean> stateCopyConstructor;
 	
+    /**
+     * Default constructor. Client must call init explicitly
+     * if using this constructor.
+     */
+    public SimpleObjectStrategy() {
+    }
 	
+    /**
+     * Constructs an object strategy using a given state class and
+     * the default ObjexObj. This constructor initialises the strategy
+     * 
+     * @param stateClass The state class to use
+     */
 	public SimpleObjectStrategy(Class<? extends ObjexObjStateBean> stateClass) {
 		this.name = stateClass.getSimpleName();
 		this.stateClass = stateClass;
-		this.stateClassConstructor = determineStateConstructor(stateClass);
-		this.stateCopyConstructor = determineCopyConstructor(stateClass);
 		this.objexClass = null;
-		this.objexClassConstructor = null;
+		
+		init();
 	}
 	
-	public SimpleObjectStrategy(String name, Class<? extends InternalObjexObj> objexClass, Class<? extends ObjexObjStateBean> stateClass) {
+	/**
+     * Constructs an object strategy using a given state class and
+     * the ObjexObj class. This constructor initialises the strategy
+     * 
+     * @param stateClass The state class to use
+     */
+    public SimpleObjectStrategy(String name, Class<? extends InternalObjexObj> objexClass, Class<? extends ObjexObjStateBean> stateClass) {
 	    this.name = name;
 	    this.stateClass = stateClass;
-        this.stateClassConstructor = determineStateConstructor(stateClass);
-        this.stateCopyConstructor = determineCopyConstructor(stateClass);
         this.objexClass = objexClass;
-        this.objexClassConstructor = determineObjexConstructor(objexClass);
+        
+        init();
     }
 	
-	private Constructor<? extends ObjexObjStateBean> determineStateConstructor(Class<? extends ObjexObjStateBean> stateClass) {
+	/**
+	 * Initialises the strategy object.
+	 * This is called automatically if the non-default constructor is used.
+	 */
+	public void init() {
+	    this.stateClassConstructor = determineStateConstructor(stateClass);
+        this.stateCopyConstructor = determineCopyConstructor(stateClass);
+        this.objexClassConstructor = determineObjexConstructor(objexClass);
+	}
+	
+	/**
+     * Helper to determine the new constructor for the state class
+     */
+    private Constructor<? extends ObjexObjStateBean> determineStateConstructor(Class<? extends ObjexObjStateBean> stateClass) {
 	    try {
             Constructor<? extends ObjexObjStateBean> ret = stateClass.getConstructor(ObjexID.class);
             if( ret == null ) throw new IllegalArgumentException("Cannot use the object state class provided has it has no valid constructor: " + stateClass);
@@ -68,7 +97,10 @@ public class SimpleObjectStrategy implements ObjectStrategy {
         }
 	}
 	
-	private Constructor<? extends ObjexObjStateBean> determineCopyConstructor(Class<? extends ObjexObjStateBean> stateClass) {
+	/**
+     * Helper to determine the copy constructor for the state class
+     */
+    private Constructor<? extends ObjexObjStateBean> determineCopyConstructor(Class<? extends ObjexObjStateBean> stateClass) {
         try {
             Constructor<? extends ObjexObjStateBean> ret = stateClass.getConstructor(stateClass);
             return ret;
@@ -78,16 +110,31 @@ public class SimpleObjectStrategy implements ObjectStrategy {
         }
     }
 	
-	private Constructor<? extends InternalObjexObj> determineObjexConstructor(Class<? extends InternalObjexObj> objexClass) {
+	/**
+	 * Helper to determine the constructor for the objex class
+	 */
+	@SuppressWarnings("unchecked")
+    private Constructor<? extends InternalObjexObj> determineObjexConstructor(Class<? extends InternalObjexObj> objexClass) {
         if( objexClass == null ) return null;
         
         try {
-            Constructor<? extends InternalObjexObj> ret = objexClass.getConstructor(ObjexObjStateBean.class);
+            Constructor<? extends InternalObjexObj> ret = null;
+            
+            Constructor<? extends InternalObjexObj>[] cons = (Constructor<? extends InternalObjexObj>[])objexClass.getConstructors();
+            for( Constructor<? extends InternalObjexObj> constructor : cons ) {
+                Class<?>[] params = constructor.getParameterTypes();
+                if( params != null && params.length == 1 ) {
+                    if( ObjexObjStateBean.class.isAssignableFrom(params[0]) ) {
+                        ret = constructor;
+                    }
+                }
+            }
+            
             if( ret == null ) throw new IllegalArgumentException("Cannot use the object class provided has it has no valid constructor: " + objexClass);
             return ret;
         }
         catch( Exception e ) {
-            throw new IllegalArgumentException("Cannot use the object class provided has it has no valid constructor: " + objexClass);
+            throw new IllegalArgumentException("Cannot use the object class provided has it has no valid constructor: " + objexClass, e);
         }
     }
 
@@ -97,6 +144,13 @@ public class SimpleObjectStrategy implements ObjectStrategy {
 	public String getTypeName() {
 		return name;
 	}
+	
+	/**
+	 * @param name The name
+	 */
+	public void setTypeName(String name) {
+        this.name = name;
+    }
 	
 	/**
 	 * Returns the ID strategy
@@ -115,6 +169,34 @@ public class SimpleObjectStrategy implements ObjectStrategy {
     }
 	
 	/**
+     * @return the objexClass
+     */
+    public Class<? extends InternalObjexObj> getObjexClass() {
+        return objexClass;
+    }
+
+    /**
+     * @param objexClass the objexClass to set
+     */
+    public void setObjexClass(Class<? extends InternalObjexObj> objexClass) {
+        this.objexClass = objexClass;
+    }
+
+    /**
+     * Simply returns the configured state class
+     */
+    public Class<? extends ObjexObjStateBean> getStateClass() {
+        return stateClass;
+    }
+    
+    /**
+     * @param stateClass the stateClass to set
+     */
+    public void setStateClass(Class<? extends ObjexObjStateBean> stateClass) {
+        this.stateClass = stateClass;
+    }
+
+    /**
 	 * Returns an instance of SimpleObjexObj around this class
 	 */
 	public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, ObjexObjStateBean state) {
@@ -136,13 +218,6 @@ public class SimpleObjectStrategy implements ObjectStrategy {
 	    }
 	    
 	    return ret;
-	}
-	
-	/**
-	 * Simply returns the configured state class
-	 */
-	public Class<? extends ObjexObjStateBean> getStateClass() {
-		return stateClass;
 	}
 	
 	/**

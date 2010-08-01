@@ -8,7 +8,7 @@ import org.tpspencer.tal.objexj.exceptions.ObjectTypeNotFoundException;
 import org.tpspencer.tal.objexj.object.DefaultObjexID;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
-public class SimpleContainerStrategy implements ContainerStrategy {
+public final class SimpleContainerStrategy implements ContainerStrategy {
 	
 	private final String name;
 	private final String id;

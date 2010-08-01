@@ -19,7 +19,7 @@
   		<version>${project.version}</version>
   	</dependency>
   	
-  	<!-- Core Objex -->
+  	<!-- Objex -->
   	<dependency>
   		<groupId>org.talframework.objex</groupId>
   		<artifactId>tal-objex-core</artifactId>
@@ -32,13 +32,6 @@
   		<optional>true</optional>
   		<scope>provided</scope>
   	</dependency>
-  	
-  	<dependency>
-		<groupId>org.springframework.roo</groupId>
-		<artifactId>org.springframework.roo.annotations</artifactId>
-		<version>1.0.2.RELEASE</version>
-		<scope>provided</scope>
-	</dependency>
   	
   	<!-- JDO -->
   	<dependency>
