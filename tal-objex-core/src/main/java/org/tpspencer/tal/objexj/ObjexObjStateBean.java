@@ -43,6 +43,11 @@ public interface ObjexObjStateBean extends Serializable {
      * @return The ObjexObj type that this bean represents
      */
     public String getObjexObjType();
+    
+    /**
+     * @return The raw ID of the object (will likely not be an ObjexID)
+     */
+    public Object getId();
 
 	/**
 	 * @return The ID of the parent object to this one (if any) 

@@ -40,4 +40,13 @@ public interface ContainerFactory {
 	 */
 	public EditableContainer open(String id);
 	
+	/**
+	 * This method will create a store if it does not
+	 * already exist. Stores are not typically created
+	 * as a result of any individual user interaction
+	 * and are expected to be present. This method will
+	 * create the store if (and only if) it does not
+	 * already exist.
+	 */
+	public void createStore();
 }

@@ -34,7 +34,7 @@ public interface ContainerMiddleware {
 	 * @return The containers ID
 	 */
 	public String getContainerId();
-
+	
 	/**
 	 * Called to actually load an object from the persistent
 	 * store.
@@ -44,4 +44,7 @@ public interface ContainerMiddleware {
 	 * @return The object
 	 */
 	public Object loadObject(Class<?> type, ObjexID id);
+	
+	// TODO: Load objects
+	
 }

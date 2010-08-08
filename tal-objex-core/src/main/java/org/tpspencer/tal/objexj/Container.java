@@ -3,6 +3,10 @@ package org.tpspencer.tal.objexj;
 import java.util.Collection;
 import java.util.Map;
 
+import org.tpspencer.tal.objexj.events.Event;
+import org.tpspencer.tal.objexj.query.QueryRequest;
+import org.tpspencer.tal.objexj.query.QueryResult;
+
 /**
  * This interface represents wrapper (or container) or related
  * objects. The container might be a store, which is akin to a
@@ -83,6 +87,33 @@ public interface Container {
 	 * @return A collection of the valid objects found
 	 */
 	public Map<ObjexID, ObjexObj> getObjectMap(ObjexID[] ids);
+	
+	/**
+	 * Call to execute a named query against the container.
+	 * 
+	 * <p>Queries against a container are named and cannot just
+	 * be constructed by the client. This is a) to ensure there
+	 * is control for performance (i.e. stop silly queries by
+	 * making it a design task) and b) because queries are 
+	 * often Database specific (which is hidden by Objex).</p> 
+	 * 
+	 * @param request The request to perform
+	 * @return The list of objects found
+	 */
+	public QueryResult executeQuery(QueryRequest request);
+	
+	/**
+     * Call to process an event from the same or another
+     * container. The container is not opened before processing
+     * an event because a) the event process may be read-only
+     * (such as a Systems Integration task or sending a 
+     * notification) and b) the event may be discarded. If
+     * writable access is needed to the container then you
+     * should open it from within the event processor.
+     * 
+     * @param event The event
+     */
+    public void processEvent(Event event);
 	
 	/**
 	 * Call to open this container for editing. The returned 

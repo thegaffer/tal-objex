@@ -1,6 +1,10 @@
 package org.tpspencer.tal.objexj.gae;
 
+import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.*; 
+
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
@@ -13,11 +17,16 @@ import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.container.TransactionCache;
 import org.tpspencer.tal.objexj.container.TransactionMiddleware;
+import org.tpspencer.tal.objexj.events.EventListener;
+import org.tpspencer.tal.objexj.gae.event.GAEEventListener;
 import org.tpspencer.tal.objexj.gae.object.ContainerBean;
 import org.tpspencer.tal.objexj.gae.persistence.PersistenceManagerFactorySingleton;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.appengine.api.labs.taskqueue.TaskOptions;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
@@ -42,6 +51,13 @@ public final class GAEMiddleware implements TransactionMiddleware {
     /** The transaction cache if we are a transaction (if not we are read-only) */
     private TransactionCache cache;
     
+    /** The standard listeners (if any) */
+    private List<EventListener> standardListners;
+    /** The registered listeners (if any) */
+    //private List<GAEEventListener> registeredListeners;
+    /** The transaction specific listeners (if any) */
+    private List<EventListener> transactionListeners;
+    
     /**
      * Constructs a middleware against an existing container.
      * 
@@ -55,6 +71,7 @@ public final class GAEMiddleware implements TransactionMiddleware {
         this.cache = null;
         
         idStrategy = GAEAllocateObjexIDStrategy.getInstance();
+        standardListners = strategy.getStandardListeners();
     }
     
     /**
@@ -73,6 +90,7 @@ public final class GAEMiddleware implements TransactionMiddleware {
         
         if( this.root.getId() == null ) idStrategy = new GAENewObjexIDStrategy(transaction.getLastId());
         else idStrategy = GAEAllocateObjexIDStrategy.getInstance();
+        standardListners = strategy.getStandardListeners();
     }
     
     /**
@@ -181,13 +199,18 @@ public final class GAEMiddleware implements TransactionMiddleware {
         return cache;
     }
     
-    public String save() {
+    public String save(String status, Map<String, String> header) {
         checkTransaction();
-        
-        // FUTURE: Update container name, desc and status
         
         PersistenceManager pm = PersistenceManagerFactorySingleton.getManager();
         Transaction tx = pm.currentTransaction();
+        
+        boolean created = false;
+        String oldStatus = root.getStatus();
+        String newStatus = status;
+        
+        // Work out the listeners
+        List<EventListener> listeners = getApplicableListeners(created, oldStatus, newStatus);
         
         try {
             tx.begin();
@@ -195,6 +218,8 @@ public final class GAEMiddleware implements TransactionMiddleware {
             // Make the root persistent (only if changed!!)
             Key rootKey = root.getId();
             if( rootKey == null ) {
+                created = true;
+                
                 // Creating a doc
                 if( root.getContainerId() == null ) {
                     rootKey = GAEAllocateObjexIDStrategy.getInstance().createContainerId(root.getContainerId());
@@ -232,6 +257,9 @@ public final class GAEMiddleware implements TransactionMiddleware {
             pm.close();
         }
         
+        // TODO: Should be inside the transaction
+        if( listeners != null ) sendListeners(listeners, oldStatus, header);
+        
         return root.getFullContainerId();
     }
     
@@ -258,6 +286,122 @@ public final class GAEMiddleware implements TransactionMiddleware {
         if( transactionId != null ) {
             MemcacheService cacheService = MemcacheServiceFactory.getMemcacheService();
             cacheService.delete(transactionId);
+        }
+    }
+    
+    public void registerListener(EventListener listener) {
+        checkTransaction();
+        root.addListener(listener);
+    }
+    
+    /**
+     * Adds the given listener to the ones for this transaction.
+     * There must be a transaction open.
+     */
+    public void registerListenerForTransaction(EventListener listener) {
+        checkTransaction();
+        if( transactionListeners == null ) transactionListeners = new ArrayList<EventListener>();
+        transactionListeners.add(listener);
+    }
+ 
+    /**
+     * Helper to get all the applicable listeners for this transaction
+     * based on whether the container is created, its old status and
+     * its new status.
+     * 
+     * @param created If true container is being created
+     * @param oldStatus The status the container was in
+     * @param newStatus The status the container is now in
+     * @return The list of applicable listeners or null
+     */
+    private List<EventListener> getApplicableListeners(boolean created, String oldStatus, String newStatus) {
+        // Quit if no listeners
+        if( standardListners == null && root.getRegisteredListeners() == null && transactionListeners == null ) return null;
+        
+        List<EventListener> ret = new ArrayList<EventListener>();
+        
+        Iterator<EventListener> it = standardListners != null ? standardListners.iterator() : null;
+        while( it != null && it.hasNext() ) {
+            EventListener e = it.next();
+            if( isListenerApplicable(e, created, oldStatus, newStatus) ) ret.add(e);
+        }
+        
+        List<GAEEventListener> registeredListeners = root.getRegisteredListeners();
+        Iterator<GAEEventListener> it2 = registeredListeners != null ? registeredListeners.iterator() : null;
+        while( it2 != null && it2.hasNext() ) {
+            EventListener e = it2.next();
+            if( isListenerApplicable(e, created, oldStatus, newStatus) ) ret.add(e);
+        }
+        
+        it = transactionListeners != null ? transactionListeners.iterator() : null;
+        while( it != null && it.hasNext() ) {
+            EventListener e = it.next();
+            if( isListenerApplicable(e, created, oldStatus, newStatus) ) ret.add(e);
+        }
+        
+        return ret.size() > 0 ? ret : null;
+    }
+    
+    /**
+     * Helper to determine if the specific listener is interested.
+     */
+    private boolean isListenerApplicable(EventListener listener, boolean created, String oldStatus, String newStatus) {
+        if( listener.isOnEdit() ) return true;
+        if( created && listener.isOnCreation() ) return true;
+        
+        boolean stateChange = oldStatus != null ? oldStatus.equals(newStatus) : newStatus != null;
+        
+        if( listener.isOnStateChange() && stateChange ) return true;
+        if( newStatus != null && listener.getInterestedStates() != null ) {
+            String[] states = listener.getInterestedStates();
+            for( int i = 0 ; i < states.length ; i++ ) {
+                if( states[i].equals(newStatus) ) return true;
+            }
+        }
+        
+        // We are not interested in this listener
+        return false;
+    }
+    
+    /**
+     * Call to send out an event to all listeners.
+     * 
+     * TODO: Put inside a transaction
+     * 
+     * @param listeners The listeners to send to
+     * @param oldState The old state of the container before transaction
+     */
+    private void sendListeners(List<EventListener> listeners, String oldState, Map<String, String> header) {
+        Queue defaultQueue = QueueFactory.getDefaultQueue();
+        
+        Iterator<EventListener> it = listeners.iterator();
+        while( it.hasNext() ) {
+            EventListener e = it.next();
+            
+            // Get queue
+            Queue queue = defaultQueue;
+            if( e.getChannel() != null ) {
+                queue = QueueFactory.getQueue(e.getChannel());
+            }
+            
+            TaskOptions task = url("/_containerEvent");
+            task.header("X-Objex-Container", e.getContainer());
+            task.header("X-Objex-SourceContainer", root.getFullContainerId());
+            task.header("X-Objex-Event", e.getEventProcessor());
+            if( root.getStatus() != null ) task.header("X-Objex-State", root.getStatus());
+            if( oldState != null ) task.header("X-Objex-OldState", oldState);
+
+            // Add payload if there is one
+            if( header != null ) {
+                Iterator<String> it2 = header.keySet().iterator();
+                while( it2.hasNext() ) {
+                    String name = it2.next();
+                    task.param(name, header.get(name));
+                }
+            }
+            
+            // Send event
+            queue.add(task);
         }
     }
 }

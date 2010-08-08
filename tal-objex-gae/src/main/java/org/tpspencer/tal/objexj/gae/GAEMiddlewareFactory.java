@@ -97,7 +97,7 @@ public final class GAEMiddlewareFactory implements ContainerMiddlewareFactory {
      * @param id The raw ID
      * @return The raw ID
      */
-    private String stripId(String id) {
+    private static String stripId(String id) {
         int index = id.indexOf('/');
         if( index < 0 ) index = id.indexOf('\\');
         
@@ -159,18 +159,11 @@ public final class GAEMiddlewareFactory implements ContainerMiddlewareFactory {
         ContainerBean ret = new ContainerBean();
         ret.setContainerId(strategy.getContainerId()); // Will be null unless its a store
         ret.setType(strategy.getContainerName());
-        // TODO: this.root.setStatus(status);
-        
-        // If store set name based on type.
-        if( ret.getContainerId() != null ) {
-            ret.setName(ret.getType());
-        }
         
         // User and status
         ret.setCreated(new Date());
         UserService userService = UserServiceFactory.getUserService();
         if( userService.isUserLoggedIn() ) ret.setCreator(userService.getCurrentUser().getEmail());
-        ret.setLastId(0); // So root obj is 1!
         
         return ret;
     }
@@ -183,5 +176,27 @@ public final class GAEMiddlewareFactory implements ContainerMiddlewareFactory {
         GAETransaction trans = (GAETransaction)cache.get(id);
         if( trans == null ) throw new TransactionNotFoundException(id);
         return trans;
+    }
+    
+    /**
+     * Public helper to get a containers key.
+     * 
+     * @param id The ID of the container
+     * @param strip If true then the initial 'ContainerType/' will be stripped
+     * @return The containers key
+     */
+    public static Key getContainerKey(String id, boolean strip) {
+        if( strip ) id = stripId(id);
+        
+        Key key = null;
+        try {
+            long i = Long.parseLong(id);
+            key = KeyFactory.createKey(ContainerBean.class.getSimpleName(), i);
+        }
+        catch( NumberFormatException e ) {
+            key = KeyFactory.createKey(ContainerBean.class.getSimpleName(), id);
+        }
+        
+        return key;
     }
 }

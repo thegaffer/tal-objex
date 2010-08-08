@@ -11,6 +11,7 @@ import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.container.SimpleTransaction;
 import org.tpspencer.tal.objexj.container.StandardContainer;
 import org.tpspencer.tal.objexj.container.TransactionMiddleware;
+import org.tpspencer.tal.objexj.exceptions.ContainerNotFoundException;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
 /**
@@ -24,10 +25,22 @@ import org.tpspencer.tal.objexj.object.ObjectStrategy;
 public final class SimpleContainerFactory implements ContainerFactory {
     
 	/** Describes the overall strategy for the container */
-	private final ContainerStrategy strategy;
+	private ContainerStrategy strategy;
 	/** Holds the class for the object cache */
-	private final ContainerMiddlewareFactory middlewareFactory;
+	private ContainerMiddlewareFactory middlewareFactory;
 	
+	/**
+	 * Default constructor for spring based construction
+	 */
+	public SimpleContainerFactory() {
+	}
+	
+	/**
+	 * Helepr constructor for one line construction
+	 * 
+	 * @param strategy The container strategy
+	 * @param middlewareFactory The middleware factory
+	 */
 	public SimpleContainerFactory(
 			ContainerStrategy strategy, 
 			ContainerMiddlewareFactory middlewareFactory) {
@@ -38,7 +51,43 @@ public final class SimpleContainerFactory implements ContainerFactory {
 		this.middlewareFactory = middlewareFactory;
 	}
 	
-	public EditableContainer create() {
+	/**
+     * @return the strategy
+     */
+    public ContainerStrategy getStrategy() {
+        return strategy;
+    }
+
+    /**
+     * Setter for the strategy field
+     *
+     * @param strategy the strategy to set
+     */
+    public void setStrategy(ContainerStrategy strategy) {
+        Assert.notNull(strategy, "You must provide a valid ContainerStrategy for the factory");
+        this.strategy = strategy;
+    }
+
+    /**
+     * @return the middlewareFactory
+     */
+    public ContainerMiddlewareFactory getMiddlewareFactory() {
+        return middlewareFactory;
+    }
+
+    /**
+     * Setter for the middlewareFactory field
+     *
+     * @param middlewareFactory the middlewareFactory to set
+     */
+    public void setMiddlewareFactory(ContainerMiddlewareFactory middlewareFactory) {
+        Assert.notNull(middlewareFactory, "You must provide a valid ContainerMiddlewareFactry for the factory");
+        this.middlewareFactory = middlewareFactory;
+    }
+
+
+
+    public EditableContainer create() {
         TransactionMiddleware middleware = middlewareFactory.createContainer(strategy);
         
         // Add in the root object
@@ -66,5 +115,22 @@ public final class SimpleContainerFactory implements ContainerFactory {
 	public EditableContainer open(String id) {
 	    TransactionMiddleware middleware = middlewareFactory.getTransaction(strategy, id);
 	    return new SimpleTransaction(strategy, middleware, middleware.getContainerId());
+	}
+	
+	/**
+	 * Determines if the factory represents a store and if
+	 * so determines if it exists. If not it creates it.
+	 */
+	public void createStore() {
+	    if( strategy.getContainerId() != null ) {
+	        try {
+	            get(strategy.getContainerId());
+	        }
+	        catch( ContainerNotFoundException e ) {
+	            // Does not exist so create
+	            EditableContainer c = create();
+	            c.saveContainer();
+	        }
+	    }
 	}
 }

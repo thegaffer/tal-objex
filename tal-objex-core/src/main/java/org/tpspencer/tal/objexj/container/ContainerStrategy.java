@@ -1,8 +1,15 @@
 package org.tpspencer.tal.objexj.container;
 
+import java.util.List;
+
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.events.EventHandler;
+import org.tpspencer.tal.objexj.events.EventListener;
+import org.tpspencer.tal.objexj.exceptions.EventHandlerNotFoundException;
 import org.tpspencer.tal.objexj.exceptions.ObjectTypeNotFoundException;
+import org.tpspencer.tal.objexj.exceptions.QueryNotFoundException;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
+import org.tpspencer.tal.objexj.query.Query;
 
 /**
  * This interface represents a strategy for a container.
@@ -56,4 +63,32 @@ public interface ContainerStrategy {
      * @throws ObjectTypeNotFoundException If the type if not known
      */
     public ObjectStrategy getObjectStrategyForState(String stateType);
+    
+    /**
+     * Call to get a named query for the container.
+     * 
+     * @param name The name of the query
+     * @return The query
+     * @throws QueryNotFoundException If the query is not known
+     */
+    public Query getQuery(String name);
+    
+    /**
+     * Call to get a named event handler for the container.
+     * 
+     * @param name The name of the event
+     * @return The event handler
+     * @throws EventHandlerNotFoundException If the event name is not known
+     */
+    public EventHandler getEventHandler(String name);
+    
+    /**
+     * Call to get all standard listeners for this container.
+     * These listeners are always applied to the container.
+     * 
+     * FUTURE: Should we support calculated listeners from container??
+     * 
+     * @return The standard event listeners.
+     */
+    public List<EventListener> getStandardListeners();
 }

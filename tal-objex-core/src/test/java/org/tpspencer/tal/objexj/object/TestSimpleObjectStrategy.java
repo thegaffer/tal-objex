@@ -103,6 +103,10 @@ public class TestSimpleObjectStrategy {
 	        return null;
 	    }
 	    
+	    public Object getId() {
+	        return null;
+	    }
+	    
 	    public String getParentId() {
 	        return null;
 	    }

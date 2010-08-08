@@ -1,12 +1,18 @@
 package org.tpspencer.tal.objexj.gae.object;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+
+import org.tpspencer.tal.objexj.events.EventListener;
+import org.tpspencer.tal.objexj.gae.event.GAEEventListener;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -27,17 +33,10 @@ public final class ContainerBean implements Serializable {
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key id;
     
-    /** Holds the last ID used for objects inside the container */
-    private long lastId;
-    
     /** The type of the container */
     private String type;
     /** The non-runtime environment ID of this container */
     private String containerId;
-    /** The name of this container */
-    private String name;
-    /** A description for this container */
-    private String description;
     /** The status of this document */
     private String status;
     
@@ -51,6 +50,9 @@ public final class ContainerBean implements Serializable {
     /** Holds the person who created the document (if known) */
     private String creator;
     
+    /** Holds the registered listeners for this container */
+    private List<GAEEventListener> registeredListeners;
+    
     /**
      * @return the id
      */
@@ -60,18 +62,7 @@ public final class ContainerBean implements Serializable {
     public void setId(Key id) {
         this.id = id;
     }
-    /**
-     * @return the lastId
-     */
-    public long getLastId() {
-        return lastId;
-    }
-    /**
-     * @param lastId the lastId to set
-     */
-    public void setLastId(long lastId) {
-        this.lastId = lastId;
-    }
+    
     /**
      * @return the type
      */
@@ -107,18 +98,6 @@ public final class ContainerBean implements Serializable {
     }
     
     /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-    /**
      * @return the created
      */
     public Date getCreated() {
@@ -141,18 +120,6 @@ public final class ContainerBean implements Serializable {
      */
     public void setCreator(String creator) {
         this.creator = creator;
-    }
-    /**
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
     }
     /**
      * @return the status
@@ -189,5 +156,41 @@ public final class ContainerBean implements Serializable {
      */
     public void setAuthor(String author) {
         this.author = author;
+    }
+    /**
+     * @return the registeredListeners
+     */
+    public List<GAEEventListener> getRegisteredListeners() {
+        return registeredListeners;
+    }
+    /**
+     * @param registeredListeners the registeredListeners to set
+     */
+    public void setRegisteredListeners(List<GAEEventListener> registeredListeners) {
+        this.registeredListeners = registeredListeners;
+    }
+    /**
+     * Helper to add a listener. It is only added if it
+     * is unique.
+     * 
+     * @param listener The listener to add
+     */
+    public void addListener(EventListener listener) {
+        // a. Make sure listener does not already exist
+        if( registeredListeners != null ) {
+            boolean found = false;
+            Iterator<GAEEventListener> it = registeredListeners.iterator();
+            while( !found && it.hasNext() ) {
+                GAEEventListener current = it.next();
+                found = current.similar(listener);
+            }
+            
+            // If found exit, but silently, already registered
+            if( found ) return;
+        }
+        
+        // b. Convert to GAEListener and add it
+        if( registeredListeners == null ) registeredListeners = new ArrayList<GAEEventListener>();
+        registeredListeners.add(new GAEEventListener(listener));
     }
 }

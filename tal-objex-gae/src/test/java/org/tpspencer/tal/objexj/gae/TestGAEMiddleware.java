@@ -1,5 +1,6 @@
 package org.tpspencer.tal.objexj.gae;
 
+import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
@@ -20,6 +21,10 @@ public class TestGAEMiddleware {
     public void setup() {
         strategy = context.mock(ContainerStrategy.class);
         container = context.mock(Container.class);
+        
+        context.checking(new Expectations() {{
+            allowing(strategy).getStandardListeners(); will(returnValue(null));
+        }});
     }
 
     /**
@@ -88,7 +93,7 @@ public class TestGAEMiddleware {
         GAEMiddleware underTest = new GAEMiddleware(strategy, bean);
         underTest.init(container);
         
-        underTest.save();
+        underTest.save(null, null);
     }
     
     /**

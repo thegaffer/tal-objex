@@ -1,5 +1,7 @@
 package org.tpspencer.tal.objexj;
 
+import org.tpspencer.tal.objexj.events.Event;
+
 /**
  * This interface represents a container that can be
  * edited. Options exist to create, update or remove

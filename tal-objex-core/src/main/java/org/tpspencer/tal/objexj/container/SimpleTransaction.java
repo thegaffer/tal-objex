@@ -9,6 +9,7 @@ import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.RootObjexObj;
 import org.tpspencer.tal.objexj.object.DefaultObjexID;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
@@ -108,6 +109,14 @@ public class SimpleTransaction extends StandardContainer implements EditableCont
 	// TODO: Setting the container ID, which must be Type/ID (slightly different to GAE ID)
 	// TODO: Refactor this into a save class as there are multiple steps (we still need to add validation)
     public String saveContainer() {
+        ObjexObj obj = getRootObject();
+        RootObjexObj root = null;
+        if( obj instanceof RootObjexObj ) root = (RootObjexObj)obj;
+        
+        // Validate container
+        // TODO: Throwing an exception is not right!!!
+        if( root != null && !root.validate() ) throw new IllegalArgumentException("Cannot save container as it is not valid - errors");
+        
         // SUGGEST: Move this to the middleware so it is inside the transaction
         Map<ObjexID, ObjexObjStateBean> newObjects = cache.getNewObjects();
         if( newObjects != null ) {
@@ -147,7 +156,11 @@ public class SimpleTransaction extends StandardContainer implements EditableCont
             }
         }
         
-        this.setId(middleware.save());
+        // Save
+        String status = root != null ? root.getStatus() : null;
+        Map<String, String> header = root != null ? root.getHeader() : null;
+        
+        this.setId(middleware.save(status, header));
         open = false;
         return getId();
     }

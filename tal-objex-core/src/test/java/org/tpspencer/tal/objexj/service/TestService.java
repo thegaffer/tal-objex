@@ -56,7 +56,7 @@ public class TestService {
 		final ProductBean product = new ProductBean();
 		product.setName("Product1");
 		*/
-		final ObjexID rootId = new DefaultObjexID("Category", "1");
+		final ObjexID rootId = new DefaultObjexID("Category", 1);
 		
 		final ObjectStrategy categoryStrategy = new SimpleObjectStrategy("Category", null, CategoryBean.class);
 		final ObjectStrategy productStrategy = new SimpleObjectStrategy("Product", null, ProductBean.class);
@@ -132,14 +132,14 @@ public class TestService {
 	public void createDocument() {
 	    // Setup
 	    final TransactionCache cache = new SimpleTransactionCache();
-	    final ObjexID rootId = new DefaultObjexID("Category", "1");
+	    final ObjexID rootId = new DefaultObjexID("Category", 1);
 	    
 	    context.checking(new Expectations() {{
 	        oneOf(middlewareFactory).createContainer(with(strategy)); will(returnValue(middleware));
 	        oneOf(middleware).getCache(); will(returnValue(cache));
 	        oneOf(middleware).init(with(any(Container.class)));
 	        oneOf(middleware).getCache(); will(returnValue(cache));
-	        oneOf(middleware).save(); will(returnValue("Stock/1"));
+	        oneOf(middleware).save(null, null); will(returnValue("Stock/1"));
 	    }});
         
 	    // Test
@@ -163,7 +163,8 @@ public class TestService {
 	@Test
 	public void update() {
 	    // Setup
-	    final ObjexID idCategory = new DefaultObjexID("Category", 20);
+	    final ObjexID idRoot = new DefaultObjexID("Category", 1);
+        final ObjexID idCategory = new DefaultObjexID("Category", 20);
         final CategoryBean currentCategory = new CategoryBean("Cat1");
         final TransactionCache cache = new SimpleTransactionCache();
         
@@ -174,7 +175,9 @@ public class TestService {
             oneOf(middleware).getCache(); will(returnValue(cache));
             oneOf(middleware).loadObject(CategoryBean.class, idCategory);
                 will(returnValue(currentCategory));
-            oneOf(middleware).save(); will(returnValue("Stock/1"));
+            oneOf(middleware).loadObject(CategoryBean.class, idRoot);
+                will(returnValue(currentCategory));
+            oneOf(middleware).save(null, null); will(returnValue("Stock/1"));
             
             oneOf(middlewareFactory).getMiddleware(strategy, "Stock/1"); will(returnValue(middleware));
             oneOf(middleware).getContainerId(); will(returnValue("Stock/1"));
@@ -205,6 +208,7 @@ public class TestService {
 	@Test
 	public void updateLongLivedEdit() {
 	    // Setup
+	    final ObjexID idRoot = new DefaultObjexID("Category", 1);
 	    final ObjexID idCategory = new DefaultObjexID("Category", 20);
         final CategoryBean currentCategory = new CategoryBean("Cat1");
 	    final TransactionCache cache = new SimpleTransactionCache();
@@ -225,9 +229,9 @@ public class TestService {
             oneOf(middleware).getCache(); will(returnValue(cache));
             oneOf(middleware).loadObject(CategoryBean.class, idCategory);
                 will(returnValue(currentCategory));
-            oneOf(middleware).loadObject(CategoryBean.class, idCategory);
+            oneOf(middleware).loadObject(CategoryBean.class, idRoot);
                 will(returnValue(currentCategory));
-            oneOf(middleware).save(); will(returnValue("Stock/1"));
+            oneOf(middleware).save(null, null); will(returnValue("Stock/1"));
             
             // Get container and query
             oneOf(middlewareFactory).getMiddleware(strategy, "Stock/1"); will(returnValue(middleware));

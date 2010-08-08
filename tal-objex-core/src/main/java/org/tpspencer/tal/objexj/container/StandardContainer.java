@@ -11,8 +11,14 @@ import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.events.Event;
+import org.tpspencer.tal.objexj.events.EventHandler;
+import org.tpspencer.tal.objexj.exceptions.EventHandlerNotFoundException;
 import org.tpspencer.tal.objexj.object.DefaultObjexID;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
+import org.tpspencer.tal.objexj.query.Query;
+import org.tpspencer.tal.objexj.query.QueryRequest;
+import org.tpspencer.tal.objexj.query.QueryResult;
 
 /**
  * Standard class that implements the container interface
@@ -154,6 +160,16 @@ public class StandardContainer implements Container {
 		return ret;
 	}
 	
+	/**
+	 * Retrieves the query from the container strategy, extracts
+	 * the object strategy for the type the query runs on and
+	 * executes the query.
+	 */
+	public QueryResult executeQuery(QueryRequest request) {
+	    Query query = strategy.getQuery(request.getName());
+	    return query.execute(this, strategy, request);
+	}
+	
 	public EditableContainer openContainer() {
 		// TODO: Remove when no longer deprecated and removed
 		return null;
@@ -174,4 +190,14 @@ public class StandardContainer implements Container {
 		ObjexID parentId = DefaultObjexID.getId(state.getParentId());
 		return objectStrategy.getObjexObjInstance(this, parentId, id, state);
 	}
+	
+	/**
+	 * Simply delegates to the event processor by name.
+	 * 
+	 * @throws EventHandlerNotFoundException If the event is unknown
+	 */
+	public void processEvent(Event event) {
+        EventHandler handler = getContainerStrategy().getEventHandler(event.getEventName());
+        handler.execute(this, event);
+    }
 }

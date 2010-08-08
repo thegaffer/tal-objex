@@ -1,6 +1,7 @@
 package org.tpspencer.tal.objexj.locator;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.tpspencer.tal.objexj.Container;
@@ -61,6 +62,17 @@ public final class SingletonContainerLocator {
     public EditableContainer open(String id) {
 	    return getFactory(getType(id)).open(id);
 	}
+    
+    /**
+     * Call to create all stores we know about if (and
+     * only if) they do not exist already.
+     */
+    public void createStores() {
+        Iterator<ContainerFactory> it = factories.values().iterator();
+        while( it.hasNext() ) {
+            it.next().createStore();
+        }
+    }
 	
 	/**
 	 * Helper to extract the type of container from the ID.
@@ -89,5 +101,24 @@ public final class SingletonContainerLocator {
 	    if( factories != null ) ret = factories.get(type);
 	    if( ret == null ) throw new ContainerTypeNotFoundException(type);
 	    return ret;
+	}
+
+    /**
+     * @return the factories
+     */
+    public Map<String, ContainerFactory> getFactories() {
+        return factories;
+    }
+	
+	public void setFactories(Map<String, ContainerFactory> factories) {
+	    this.factories.clear();
+	    
+	    if( factories == null || factories.size() == 0 ) return;
+	    
+	    Iterator<String> it = factories.keySet().iterator();
+	    while( it.hasNext() ) {
+	        String name = it.next();
+	        this.factories.put(name, factories.get(name));
+	    }
 	}
 }
