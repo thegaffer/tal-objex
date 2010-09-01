@@ -15,11 +15,25 @@ public class StockBean implements ObjexObjStateBean {
 	public StockBean() {
 	}
 	
-	public StockBean(ObjexID parentId) {
+	public void create(ObjexID parentId) {
     }
 
-	public void init(Object id) {
+	public void preSave(Object id) {
         this.id = id != null ? id.toString() : null;
+    }
+	
+	public ObjexObjStateBean clone() {
+	    StockBean ret = new StockBean();
+	    ret.setId(this.id);
+	    ret.setCategories(this.categories); // Should clone, but ok for test
+	    return ret;
+	}
+	
+	public boolean isEditable() {
+	    return true; // OK for test
+	}
+    
+	public void setEditable() {
     }
     
     public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {

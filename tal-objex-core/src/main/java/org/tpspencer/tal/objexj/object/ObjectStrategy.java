@@ -1,10 +1,12 @@
 package org.tpspencer.tal.objexj.object;
 
-import org.tpspencer.tal.objexj.Container;
+import java.util.Map;
+
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.container.InternalContainer;
 
 /**
  * This interface represents something that can describe
@@ -44,7 +46,7 @@ public interface ObjectStrategy {
 	 * @param state The state of the object
 	 * @return The objex obj instance
 	 */
-	public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, ObjexObjStateBean state);
+	public ObjexObj getObjexObjInstance(InternalContainer container, ObjexID parent, ObjexID id, ObjexObjStateBean state);
 	
 	/**
 	 * Call to get the class that represents the objects
@@ -57,20 +59,26 @@ public interface ObjectStrategy {
 	public Class<? extends ObjexObjStateBean> getStateClass();
 	
 	/**
-	 * Call for the strategy to create a new instance of the
-	 * state class. This method may not return an instance
-	 * of the state class returned above. The main motiviation
-	 * for this method is to clone the persisted state instance.
+	 * Called to get the reference properties on this object.
+	 * This is currently only needed if using the {@link SimpleObjexObj}
+	 * class.
 	 * 
-	 * @return A new instance of the state class
+	 * <p>The returned map holds the name of the reference
+	 * property together with it's preferred method to hold
+	 * the IDs as. This can either be {@link ObjexID}, 
+	 * {@link String} or simple {@link Object} (which will 
+	 * be treated as {@link ObjexID} when setting.</p>
+	 * 
+	 * @return The reference properties and the class they represent IDs as
 	 */
-	public ObjexObjStateBean getNewStateInstance(ObjexID parentId);
+	public Map<String, Class<?>> getReferenceProperties();
 	
 	/**
-	 * Call to get a cloned instance of the state bean.
+	 * Called to get the super set of reference properties that
+	 * are 'owned' by this object - that is 'this' object owns
+	 * the lifecycle of the owned object.
 	 * 
-	 * @param source The source instance
-	 * @return The copied instance
+	 * @return The owned reference properties and the class they represents IDs as
 	 */
-	public ObjexObjStateBean getClonedStateInstance(ObjexObjStateBean source);
+	public Map<String, Class<?>> getOwnedReferenceProperties();
 }

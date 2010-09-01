@@ -1,6 +1,6 @@
 package org.tpspencer.tal.objexj;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.tpspencer.tal.objexj.events.Event;
@@ -13,11 +13,6 @@ import org.tpspencer.tal.objexj.query.QueryResult;
  * rolodex or similar, or a document which is akin to a folder
  * in a filing cabinet. Inside the folder or the rolodex are 
  * pieces of paper - these are the objects.
- * 
- * <p>The container interface provides read-only facilities to
- * query the container and get at its objects. The 
- * {@link EditableContainer} interface represents a container
- * that can be edited.</p>
  * 
  * @author Tom Spencer
  */
@@ -58,35 +53,27 @@ public interface Container {
 	public ObjexObj getObject(Object id);
 	
 	/**
-     * Call to get the real ID of an object given the
-     * generic ID passed in (which may be the ID or a
-     * string ref). Getting a non-null return does not
-     * ensure the ID is a real object in the container,
-     * but it does ensure its a valid ID.
-     * 
-     * @param id The ID of the object (may be an ObjexID, may be a string)
-     * @return The ID of the object
-     * @throws IllegalArgumentException If a null object id is supplied
-     */
-    public ObjexID getObjectId(Object id);
-	
-	/**
-	 * Call to get a collection of objects given an array of IDs.
-	 * This function is primarily for internal use.
+	 * Call to get a list of objects from a given list of
+	 * references. The references may be {@link ObjexID} 
+	 * instances or simply strings that are the stringified
+	 * form of object references.
 	 *  
 	 * @param ids The IDs in to get
 	 * @return A collection of the valid objects found
 	 */
-	public Collection<ObjexObj> getObjects(ObjexID[] ids);
+	public List<ObjexObj> getObjectList(List<? extends Object> ids);
 	
 	/**
-	 * Call to get a map, keyed by the objects ID given an array
-	 * if IDs. This function is primarily for internal use.
+	 * Call to get a map of objects from a given map of
+     * references. The references may be {@link ObjexID} 
+     * instances or simply strings that are the stringified
+     * form of object references. The keys are unchanged
+     * in the resulting map.
 	 * 
 	 * @param ids The IDs in to get
-	 * @return A collection of the valid objects found
+	 * @return A map containing the references to get
 	 */
-	public Map<ObjexID, ObjexObj> getObjectMap(ObjexID[] ids);
+	public Map<? extends Object, ObjexObj> getObjectMap(Map<? extends Object, ? extends Object> ids);
 	
 	/**
 	 * Call to execute a named query against the container.
@@ -117,11 +104,52 @@ public interface Container {
 	
 	/**
 	 * Call to open this container for editing. The returned 
-	 * instance will typically be of a different object that
-	 * you should now interact with instead of this instance.
+	 * instance may be of a different object that you should 
+	 * now interact with instead of this instance.
 	 * 
 	 * @return An editable container to start working with 
-	 * @deprecated
 	 */
-	public EditableContainer openContainer();
+	public Container openContainer();
+	
+	/**
+     * Call to determine if the editable container represents a
+     * new container that has not yet been persisted. If so the
+     * next object will be the root object.
+     * 
+     * @return Determines if the container if new (and not yet persisted)
+     */
+    public boolean isNew();
+    
+    /**
+     * Call to determine if the editable container can still
+     * accept changes.
+     * 
+     * @return True if it is open, false otherwise
+     */
+    public boolean isOpen();
+    
+    /**
+     * Call to save the container. Once this is done the
+     * no further changes can be made via this editable
+     * container.
+     * 
+     * @return The ID of the container
+     */
+    public String saveContainer();
+    
+    /**
+     * Call to close the container without saving any
+     * changes. No further changes can be made via this
+     * editable container. 
+     */
+    public void closeContainer();
+    
+    /**
+     * Call to suspend the transaction and come back to
+     * it later. This is not supported in all runtime
+     * environments.
+     * 
+     * @return The ID of the transaction 
+     */
+    public String suspend();
 }

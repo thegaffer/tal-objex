@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.container.InternalContainer;
 
 /**
  * This class contains various helper methods that can be
@@ -53,7 +54,7 @@ public class ObjectUtils {
      * @return The real objex ID
      */
     public static ObjexID getObjectId(ObjexObj obj, Object id) {
-        return obj.getContainer().getObjectId(id);
+        return DefaultObjexID.getId(id);
     }
     
     /**
@@ -128,13 +129,14 @@ public class ObjectUtils {
      * parent of the given object.
      * 
      * @param obj The parent object
+     * @param currentState The current state of the parent object
      * @param type The type of object to create
      * @return The new object
      */
-    public static ObjexObj createObject(ObjexObj obj, String type) {
+    public static ObjexObj createObject(ObjexObj obj, ObjexObjStateBean currentState, String type) {
         Container container = obj.getContainer();
-        if( container instanceof EditableContainer ) {
-            return ((EditableContainer)container).newObject(type, obj);
+        if( container instanceof InternalContainer ) {
+            return ((InternalContainer)container).newObject(obj, currentState, type);
         }
         else {
             // TODO: Throw an exception!!!
@@ -146,16 +148,19 @@ public class ObjectUtils {
      * Call to remove an object from the container.
      * 
      * @param obj The object we are removing from
+     * @param currentState The current state of the parent object
      * @param id The ID of the object to remove
      */
-    public static void removeObject(ObjexObj obj, String id) {
+    public static void removeObject(ObjexObj obj, ObjexObjStateBean currentState, String id) {
         Container container = obj.getContainer();
-        if( container instanceof EditableContainer ) {
-            ObjexID realId = container.getObjectId(id);
-            ((EditableContainer)container).removeObject(realId);
+        
+        ObjexObj objToRemove = container.getObject(id);
+        // TODO: There should be a method on the object to do this!
+        if( objToRemove != null && container instanceof InternalContainer ) {
+            ((InternalContainer)container).removeObject(objToRemove, currentState);
         }
         else {
-            // TODO: Throw an exception!!!
+            // TODO: Throw an exception
         }
     }
     

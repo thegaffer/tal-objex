@@ -1,17 +1,13 @@
 package org.tpspencer.tal.objexj.object;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.container.InternalContainer;
+import org.tpspencer.tal.objexj.exceptions.ObjectFieldInvalidException;
 
 /**
  * Base class for an ObjexObj. Most basic methods are implemented
@@ -27,7 +23,7 @@ import org.tpspencer.tal.objexj.ObjexObj;
 public abstract class BaseObjexObj implements InternalObjexObj {
 
     /** The container that the object belongs to */
-    private Container container;
+    private InternalContainer container;
     /** ID of the object */
 	private ObjexID id;
 	/** ID of this object parent (or null if this is the root object) */
@@ -44,7 +40,7 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	 * @param id The ID of the object
 	 * @param parentId The parentID of the object
 	 */
-	public void init(Container container, ObjexID id, ObjexID parentId) {
+	public void init(InternalContainer container, ObjexID id, ObjexID parentId) {
 	    if( container == null ) throw new IllegalArgumentException("Cannot create object without a container");
         if( id == null || id.isNull() ) throw new IllegalArgumentException("Cannot create object without a valid id");
         
@@ -53,10 +49,9 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	    this.parentId = parentId;
 	}
 	
-	protected void checkInitialised() {
-	    if( container == null ) throw new IllegalStateException("The object has not been initialised: " + this); 
-	}
-	
+	////////////////////////////////////////////
+    // ObjexObj Methods
+    
 	/**
 	 * Simply returns the ID
 	 */
@@ -117,32 +112,14 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	}
 	
 	/**
-     * Returns either the state object directly or a copy
-     * depending on if in open editable container.
-     */
-    public <T> T getStateObject(Class<T> expected) {
-        checkInitialised();
-        return expected.cast(getStateObject());
-    }
-	
-	/**
-     * Helper that returns the state object without 
-     * cloning it. Can be used by the derived class.
-     * 
-     * @return The state object
-     */
-    protected abstract Object getLocalState();
-    
-    /**
-     * Helper that returns the state object without 
-     * cloning it. Can be used by the derived class.
-     * 
-     * @return The state object
-     */
-    protected <T> T getLocalState(Class<T> expected) {
-        checkInitialised();
-        return expected.cast(getLocalState());
-    }
+	 * Helper to allow derived to get at internal container.
+	 * 
+	 * @return The container
+	 */
+	protected InternalContainer getInternalContainer() {
+	    checkInitialised();
+	    return container;
+	}
 	
 	/**
 	 * The default method tests whether the instance supports
@@ -159,112 +136,185 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	 */
 	public boolean isUpdateable() {
 	    checkInitialised();
-	    if( container instanceof EditableContainer ) return true;
-	    return false;
+	    return container.isOpen();
 	}
 	
 	/**
-	 * 
-	 */
-	protected void checkUpdateable() {
-	    checkInitialised();
-		if( !isUpdateable() ) throw new IllegalArgumentException("Cannot update an object that is not inside a transaction: " + this);
-	}
-	
-	/**
-	 * Uses the name as a property and reflects value
-	 * turning it into a String if non-null
-	 */
-	public String getPropertyAsString(String name) {
-	    checkInitialised();
-		BeanWrapper wrapper = new BeanWrapperImpl(getLocalState());
-		Object obj = wrapper.getPropertyValue(name);
-		return obj != null ? obj.toString() : null;
-	}
-	
-	/**
-	 * Uses the name as a property and reflects value
+	 * Base version tries to find a property on this
+	 * class (derived) and uses it to get the value.
 	 */
 	public Object getProperty(String name) {
 	    checkInitialised();
-		BeanWrapper wrapper = new BeanWrapperImpl(getLocalState());
-		return wrapper.getPropertyValue(name);
+	    
+	    try {
+	        PropertyDescriptor prop = getPropertyDescriptor(name);
+	        if( prop.getReadMethod() == null ) throw new ObjectFieldInvalidException(name, "No read method available");
+	        return prop.getReadMethod().invoke(this, (Object[])null);
+	    }
+	    catch( RuntimeException e ) {
+	        throw e;
+	    }
+	    catch( Exception e ) {
+	        throw new ObjectFieldInvalidException(name, e.getMessage(), e);
+	    }
 	}
 	
 	/**
-	 * Returns the reference in the given property as
-	 * an object using the container to resolve.
+	 * Uses the raw getProperty method and then casts as 
+	 * appropriate.
 	 */
-	public ObjexObj getReference(String name) {
-	    checkInitialised();
-		Object id = getProperty(name);
-		return id != null ? container.getObject(id) : null;
+	public <T> T getProperty(String name, Class<T> expected) {
+	    Object val = getProperty(name);
+	    return expected.cast(val);
 	}
 	
 	/**
-	 * Gets the collection of objects from the container having
-	 * got IDs from reference property. The IDs can be an array
-	 * of ObjexID, an array of Strings or a collection of either.
-	 */
-	public Collection<ObjexObj> getCollectionReference(String name) {
-	    checkInitialised();
-		ObjexID[] ids = getReferenceIds(name);
-		return ids != null ? container.getObjects(ids) : null;
-	}
-	
-	/**
-	 * Gets the IDs and asks the container to fill map
+     * Uses the name as a property and reflects value
+     * turning it into a String if non-null
+     */
+    public String getPropertyAsString(String name) {
+        Object obj = getProperty(name);
+        return obj != null ? obj.toString() : null;
+    }
+    
+    /**
+	 * Delegates handling to private setProperty method
+	 * if one exists.
 	 * 
-	 * TODO: IDs should be held as a map by object!
+	 * @throws ObjectFieldInvalidException If cannot set this property
 	 */
-	public Map<ObjexID, ObjexObj> getMapReference(String name) {
-	    checkInitialised();
-		ObjexID[] ids = getReferenceIds(name);
-		return ids != null ? container.getObjectMap(ids) : null;
+	public void setProperty(String name, Object val) {
+	    checkUpdateable();
+	    
+	    try {
+            PropertyDescriptor prop = getPropertyDescriptor(name);
+            if( prop.getWriteMethod() == null ) throw new ObjectFieldInvalidException(name, "No write method available");
+            prop.getWriteMethod().invoke(this, val);
+        }
+        catch( RuntimeException e ) {
+            throw e;
+        }
+        catch( Exception e ) {
+            throw new ObjectFieldInvalidException(name, e.getMessage(), e);
+        }
 	}
 	
 	/**
-	 * Internal helper to get the IDs referred to by a
-	 * property as an array of ObjexIDs
-	 * 
-	 * @param name
-	 * @return
-	 */
-	private ObjexID[] getReferenceIds(String name) {
-		Object ids = getProperty(name);
-		
-		ObjexID[] ret = null;
-		
-		// Direct set of ObjexIDs
-		if( ids instanceof ObjexID[] ) {
-			ret = (ObjexID[])ids;
-		}
-		
-		// Array of strings
-		else if( ids instanceof String[] ) {
-			// TODO: Use container to turn each into ObjexIDs
-			ret = null;
-		}
-		
-		// Collection of IDs or Strings
-		else if( ids instanceof Collection<?> ) {
-			List<ObjexID> realIds = null;
-			Iterator<?> it = ((Collection<?>)ids).iterator();
-			while( it.hasNext() ) {
-				Object id = it.next();
-				ObjexID realId = null;
-				if( id instanceof ObjexID ) realId = (ObjexID)id;
-				else if( id instanceof String ) realId = null; // TODO: Use container!
-				
-				if( realId != null ) {
-					if( realIds == null ) realIds = new ArrayList<ObjexID>();
-					realIds.add(realId);
-				}
-			}
-			
-			ret = realIds != null ? realIds.toArray(new ObjexID[realIds.size()]) : null;
-		}
-		
-		return ret;
-	}
+     * Attempts to find a create'Name' method on this class
+     * and invoke it. The method may or may not have a type
+     * parameter - it is passed if it doesn't.
+     * 
+     * <p><b>Note: </b>If type is passed, but the create
+     * method is found but does not support passing in a 
+     * type then the parameter is ignored.</p>
+     * 
+     * @param name The name of the reference property
+     * @param type The type of object to create
+     * @return The newly constructed object
+     */
+    public ObjexObj createReference(String name, String type) {
+        String createMethod = "create";
+        if( Character.isLowerCase(name.charAt(0)) ) {
+            createMethod += name.substring(0, 1).toUpperCase();
+            if( name.length() > 1 ) createMethod += name.substring(1);
+        }
+        else {
+            createMethod += name;
+        }
+        
+        // Try non-plural
+        String altCreateMethod = null;
+        if( createMethod.endsWith("s") ) altCreateMethod = createMethod.substring(0, createMethod.length() - 1);
+        
+        // Find the method
+        boolean includeType = false;
+        Method method = findMethod(createMethod, String.class);
+        if( method != null ) includeType = true;
+        
+        if( method == null ) method = findMethod(altCreateMethod, String.class);
+        if( method != null ) includeType = true;
+        
+        if( method == null ) method = findMethod(createMethod, (Class<?>[])null);
+        if( method == null ) method = findMethod(altCreateMethod, (Class<?>[])null);
+        
+        // Invoke if found
+        if( method != null && ObjexObj.class.isAssignableFrom(method.getReturnType()) ) {
+            try {
+                return (ObjexObj)method.invoke(this, includeType ? type : null);
+            }
+            catch( RuntimeException e ) {
+                throw e;
+            }
+            catch( Exception e ) {
+                throw new UnsupportedOperationException("Creation failed", e);
+            }
+        }
+        else {
+            throw new UnsupportedOperationException("Creation not supported on property: " + name);
+        }
+    }
+	
+	//////////////////////////////////////////////////
+	// Internal
+	
+    /**
+     * Helper method to ensure this object is initialised as
+     * an ObjexObj - if not throws an {@link IllegalStateException}.
+     * 
+     * @throws IllegalStateException If not initialised
+     */
+	protected void checkInitialised() {
+        if( container == null ) throw new IllegalStateException("The object has not been initialised: " + this); 
+    }
+	
+	/**
+     * Ensures the object is updateable before continuing
+     * 
+     * @throws IllegalStateException If not editable
+     */
+    protected void checkUpdateable() {
+        checkInitialised();
+        if( !isUpdateable() ) throw new IllegalStateException("Cannot update an object that is not inside a transaction: " + this);
+    }
+    
+    /**
+     * Helper to get a property descriptor on this class for
+     * the given property. The default creates the descriptor
+     * using full introspection, but can be overridden if
+     * there is some unusable behaviour - for instance the
+     * getter and/or setter is not named normally.
+     * 
+     * @param name The name of the property
+     * @return The property descriptor
+     * @throws 
+     */
+    protected PropertyDescriptor getPropertyDescriptor(String name) {
+        try {
+            return new PropertyDescriptor(name, this.getClass());
+        }
+        catch( RuntimeException e ) {
+            throw e;
+        }
+        catch( Exception e ) {
+            throw new ObjectFieldInvalidException(name, e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Helper to find a method. Used from createReference as we test
+     * for a number of different names and parameters
+     * 
+     * @param name The name of the method
+     * @param params The parameters we want
+     * @return The method if found
+     */
+    private Method findMethod(String name, Class<?>... params) {
+        Method ret = null;
+        try {
+            ret = this.getClass().getMethod(name, params);
+        }
+        catch( NoSuchMethodException e ) {}
+        
+        return ret;
+    }
 }

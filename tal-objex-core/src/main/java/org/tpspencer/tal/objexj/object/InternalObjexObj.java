@@ -1,8 +1,8 @@
 package org.tpspencer.tal.objexj.object;
 
-import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.container.InternalContainer;
 
 public interface InternalObjexObj extends ObjexObj {
 
@@ -14,5 +14,5 @@ public interface InternalObjexObj extends ObjexObj {
      * @param id
      * @param parentId
      */
-    public void init(Container container, ObjexID id, ObjexID parentId);
+    public void init(InternalContainer container, ObjexID id, ObjexID parentId);
 }

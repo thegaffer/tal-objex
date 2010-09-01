@@ -1,7 +1,6 @@
 package org.tpspencer.tal.objexj.locator;
 
 import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.EditableContainer;
 
 /**
  * This interface represents something that create container
@@ -18,7 +17,7 @@ public interface ContainerFactory {
      * 
      * @return The open container (the root object and any defaults have been set)
      */
-    public EditableContainer create();
+    public Container create();
     
     /**
 	 * Gets a container if this type given its ID. If the
@@ -38,7 +37,7 @@ public interface ContainerFactory {
 	 * @param id The ID of the container or transaction to open
 	 * @return The opened container
 	 */
-	public EditableContainer open(String id);
+	public Container open(String id);
 	
 	/**
 	 * This method will create a store if it does not

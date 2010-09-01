@@ -1,7 +1,7 @@
 package org.tpspencer.tal.objexj.query;
 
-import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
+import org.tpspencer.tal.objexj.container.InternalContainer;
 
 /**
  * This internal interface represents a query against a
@@ -22,5 +22,5 @@ public interface Query {
      * @param request The request and its parameters
      * @return The result of the query
      */
-    public QueryResult execute(Container container, ContainerStrategy strategy, QueryRequest request);
+    public QueryResult execute(InternalContainer container, ContainerStrategy strategy, QueryRequest request);
 }

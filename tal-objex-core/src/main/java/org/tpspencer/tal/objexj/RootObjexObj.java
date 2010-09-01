@@ -1,6 +1,9 @@
 package org.tpspencer.tal.objexj;
 
+import java.util.List;
 import java.util.Map;
+
+import org.tpspencer.tal.objexj.events.EventListener;
 
 /**
  * This interface is implemented by any object that is
@@ -37,13 +40,40 @@ public interface RootObjexObj {
     public Map<String, String> getHeader();
     
     /**
-     * This method is called on the root object whenever
-     * we are about to save a transaction whether or not
-     * the root object is part of transaction or not.
+     * This method is called to get any applicable listeners
+     * for this container.
      * 
-     * TODO: Should return errors (what format??) not a boolean
-     * 
-     * @return Indicates if there are any errors in the container
+     * @return The applicable listeners to send events to.
      */
-    public boolean validate();
+    public List<EventListener> getListeners();
+    
+    /**
+     * Called to get any existing errors on the container.
+     * This is called at the beginning of the first validation
+     * run since opening.
+     * 
+     * @return The existing errors
+     */
+    public ValidationRequest getErrors();
+    
+    /**
+     * This method is called after any validate on the container
+     * as a whole. It gives the root object a chance to save
+     * the errors if it is acceptable to save the container with
+     * any errors. The root object can also adjust the errors
+     * if required.
+     * 
+     * @param request The validation request
+     * @return The amended validation request (may be the original)
+     */
+    public ValidationRequest processValidation(ValidationRequest request);
+    
+    /**
+     * This is called before saving to make sure the root object
+     * believes it is valid to save given any errors etc.
+     * 
+     * @param request The validation request
+     * @return True if we can save, false otherwise
+     */
+    public boolean canSave(ValidationRequest request);
 }

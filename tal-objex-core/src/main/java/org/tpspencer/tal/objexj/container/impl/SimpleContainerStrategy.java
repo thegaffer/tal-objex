@@ -1,10 +1,11 @@
-package org.tpspencer.tal.objexj.container;
+package org.tpspencer.tal.objexj.container.impl;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.events.EventHandler;
 import org.tpspencer.tal.objexj.events.EventListener;
 import org.tpspencer.tal.objexj.exceptions.EventHandlerNotFoundException;

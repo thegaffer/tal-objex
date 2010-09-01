@@ -27,5 +27,5 @@ public interface ObjexIDStrategy {
      * @param obj The finished object (if present a temp ID cannot be returned)
      * @return The ID
      */
-    public ObjexID createId(EditableContainer container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj);
+    public ObjexID createId(Container container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj);
 }

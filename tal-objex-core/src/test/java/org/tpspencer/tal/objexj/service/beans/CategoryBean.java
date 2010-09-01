@@ -1,5 +1,6 @@
 package org.tpspencer.tal.objexj.service.beans;
 
+import java.util.List;
 import java.util.Map;
 
 import org.tpspencer.tal.objexj.ObjexID;
@@ -32,33 +33,55 @@ public class CategoryBean implements ObjexObjStateBean {
 	private String id;
 	/** Represents the id of parent object of this object */
 	private String parentId;
+	/** Determines if bean is editable */
+	private transient boolean editable = false;
 	
 	/** The name of the category */
 	private String name;
 	/** The description of the category */
 	private String description;
 	
+	/** A main product - here to test */
+	private String mainProduct;
 	/** References to the products of this category */
-	private String[] products;
+	private List<String> products;
+	/** A map of categories */
+	private Map<String, String> categories;
 	
-	public CategoryBean() {
-	    
-	}
+	public CategoryBean() {}
 	
 	public CategoryBean(String name) {
-        this.name = name;
-    }
+	    this.name = name;
+	}
 	
-	public CategoryBean(ObjexID parentId) {
+	public void create(ObjexID parentId) {
 	    this.parentId = parentId != null ? parentId.toString() : null;
 	}
 	
-	public void init(Object id) {
+	public void preSave(Object id) {
 	    this.id = id != null ? id.toString() : null;
+	}
+	
+	public ObjexObjStateBean clone() {
+	    CategoryBean ret = new CategoryBean();
+	    ret.setId(this.id);
+	    ret.setParentId(this.parentId);
+	    ret.setName(this.name);
+	    ret.setDescription(this.description);
+	    ret.setProducts(this.products); // Should clone it, but ok in test
+	    return ret;
 	}
 	
 	public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
 	    // No-op in this test bean
+	}
+	
+	public boolean isEditable() {
+	    return editable;
+	}
+	
+	public void setEditable() {
+	    editable = true;
 	}
 	
 	/**
@@ -104,6 +127,9 @@ public class CategoryBean implements ObjexObjStateBean {
 	public void setName(String name) {
 		this.name = name;
 	}
+	public String getName2() {
+	    return name;
+	}
 	/**
 	 * @return the description
 	 */
@@ -116,16 +142,52 @@ public class CategoryBean implements ObjexObjStateBean {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	/**
-	 * @return the products
-	 */
-	public String[] getProducts() {
-		return products;
-	}
-	/**
-	 * @param products the products to set
-	 */
-	public void setProducts(String[] products) {
-		this.products = products;
-	}
+
+    /**
+     * @return the mainProduct
+     */
+    public String getMainProduct() {
+        return mainProduct;
+    }
+
+    /**
+     * Setter for the mainProduct field
+     *
+     * @param mainProduct the mainProduct to set
+     */
+    public void setMainProduct(String mainProduct) {
+        this.mainProduct = mainProduct;
+    }
+
+    /**
+     * @return the products
+     */
+    public List<String> getProducts() {
+        return products;
+    }
+
+    /**
+     * Setter for the products field
+     *
+     * @param products the products to set
+     */
+    public void setProducts(List<String> products) {
+        this.products = products;
+    }
+
+    /**
+     * @return the categories
+     */
+    public Map<String, String> getCategories() {
+        return categories;
+    }
+
+    /**
+     * Setter for the categories field
+     *
+     * @param categories the categories to set
+     */
+    public void setCategories(Map<String, String> categories) {
+        this.categories = categories;
+    }
 }

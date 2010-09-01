@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.exceptions.ContainerTypeNotFoundException;
 
 /**
@@ -59,7 +58,7 @@ public final class SingletonContainerLocator {
      * locate the {@link ContainerFactory} for that type
      * and then use it to open the container.
      */
-    public EditableContainer open(String id) {
+    public Container open(String id) {
 	    return getFactory(getType(id)).open(id);
 	}
     

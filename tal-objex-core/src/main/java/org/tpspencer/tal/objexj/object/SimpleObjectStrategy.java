@@ -1,15 +1,13 @@
 package org.tpspencer.tal.objexj.object;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
+import java.util.Map;
 
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.container.InternalContainer;
 
 /**
  * Very basic implementation of ObjectStrategy that requires
@@ -17,6 +15,8 @@ import org.tpspencer.tal.objexj.ObjexObjStateBean;
  * The name of the object will be set from the simple name of
  * the state class, the parentIdProp will be "parentId" and
  * we will use SimpleObjexObj as the class for objects.
+ * 
+ * TODO: Make reference property map based on annotations in state bean
  * 
  * @author Tom Spencer
  */
@@ -30,13 +30,13 @@ public final class SimpleObjectStrategy implements ObjectStrategy {
     private Class<? extends ObjexObjStateBean> stateClass;
     /** Holds the raw class for the main objex object */
     private Class<? extends InternalObjexObj> objexClass;
+    /** Holds the optional set of reference properties on the class */
+    private Map<String, Class<?>> referenceProps;
+    /** Holds the optional super-set of reference properties that are considered owned */
+    private Map<String, Class<?>> ownedReferenceProps;
     
     /** Holds the constructor for the object object to instantiate */
     private Constructor<? extends InternalObjexObj> objexClassConstructor;
-	/** Holds the constructor for the object object to instantiate */
-    private Constructor<? extends ObjexObjStateBean> stateClassConstructor;
-    /** Holds the constructor for the object object to instantiate */
-    private Constructor<? extends ObjexObjStateBean> stateCopyConstructor;
 	
     /**
      * Default constructor. Client must call init explicitly
@@ -78,37 +78,8 @@ public final class SimpleObjectStrategy implements ObjectStrategy {
 	 * This is called automatically if the non-default constructor is used.
 	 */
 	public void init() {
-	    this.stateClassConstructor = determineStateConstructor(stateClass);
-        this.stateCopyConstructor = determineCopyConstructor(stateClass);
-        this.objexClassConstructor = determineObjexConstructor(objexClass);
+	    this.objexClassConstructor = determineObjexConstructor(objexClass);
 	}
-	
-	/**
-     * Helper to determine the new constructor for the state class
-     */
-    private Constructor<? extends ObjexObjStateBean> determineStateConstructor(Class<? extends ObjexObjStateBean> stateClass) {
-	    try {
-            Constructor<? extends ObjexObjStateBean> ret = stateClass.getConstructor(ObjexID.class);
-            if( ret == null ) throw new IllegalArgumentException("Cannot use the object state class provided has it has no valid constructor: " + stateClass);
-            return ret;
-        }
-        catch( Exception e ) {
-            throw new IllegalArgumentException("Cannot use the object state class provided has it has no valid constructor: " + stateClass);
-        }
-	}
-	
-	/**
-     * Helper to determine the copy constructor for the state class
-     */
-    private Constructor<? extends ObjexObjStateBean> determineCopyConstructor(Class<? extends ObjexObjStateBean> stateClass) {
-        try {
-            Constructor<? extends ObjexObjStateBean> ret = stateClass.getConstructor(stateClass);
-            return ret;
-        }
-        catch( Exception e ) {
-            return null;
-        }
-    }
 	
 	/**
 	 * Helper to determine the constructor for the objex class
@@ -199,7 +170,7 @@ public final class SimpleObjectStrategy implements ObjectStrategy {
     /**
 	 * Returns an instance of SimpleObjexObj around this class
 	 */
-	public ObjexObj getObjexObjInstance(Container container, ObjexID parent, ObjexID id, ObjexObjStateBean state) {
+	public ObjexObj getObjexObjInstance(InternalContainer container, ObjexID parent, ObjexID id, ObjexObjStateBean state) {
 	    InternalObjexObj ret = null;
 	    if( objexClassConstructor != null ) {
 	        try {
@@ -221,50 +192,30 @@ public final class SimpleObjectStrategy implements ObjectStrategy {
 	}
 	
 	/**
-	 * Simply creates a new instance from the stateClass member
+	 * Simply returns the map of reference properties
 	 */
-	public ObjexObjStateBean getNewStateInstance(ObjexID parentId) {
-		try {
-			return stateClassConstructor.newInstance(parentId);
-		}
-		catch( RuntimeException e ) {
-			throw e;
-		}
-		catch( Exception e ) {
-			throw new IllegalStateException("Cannot create new state object: " + stateClass, e);
-		}
+	public Map<String, Class<?>> getReferenceProperties() {
+	    return referenceProps;
 	}
 	
 	/**
-     * Simply creates a new instance from the stateClass member
+	 * @param referenceProps The map of reference props to set
+	 */
+	public void setReferenceProperties(Map<String, Class<?>> referenceProps) {
+        this.referenceProps = referenceProps;
+    }
+	
+	/**
+     * Simply returns the map of reference properties
      */
-    public ObjexObjStateBean getClonedStateInstance(ObjexObjStateBean source) {
-       try {
-           if( stateCopyConstructor != null ) {
-                return stateCopyConstructor.newInstance(source);
-           }
-           else {
-               ObjexObjStateBean ret = stateClass.newInstance();
-               
-               BeanWrapper copyWrapper = new BeanWrapperImpl(ret);
-               BeanWrapper wrapper = new BeanWrapperImpl(source);
-               PropertyDescriptor[] props = wrapper.getPropertyDescriptors();
-               for( int i = 0 ; i < props.length ; i++ ) {
-                   if( copyWrapper.isWritableProperty(props[i].getName()) ) {
-                       copyWrapper.setPropertyValue(
-                               props[i].getName(), 
-                               wrapper.getPropertyValue(props[i].getName()));
-                   }
-               }
-               
-               return ret;
-           }
-        }
-        catch( RuntimeException e ) {
-            throw e;
-        }
-        catch( Exception e ) {
-            throw new IllegalStateException("Cannot create new state object: " + stateClass, e);
-        }
+    public Map<String, Class<?>> getOwnedReferenceProperties() {
+        return ownedReferenceProps;
+    }
+    
+    /**
+     * @param referenceProps The map of reference props to set
+     */
+    public void setOwnedReferenceProperties(Map<String, Class<?>> referenceProps) {
+        this.ownedReferenceProps = referenceProps;
     }
 }

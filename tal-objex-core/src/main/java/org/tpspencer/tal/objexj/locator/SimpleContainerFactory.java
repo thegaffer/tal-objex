@@ -2,15 +2,13 @@ package org.tpspencer.tal.objexj.locator;
 
 import org.springframework.util.Assert;
 import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerMiddleware;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.SimpleTransaction;
-import org.tpspencer.tal.objexj.container.StandardContainer;
-import org.tpspencer.tal.objexj.container.TransactionMiddleware;
+import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
+import org.tpspencer.tal.objexj.container.impl.SimpleContainer;
 import org.tpspencer.tal.objexj.exceptions.ContainerNotFoundException;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 
@@ -85,18 +83,35 @@ public final class SimpleContainerFactory implements ContainerFactory {
         this.middlewareFactory = middlewareFactory;
     }
 
-
-
-    public EditableContainer create() {
-        TransactionMiddleware middleware = middlewareFactory.createContainer(strategy);
+    public Container create() {
+        ContainerMiddleware middleware = middlewareFactory.createContainer(strategy);
         
         // Add in the root object
-        ObjectStrategy rootStrategy = strategy.getObjectStrategy(strategy.getRootObjectName());
         ObjexID rootId = strategy.getRootObjectID();
-        ObjexObjStateBean rootBean = rootStrategy.getNewStateInstance(null);
-        middleware.getCache().addNewObject(rootId, rootBean);
+        ObjexObjStateBean rootBean = createRootBean();
+        middleware.getCache().addObject(ObjectRole.NEW, rootId, rootBean);
         
-        return new SimpleTransaction(strategy, middleware, null);
+        return new SimpleContainer(null, strategy, middleware, true);
+    }
+
+    /**
+     * Helper to create the state bean for the root object.
+     * 
+     * @return The state bean
+     */
+    private ObjexObjStateBean createRootBean() {
+        ObjectStrategy rootStrategy = strategy.getObjectStrategy(strategy.getRootObjectName());
+        ObjexObjStateBean rootBean;
+        try {
+            rootBean = rootStrategy.getStateClass().newInstance();
+        }
+        catch( RuntimeException e ) {
+            throw e;
+        }
+        catch( Exception e ) {
+            throw new IllegalArgumentException("Cannot create root bean: " + rootStrategy.getStateClass(), e);
+        }
+        return rootBean;
     }
     
     /**
@@ -105,16 +120,16 @@ public final class SimpleContainerFactory implements ContainerFactory {
 	 */
 	public Container get(String id) {
 	    ContainerMiddleware middleware = middlewareFactory.getMiddleware(strategy, id);
-	    return new StandardContainer(strategy, middleware, middleware.getContainerId());
+	    return new SimpleContainer(middleware.getContainerId(), strategy, middleware, false);
 	}
 	
 	/**
 	 * Simply constructs an instance of the basic editable 
 	 * container.
 	 */
-	public EditableContainer open(String id) {
-	    TransactionMiddleware middleware = middlewareFactory.getTransaction(strategy, id);
-	    return new SimpleTransaction(strategy, middleware, middleware.getContainerId());
+	public Container open(String id) {
+	    ContainerMiddleware middleware = middlewareFactory.getTransaction(strategy, id);
+	    return new SimpleContainer(middleware.getContainerId(), strategy, middleware, true);
 	}
 	
 	/**
@@ -128,7 +143,7 @@ public final class SimpleContainerFactory implements ContainerFactory {
 	        }
 	        catch( ContainerNotFoundException e ) {
 	            // Does not exist so create
-	            EditableContainer c = create();
+	            Container c = create();
 	            c.saveContainer();
 	        }
 	    }

@@ -36,19 +36,36 @@ public class ProductBean implements ObjexObjStateBean {
 	private int stockLevel;
 	private double price;
 	
-	public ProductBean() {
+	public ProductBean() {}
+    
+    public ProductBean(String name) {
+        this.name = name;
     }
-	
-	public ProductBean(String name) {
-	    this.name = name;
-	}
-	
-	public ProductBean(ObjexID parentId) {
+    
+    public void create(ObjexID parentId) {
         this.parentId = parentId != null ? parentId.toString() : null;
     }
 	
-	public void init(Object id) {
+	public void preSave(Object id) {
         this.id = id != null ? id.toString() : null;
+    }
+	
+	public ObjexObjStateBean clone() {
+	    ProductBean ret = new ProductBean();
+	    ret.setId(this.id);
+	    ret.setParentId(this.parentId);
+	    ret.setName(this.name);
+	    ret.setDescription(this.description);
+	    ret.setStockLevel(this.stockLevel);
+	    ret.setPrice(this.price);
+	    return ret;
+	}
+	
+	public boolean isEditable() {
+	    return true; // Not right, but ok for test
+	}
+    
+	public void setEditable() {
     }
     
     public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {

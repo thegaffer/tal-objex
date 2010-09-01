@@ -1,8 +1,5 @@
 package org.tpspencer.tal.objexj;
 
-import java.util.Collection;
-import java.util.Map;
-
 /**
  * This interface represents an actual object held by
  * a container. 
@@ -42,16 +39,6 @@ public interface ObjexObj {
 	public Container getContainer();
 	
 	/**
-	 * This method returns the inner state (or properties) or the
-	 * object. Unless we are in a transaction this will be a clone
-	 * of the state object and any changes made to it will not be
-	 * reflected on this object or elsewhere on the container.
-	 * 
-	 * @return The state object
-	 */
-	public ObjexObjStateBean getStateObject();
-	
-	/**
 	 * Call to get a behaviour interface from this object. We 
 	 * encourage the use of this method over instanceof on
 	 * ObjexObj instances in case the interface is supported
@@ -65,31 +52,6 @@ public interface ObjexObj {
 	public <T> T getBehaviour(Class<T> behaviour);
 	
 	/**
-	 * Convienience version of getStateObject when you know the
-	 * type of the object. As above this will be a cloned instance
-	 * unless we are inside an {@link EditableContainer}.
-	 * 
-	 * @param expected The expected type of the state object
-	 * @return The state object
-	 */
-	public <T> T getStateObject(Class<T> expected);
-	
-	/**
-	 * Helper to get a property given its name. This is
-	 * a convienience to save the client having to do
-	 * reflection if it does not know the concrete type.
-	 * 
-	 * <p>Note: With this version of the method the property
-	 * is returned as a string. The formatting is determined
-	 * by the object. If you prefer to do you own formatting
-	 * use the getProperty method below.
-	 * 
-	 * @param name The name of the property required
-	 * @return The value of the property as a string
-	 */
-	public String getPropertyAsString(String name);
-	
-	/**
 	 * Helper to get a property given its name. This is
 	 * a convienience to save the client having to do
 	 * reflection if it does not know the concrete type.
@@ -100,35 +62,72 @@ public interface ObjexObj {
 	public Object getProperty(String name);
 	
 	/**
-	 * Gets a component or reference property as a native
-	 * object instead of the direct key.
+	 * Convienience method to both get the properties
+	 * value and return it as the expected type. If
+	 * the property is not of that type a class cast
+	 * exception occurs.
 	 * 
-	 * <p><b>Note: </b>This only works inside the same container
-	 *  
-	 * @param name The name of the property holding the reference
-	 * @return The object
+	 * @param name The name of the property
+	 * @param expected It's expected type
+	 * @return The property value
+	 * @throws ClassCastException If the property is not of that type
 	 */
-	public ObjexObj getReference(String name);
+	public <T> T getProperty(String name, Class<T> expected);
 	
 	/**
-	 * Gets a component or reference property as a native
-	 * collection of objects instead of the direct keys.
-	 * 
-	 * <p><b>Note: </b>This only works inside the same container
-	 * 
-	 * @param name The name of the property holding the reference
-	 * @return The collection of objects
-	 */
-	public Collection<ObjexObj> getCollectionReference(String name);
+     * Helper to get a property given its name. This is
+     * a convienience to save the client having to do
+     * reflection if it does not know the concrete type.
+     * 
+     * <p>Note: With this version of the method the property
+     * is returned as a string. The formatting is determined
+     * by the object. If you prefer to do you own formatting
+     * use the getProperty method below.
+     * 
+     * @param name The name of the property required
+     * @return The value of the property as a string
+     */
+    public String getPropertyAsString(String name);
+    
+    /**
+     * Sets the property if possible. The type of object
+     * must be the same or compatible with the value on
+     * the state bean.
+     * 
+     * <p><b>Note: </b>There is no guarantee this method
+     * is supported. In real business objects with complex
+     * or semi-complex behaviour this is typically not
+     * supported in favour of finer grained methods on
+     * the behaviour class.</p>
+     * 
+     * @param name The name of the property
+     * @param val The raw value.
+     */
+    public void setProperty(String name, Object newValue);
+    
+    /**
+     * Call to create a new object in the container under
+     * the reference property named. The property named
+     * must be an owned reference property. Although type
+     * is passed in it may be ignored if the reference
+     * property only supports a single pre-determined
+     * object type.
+     * 
+     * @param name The name of the reference property
+     * @param type The type of object to create
+     * @return The newly constructed object
+     */
+    public ObjexObj createReference(String name, String type);
 	
 	/**
-	 * Gets a component or reference property as a native
-	 * collection of objects instead of the direct keys.
+	 * Call this method to validate an object. This can be called
+	 * at any time to have an object validate itself. It is called
+	 * as part of the saving process automatically, but often we
+	 * need to know the errors and warnings before that time so
+	 * this method is publically available.
 	 * 
-	 * <p><b>Note: </b>This only works inside the same container
-	 * 
-	 * @param name The name of the property holding the reference
-	 * @return The map of objects
+	 * @param request The validation request object
+	 * @return True if the object is valid, false otherwise
 	 */
-	public Map<ObjexID, ObjexObj> getMapReference(String name);
+	public void validate(ValidationRequest request);
 }

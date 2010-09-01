@@ -8,28 +8,29 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.ValidationRequest;
+import org.tpspencer.tal.objexj.container.InternalContainer;
 
 /**
- * TODO: Write the tests
+ * Tests the {@link SimpleObjectStrategy} class.
  * 
  * @author Tom Spencer
  */
 public class TestSimpleObjectStrategy {
     
     private Mockery context = new JUnit4Mockery();
-    private Container container;
+    private InternalContainer container;
     private ObjexID id;
     private ObjexID parentId;
     private ObjexIDStrategy idStrategy;
     
     @Before
     public void setup() {
-        container = context.mock(Container.class);
+        container = context.mock(InternalContainer.class);
         id = context.mock(ObjexID.class);
         parentId = context.mock(ObjexID.class, "parent");
         idStrategy = context.mock(ObjexIDStrategy.class);
@@ -55,13 +56,8 @@ public class TestSimpleObjectStrategy {
         Assert.assertNotNull(strategy.getObjexClass());
 	    
         // Construction
-	    StateBean bean = (StateBean)strategy.getNewStateInstance(parentId);
-	    Assert.assertNotNull(bean);
-	    
-	    StateBean copy = (StateBean)strategy.getClonedStateInstance(bean);
-	    Assert.assertNotNull(copy);
-	    
-	    ObjexObj obj = strategy.getObjexObjInstance(container, parentId, id, copy);
+	    StateBean bean = new StateBean(parentId);
+	    ObjexObj obj = strategy.getObjexObjInstance(container, parentId, id, bean);
 	    Assert.assertNotNull(obj);
     }
 	
@@ -78,9 +74,7 @@ public class TestSimpleObjectStrategy {
         Assert.assertNull(strategy.getObjexClass());
         
         // Construction
-        StateBean bean = (StateBean)strategy.getNewStateInstance(parentId);
-        Assert.assertNotNull(bean);
-        
+        StateBean bean = new StateBean(parentId);
         ObjexObj obj = strategy.getObjexObjInstance(container, parentId, id, bean);
         Assert.assertNotNull(obj);
     }
@@ -88,15 +82,23 @@ public class TestSimpleObjectStrategy {
 	public static class StateBean implements ObjexObjStateBean {
 	    private static final long serialVersionUID = 1L;
 	    
-	    public StateBean(ObjexID parent) {
-	        
+	    public StateBean() {}
+	    
+	    public StateBean(ObjexID parent) {}
+	    public StateBean(StateBean bean) {}
+	    
+	    public void create(ObjexID parentId) {}
+	    public void preSave(Object id) {}
+	    
+	    public void setEditable() {
 	    }
 	    
-	    public StateBean(StateBean bean) {
-	        
+	    public boolean isEditable() {
+	        return true;
 	    }
 	    
-	    public void init(Object id) {
+	    public ObjexObjStateBean clone() {
+	        return new StateBean();
 	    }
 	    
 	    public String getObjexObjType() {
@@ -120,13 +122,7 @@ public class TestSimpleObjectStrategy {
 	    public TestObj(StateBean bean) {
 	    }
 	    
-	    @Override
-	    protected Object getLocalState() {
-	        return null;
-	    }
-	    
-	    public ObjexObjStateBean getStateObject() {
-	        return null;
+	    public void validate(ValidationRequest request) {
 	    }
 	}
 }
