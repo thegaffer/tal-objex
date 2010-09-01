@@ -8,11 +8,11 @@ import java.util.List;
 
 import javax.jdo.PersistenceManager;
 
-import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
+import org.tpspencer.tal.objexj.container.InternalContainer;
 import org.tpspencer.tal.objexj.gae.GAEMiddlewareFactory;
 import org.tpspencer.tal.objexj.gae.persistence.PersistenceManagerFactorySingleton;
 import org.tpspencer.tal.objexj.object.DefaultObjexID;
@@ -83,7 +83,7 @@ public abstract class GAEBaseQuery implements org.tpspencer.tal.objexj.query.Que
      * @param request The request
      * @return The result
      */
-    protected QueryResult retreiveResults(Query query, Container container, ContainerStrategy strategy, QueryRequest request) {
+    protected QueryResult retreiveResults(Query query, InternalContainer container, ContainerStrategy strategy, QueryRequest request) {
         DatastoreService service = DatastoreServiceFactory.getDatastoreService();
         return retreiveResults(service.prepare(query), container, strategy, request);
     }
@@ -101,7 +101,7 @@ public abstract class GAEBaseQuery implements org.tpspencer.tal.objexj.query.Que
      * @param request The request
      * @return The result
      */
-    protected QueryResult retreiveResults(PreparedQuery query, Container container, ContainerStrategy strategy, QueryRequest request) {
+    protected QueryResult retreiveResults(PreparedQuery query, InternalContainer container, ContainerStrategy strategy, QueryRequest request) {
         QueryResult ret = null;
         
         // Get offset

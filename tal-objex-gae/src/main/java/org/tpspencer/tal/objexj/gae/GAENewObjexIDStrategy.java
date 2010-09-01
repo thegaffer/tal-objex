@@ -1,6 +1,6 @@
 package org.tpspencer.tal.objexj.gae;
 
-import org.tpspencer.tal.objexj.EditableContainer;
+import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
@@ -28,7 +28,7 @@ public final class GAENewObjexIDStrategy implements ObjexIDStrategy {
     /**
      * Simply creates a new ID and increments the last number
      */
-    public ObjexID createId(EditableContainer container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj) {
+    public ObjexID createId(Container container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj) {
         return new DefaultObjexID(type, lastId++);
     }
 

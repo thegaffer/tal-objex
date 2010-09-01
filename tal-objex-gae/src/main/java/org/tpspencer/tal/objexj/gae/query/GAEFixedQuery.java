@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
+import org.tpspencer.tal.objexj.container.InternalContainer;
 import org.tpspencer.tal.objexj.query.QueryRequest;
 import org.tpspencer.tal.objexj.query.QueryResult;
 
@@ -31,7 +31,7 @@ public final class GAEFixedQuery extends GAEBaseQuery {
     private List<String> defaultSorts;
     private boolean containerSpecific = true;
     
-    public QueryResult execute(Container container, ContainerStrategy strategy, QueryRequest request) {
+    public QueryResult execute(InternalContainer container, ContainerStrategy strategy, QueryRequest request) {
         Query query = getQuery(kind.getSimpleName(), containerSpecific ? container.getId() : null);
         
         addParameters(query, mandatoryParameters, request.getParameters(), true);

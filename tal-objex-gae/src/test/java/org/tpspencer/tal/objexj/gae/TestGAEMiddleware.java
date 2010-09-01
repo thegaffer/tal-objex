@@ -7,8 +7,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.tpspencer.tal.objexj.Container;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.SimpleTransactionCache;
+import org.tpspencer.tal.objexj.container.impl.SimpleTransactionCache;
 import org.tpspencer.tal.objexj.gae.object.ContainerBean;
 
 public class TestGAEMiddleware {
@@ -81,7 +82,7 @@ public class TestGAEMiddleware {
     public void loadIfNotInitialised() {
         ContainerBean bean = new ContainerBean();
         GAEMiddleware underTest = new GAEMiddleware(strategy, bean);
-        underTest.loadObject(String.class, null);
+        underTest.loadObject(ObjexObjStateBean.class, null);
     }
     
     /**

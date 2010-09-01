@@ -1,6 +1,6 @@
 package org.tpspencer.tal.objexj.gae;
 
-import org.tpspencer.tal.objexj.EditableContainer;
+import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObj;
@@ -44,7 +44,7 @@ public final class GAEAllocateObjexIDStrategy implements ObjexIDStrategy {
      * 
      * TODO: Should we just pass through a hardcoded type here?
      */
-    public ObjexID createId(EditableContainer container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj) {
+    public ObjexID createId(Container container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj) {
         DatastoreService service = DatastoreServiceFactory.getDatastoreService();
         
         Key root = KeyFactory.createKey(ContainerBean.class.getSimpleName(), container.getId());

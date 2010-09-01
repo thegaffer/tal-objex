@@ -1,6 +1,6 @@
 package org.tpspencer.tal.objexj.gae;
 
-import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.*; 
+import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,9 +14,11 @@ import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexIDStrategy;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.container.ContainerMiddleware;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
 import org.tpspencer.tal.objexj.container.TransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionMiddleware;
+import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
+import org.tpspencer.tal.objexj.container.impl.SimpleTransactionCache;
 import org.tpspencer.tal.objexj.events.EventListener;
 import org.tpspencer.tal.objexj.gae.event.GAEEventListener;
 import org.tpspencer.tal.objexj.gae.object.ContainerBean;
@@ -35,7 +37,7 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
  * 
  * @author Tom Spencer
  */
-public final class GAEMiddleware implements TransactionMiddleware {
+public final class GAEMiddleware implements ContainerMiddleware {
 
     /** The root bean for this container */
     private final ContainerBean root;
@@ -146,14 +148,14 @@ public final class GAEMiddleware implements TransactionMiddleware {
      * @param id The ID to perform
      * @return The persisted state of the object
      */
-    public Object loadObject(Class<?> type, ObjexID id) {
+    public ObjexObjStateBean loadObject(Class<? extends ObjexObjStateBean> type, ObjexID id) {
         checkInitialised();
         
-        Object ret = null;
+        ObjexObjStateBean ret = null;
         
         // a. Try the cache first
         if( cache != null ) {
-            ret = cache.findObject(id);
+            ret = cache.findObject(id, null);
         }
         
         // b. Otherwise load if we are a real container
@@ -182,6 +184,14 @@ public final class GAEMiddleware implements TransactionMiddleware {
      */
     public boolean isNew() {
         return this.root.getId() == null;
+    }
+    
+    /**
+     * Creates a new cache as neccessary
+     */
+    public TransactionCache open() {
+        if( cache == null ) cache = new SimpleTransactionCache();
+        return cache;
     }
     
     /**
@@ -236,19 +246,23 @@ public final class GAEMiddleware implements TransactionMiddleware {
             pm.makePersistent(root);
             
             // Save or create objects
-            if( cache.getNewObjects() != null ) {
-                Map<ObjexID, ObjexObjStateBean> newObjects = cache.getNewObjects();
+            Map<ObjexID, ObjexObjStateBean> newObjects = cache.getObjects(ObjectRole.NEW);
+            Map<ObjexID, ObjexObjStateBean> updatedObjects = cache.getObjects(ObjectRole.UPDATED);
+            Map<ObjexID, ObjexObjStateBean> removedObjects = cache.getObjects(ObjectRole.REMOVED);
+            
+            
+            if( newObjects != null ) {
                 Iterator<ObjexID> it = newObjects.keySet().iterator();
                 while( it.hasNext() ) {
                     ObjexID id = it.next();
                     ObjexObjStateBean bean = newObjects.get(id);
                     String k = getKeyString(rootKey, bean.getClass().getSimpleName(), id);
-                    bean.init(k);
+                    bean.preSave(k);
                 }
-                pm.makePersistentAll(cache.getNewObjects().values());
+                pm.makePersistentAll(newObjects.values());
             }
-            if( cache.getUpdatedObjects() != null ) pm.makePersistentAll(cache.getUpdatedObjects().values());
-            if( cache.getRemovedObjects() != null ) pm.deletePersistentAll(cache.getRemovedObjects().values());
+            if( updatedObjects != null ) pm.makePersistentAll(updatedObjects.values());
+            if( removedObjects != null ) pm.deletePersistentAll(removedObjects.values());
             
             tx.commit();
         }

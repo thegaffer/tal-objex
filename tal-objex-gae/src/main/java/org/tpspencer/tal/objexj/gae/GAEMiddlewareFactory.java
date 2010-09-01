@@ -8,8 +8,7 @@ import javax.jdo.PersistenceManager;
 import org.tpspencer.tal.objexj.container.ContainerMiddleware;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.SimpleTransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionMiddleware;
+import org.tpspencer.tal.objexj.container.impl.SimpleTransactionCache;
 import org.tpspencer.tal.objexj.exceptions.ContainerNotFoundException;
 import org.tpspencer.tal.objexj.exceptions.TransactionNotFoundException;
 import org.tpspencer.tal.objexj.gae.object.ContainerBean;
@@ -51,7 +50,7 @@ public final class GAEMiddlewareFactory implements ContainerMiddlewareFactory {
     /**
 	 * Creates a new transaction around an empty container
 	 */
-	public TransactionMiddleware createContainer(ContainerStrategy strategy) {
+	public ContainerMiddleware createContainer(ContainerStrategy strategy) {
 	    GAETransaction trans = new GAETransaction();
 	    trans.setId(createTransactionID());
 	    trans.setContainerBean(createContainerBean(strategy));
@@ -70,7 +69,7 @@ public final class GAEMiddlewareFactory implements ContainerMiddlewareFactory {
      * @throws TransactionNotFoundException If the transaction is not found
      * @throws ContainerNotFoundException If the container is not found
      */
-    public TransactionMiddleware getTransaction(ContainerStrategy strategy, String id) {
+    public ContainerMiddleware getTransaction(ContainerStrategy strategy, String id) {
         GAETransaction trans = null;
         id = stripId(id);
         
