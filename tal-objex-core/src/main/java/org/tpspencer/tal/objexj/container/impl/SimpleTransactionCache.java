@@ -91,7 +91,7 @@ public final class SimpleTransactionCache implements TransactionCache, Serializa
             updatedObjects.put(id, state);
             
             if( auditStates == null ) auditStates = new HashMap<ObjexID, ObjexObjStateBean>();
-            auditStates.put(id, state.clone());
+            auditStates.put(id, state.cloneState());
 
             break;
             

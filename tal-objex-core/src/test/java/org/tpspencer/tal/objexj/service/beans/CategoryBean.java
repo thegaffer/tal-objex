@@ -62,7 +62,7 @@ public class CategoryBean implements ObjexObjStateBean {
 	    this.id = id != null ? id.toString() : null;
 	}
 	
-	public ObjexObjStateBean clone() {
+	public ObjexObjStateBean cloneState() {
 	    CategoryBean ret = new CategoryBean();
 	    ret.setId(this.id);
 	    ret.setParentId(this.parentId);

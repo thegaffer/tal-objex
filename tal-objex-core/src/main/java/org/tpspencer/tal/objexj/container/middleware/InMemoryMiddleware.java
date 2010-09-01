@@ -101,7 +101,7 @@ public class InMemoryMiddleware implements ContainerMiddleware {
                 current = this.objects.get(realId);
             }
             
-            if( current != null ) ret = current.clone();
+            if( current != null ) ret = current.cloneState();
         }
         
         return ret;

@@ -22,7 +22,7 @@ public class StockBean implements ObjexObjStateBean {
         this.id = id != null ? id.toString() : null;
     }
 	
-	public ObjexObjStateBean clone() {
+	public ObjexObjStateBean cloneState() {
 	    StockBean ret = new StockBean();
 	    ret.setId(this.id);
 	    ret.setCategories(this.categories); // Should clone, but ok for test

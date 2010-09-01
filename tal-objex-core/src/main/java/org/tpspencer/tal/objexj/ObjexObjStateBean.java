@@ -49,7 +49,7 @@ public interface ObjexObjStateBean extends Serializable {
      * 
      * @return The cloned instance
      */
-    public ObjexObjStateBean clone();
+    public ObjexObjStateBean cloneState();
     
     /**
      * @return The raw ID of the object (will likely not be an ObjexID)

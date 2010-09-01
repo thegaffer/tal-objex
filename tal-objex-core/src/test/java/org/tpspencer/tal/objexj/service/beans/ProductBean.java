@@ -50,7 +50,7 @@ public class ProductBean implements ObjexObjStateBean {
         this.id = id != null ? id.toString() : null;
     }
 	
-	public ObjexObjStateBean clone() {
+	public ObjexObjStateBean cloneState() {
 	    ProductBean ret = new ProductBean();
 	    ret.setId(this.id);
 	    ret.setParentId(this.parentId);

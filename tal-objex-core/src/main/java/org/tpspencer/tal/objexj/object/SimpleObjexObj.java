@@ -82,9 +82,11 @@ public class SimpleObjexObj extends BaseObjexObj {
 	
 	/**
 	 * Returns a cloned copy of the state object
+	 * 
+	 * @deprecated
 	 */
 	public Object getStateObject() {
-		return state.clone();
+		return state.cloneState();
 	}
 	
 	/**
@@ -92,6 +94,7 @@ public class SimpleObjexObj extends BaseObjexObj {
 	 * cloning it. Can be used by the derived class.
 	 * 
 	 * @return The state object
+	 * @deprecated
 	 */
 	protected ObjexObjStateBean getState() {
 		return state;

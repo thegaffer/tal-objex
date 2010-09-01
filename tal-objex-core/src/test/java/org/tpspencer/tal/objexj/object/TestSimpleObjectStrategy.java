@@ -97,7 +97,7 @@ public class TestSimpleObjectStrategy {
 	        return true;
 	    }
 	    
-	    public ObjexObjStateBean clone() {
+	    public ObjexObjStateBean cloneState() {
 	        return new StateBean();
 	    }
 	    
