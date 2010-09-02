@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.gae;
+package org.talframework.objexj.runtime.gae;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -6,11 +6,15 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.impl.SimpleTransactionCache;
-import org.tpspencer.tal.objexj.gae.object.ContainerBean;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.container.impl.SimpleTransactionCache;
+import org.talframework.objexj.runtime.gae.GAEAllocateObjexIDStrategy;
+import org.talframework.objexj.runtime.gae.GAEMiddleware;
+import org.talframework.objexj.runtime.gae.GAENewObjexIDStrategy;
+import org.talframework.objexj.runtime.gae.GAETransaction;
+import org.talframework.objexj.runtime.gae.object.ContainerBean;
 
 public class TestGAEMiddleware {
     
