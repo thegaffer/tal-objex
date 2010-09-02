@@ -8,12 +8,12 @@
   <!-- Servlets -->
   <servlet>
     <servlet-name>greetServlet</servlet-name>
-    <servlet-class>org.tpspencer.tal.gaetest.server.GreetingServiceImpl</servlet-class>
+    <servlet-class>org.talframework.objexj.sample.gaetest.server.GreetingServiceImpl</servlet-class>
   </servlet>
   
   <servlet>
     <servlet-name>sampleApp</servlet-name>
-    <servlet-class>org.tpspencer.tal.gaetest.GAEObjexSampleApp</servlet-class>
+    <servlet-class>org.talframework.objexj.sample.gaetest.GAEObjexSampleApp</servlet-class>
   </servlet>
   
   <servlet-mapping>
