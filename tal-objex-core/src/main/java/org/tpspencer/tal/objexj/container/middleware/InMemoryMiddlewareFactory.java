@@ -3,6 +3,7 @@ package org.tpspencer.tal.objexj.container.middleware;
 import org.tpspencer.tal.objexj.container.ContainerMiddleware;
 import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
 import org.tpspencer.tal.objexj.container.ContainerStrategy;
+import org.tpspencer.tal.objexj.exceptions.ContainerExistsException;
 
 /**
  * Implements the middleware factory interface over the internal
@@ -21,6 +22,11 @@ public class InMemoryMiddlewareFactory implements ContainerMiddlewareFactory {
     }
     
     public ContainerMiddleware createContainer(ContainerStrategy strategy) {
-        return new InMemoryMiddleware(null, true);
+        String id = strategy.getContainerId();
+        if( id != null && SingletonContainerStore.getInstance().getObjects(id) != null ) {
+            throw new ContainerExistsException(id);
+        }
+        
+        return new InMemoryMiddleware(id, true);
     }
 }

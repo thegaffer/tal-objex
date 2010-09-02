@@ -1,69 +1,65 @@
 package org.tpspencer.tal.objexj.sample.model.order.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.ValidationRequest;
+import org.tpspencer.tal.objexj.object.BaseObjexObj;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
-import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.order.Order;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItem;
 import org.tpspencer.tal.objexj.sample.beans.order.OrderBean;
 
-public class OrderImpl extends SimpleObjexObj implements Order {
-    
+/**
+ * Manual simple {@link ObjexObj} implementation of the {@link Order}
+ * domain object interface. Note in here how the set's are protected
+ * against re-setting the same value and how they call ensureUpdateable,
+ * which makes sure the object is in the transaction.
+ *
+ * @author Tom Spencer
+ */
+public class OrderImpl extends BaseObjexObj implements Order {
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Order", OrderImpl.class, OrderBean.class);
+    
+    private final OrderBean bean;
 
-	public OrderImpl(ObjexObjStateBean state) {
-		super(STRATEGY, state);
+	public OrderImpl(OrderBean bean) {
+		this.bean = bean;
 	}
 	
 	public long getAccount() {
-		return getLocalState(OrderBean.class).getAccount();
+		return bean.getAccount();
 	}
 	
 	public void setAccount(long account) {
-		checkUpdateable();
-		getLocalState(OrderBean.class).setAccount(account);
+	    if( account == bean.getAccount() ) return;
+	    
+		ensureUpdateable(bean);
+		bean.setAccount(account);
 	}
 	
 	public List<String> getItemRefs() {
-		return getLocalState(OrderBean.class).getItems();
+		return bean.getItems();
 	}
 	
 	public void setItemRefs(List<String> items) {
-		checkUpdateable();
-		getLocalState(OrderBean.class).setItems(items);
+		ensureUpdateable(bean);
+		bean.setItems(items);
 	}
 	
 	public List<OrderItem> getItems() {
-        List<OrderItem> itemList = null;
-        List<String> items = getItemRefs();
-        if( items != null && items.size() > 0 ) {
-            Iterator<String> it = items.iterator();
-            while( it.hasNext() ) {
-                OrderItem item = getContainer().getObject(it.next(), OrderItem.class);
-                if( item != null ) {
-                    if( itemList == null ) itemList = new ArrayList<OrderItem>();
-                    itemList.add(item);
-                }
-            }
-        }
-        return itemList;
+	    return getContainer().getObjectList(bean.getItems(), OrderItem.class);
     }
 	
 	public OrderItem createItem() {
-		checkUpdateable();
+	    ensureUpdateable(bean);
 		
-		EditableContainer container = (EditableContainer)getContainer();
-		ObjexObj item = container.newObject("OrderItem", this);
+		ObjexObj item = getInternalContainer().newObject(this, bean, "OrderItem");
 		
 		// Add to list of items
-		List<String> items = getItemRefs();
+		List<String> items = bean.getItems();
 		if( items == null ) items = new ArrayList<String>();
 		items.add(item.getId().toString());
 		setItemRefs(items);
@@ -84,6 +80,13 @@ public class OrderImpl extends SimpleObjexObj implements Order {
 	
 	public void removeItemById(Object id) {
 	    checkUpdateable();
+
 	    // TODO:
+	}
+	
+	/**
+	 * Currently no validation
+	 */
+	public void validate(ValidationRequest request) {
 	}
 }

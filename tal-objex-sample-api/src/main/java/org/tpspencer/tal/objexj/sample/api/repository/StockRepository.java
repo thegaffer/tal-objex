@@ -1,5 +1,7 @@
 package org.tpspencer.tal.objexj.sample.api.repository;
 
+import java.util.List;
+
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
 import org.tpspencer.tal.objexj.sample.api.stock.Product;
 
@@ -20,17 +22,17 @@ public interface StockRepository {
 	
 	public Product findProduct(String id);
 	
-	public Category[] getRootCategories();
+	public List<Category> getRootCategories();
 	
-	public Category[] findCategoriesByName(String name);
+	public List<Category> findCategoriesByName(String name);
 	
-	public Product[] findProductsByCategory(String categoryId);
+	public List<Product> findProductsByCategory(String categoryId);
 	
-	public Product[] findProductsByName(String name);
+	public List<Product> findProductsByName(String name);
 	
-	public Product[] findProductsByPrice(double priceFrom, double priceTo);
+	public List<Product> findProductsByPrice(double priceFrom, double priceTo);
 	
-	public Product[] findExpiredProducts();
+	public List<Product> findExpiredProducts();
 	
 	/**
 	 * Call to suspend all changes currently made and

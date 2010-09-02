@@ -1,26 +1,33 @@
 package org.tpspencer.tal.objexj.sample.model.stock.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.ValidationRequest;
+import org.tpspencer.tal.objexj.object.BaseObjexObj;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
-import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
 import org.tpspencer.tal.objexj.sample.api.stock.Product;
 import org.tpspencer.tal.objexj.sample.beans.stock.CategoryBean;
 
-public class CategoryImpl extends SimpleObjexObj implements Category {
-    
+/**
+ * Manual simple {@link ObjexObj} implementation of the {@link Category}
+ * domain object interface. Note in here how the set's are protected
+ * against re-setting the same value and how they call ensureUpdateable,
+ * which makes sure the object is in the transaction.
+ *
+ * @author Tom Spencer
+ */
+public class CategoryImpl extends BaseObjexObj implements Category {
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Category", CategoryImpl.class, CategoryBean.class);
+    
+    private final CategoryBean bean;
 
-    public CategoryImpl(ObjexObjStateBean state) {
-        super(STRATEGY, state);
+    public CategoryImpl(CategoryBean state) {
+        this.bean = state;
     }
     
     public String getParentCategoryId() {
@@ -29,98 +36,79 @@ public class CategoryImpl extends SimpleObjexObj implements Category {
     }
 
     public String getName() {
-        return getLocalState(CategoryBean.class).getName();
+        return bean.getName();
     }
     
     public void setName(String name) {
-        checkUpdateable();
-        getLocalState(CategoryBean.class).setName(name);
+        if( name == bean.getName() ) return;
+        if( name != null && name.equals(bean.getName()) ) return;
+        
+        ensureUpdateable(bean);
+        bean.setName(name);
     }
     
     public String getDescription() {
-        return getLocalState(CategoryBean.class).getDescription();
+        return bean.getDescription();
     }
     
     public void setDescription(String description) {
-        checkUpdateable();
-        getLocalState(CategoryBean.class).setDescription(description);
+        if( description == bean.getDescription() ) return;
+        if( description != null && description.equals(bean.getDescription()) ) return;
+        
+        ensureUpdateable(bean);
+        bean.setDescription(description);
     }
     
     public List<String> getCategoryRefs() {
-        return getLocalState(CategoryBean.class).getCategories();
+        return bean.getCategories();
     }
     
     public List<Category> getCategories() {
-        List<Category> categories = null;
-        
-        List<String> cats = getCategoryRefs();
-        if( cats != null ) {
-            Iterator<String> it = cats.iterator();
-            while( it.hasNext() ) {
-                Category c = getContainer().getObject(it.next(), Category.class);
-                if( c != null ) {
-                    if( categories == null ) categories = new ArrayList<Category>();
-                    categories.add(c);
-                }
-            }
-        }
-        return categories;
+        return getContainer().getObjectList(bean.getCategories(), Category.class);
     }
     
     public void setCategories(List<String> categories) {
-        checkUpdateable();
-        getLocalState(CategoryBean.class).setCategories(categories);
+        ensureUpdateable(bean);
+        bean.setCategories(categories);
     }
     
     public List<String> getProductRefs() {
-        return getLocalState(CategoryBean.class).getProducts();
+        return bean.getProducts();
     }
     
     public List<Product> getProducts() {
-        List<Product> products = null;
-        List<String> prods = getProductRefs();
-        if( prods != null ) {
-            Iterator<String> it = prods.iterator();
-            while( it.hasNext() ) {
-                Product p = getContainer().getObject(it.next(), Product.class);
-                if( p != null ) {
-                    if( products == null ) products = new ArrayList<Product>();
-                    products.add(p);
-                }
-            }
-        }
-        
-        return products;
+        return getContainer().getObjectList(bean.getProducts(), Product.class);
     }
     
     public void setProducts(List<String> products) {
-        checkUpdateable();
-        getLocalState(CategoryBean.class).setProducts(products);
+        ensureUpdateable(bean);
+        bean.setProducts(products);
     }
     
     public Category createCategory() {
-        checkUpdateable();
+        ObjexObj newCat = getInternalContainer().newObject(this, bean, "Category");
         
-        ObjexObj newCat = ((EditableContainer)getContainer()).newObject("Category", this);
-        
-        List<String> cats = getCategoryRefs();
+        ensureUpdateable(bean);
+        List<String> cats = bean.getCategories();
         if( cats == null ) cats = new ArrayList<String>();
         cats.add(newCat.getId().toString());
-        getLocalState(CategoryBean.class).setCategories(cats);
+        bean.setCategories(cats);
         
         return newCat.getBehaviour(Category.class);
     }
     
     public Product createProduct() {
-        checkUpdateable();
+        ObjexObj newProduct = getInternalContainer().newObject(this, bean, "Product");
         
-        ObjexObj newProduct = ((EditableContainer)getContainer()).newObject("Product", this);
-        
-        List<String> prods = getProductRefs();
+        ensureUpdateable(bean);
+        List<String> prods = bean.getProducts();
         if( prods == null ) prods = new ArrayList<String>();
         prods.add(newProduct.getId().toString());
-        getLocalState(CategoryBean.class).setProducts(prods);
+        bean.setProducts(prods);
         
         return newProduct.getBehaviour(Product.class);
+    }
+    
+    public void validate(ValidationRequest request) {
     }
 }

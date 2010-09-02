@@ -64,6 +64,17 @@ public interface Container {
 	public List<ObjexObj> getObjectList(List<? extends Object> ids);
 	
 	/**
+	 * Templates version of getObjects that allows the
+	 * type of element in the list to be specified. This
+	 * method will query each object for this behaviour.
+	 * 
+	 * @param ids The IDs
+	 * @param expectedElement The expected type of element.
+	 * @return The list of objects
+	 */
+	public <T> List<T> getObjectList(List<? extends Object> ids, Class<T> expectedElement);
+	
+	/**
 	 * Call to get a map of objects from a given map of
      * references. The references may be {@link ObjexID} 
      * instances or simply strings that are the stringified
@@ -74,6 +85,17 @@ public interface Container {
 	 * @return A map containing the references to get
 	 */
 	public Map<? extends Object, ObjexObj> getObjectMap(Map<? extends Object, ? extends Object> ids);
+	
+	/**
+	 * As standard getObjectMap, but ensures each element
+	 * returned (value in the map) is of the given type
+	 * be called getBehaviour on it.
+	 * 
+	 * @param ids The map of keys to Object IDs
+	 * @param expectedElement The expected behaviour for each element
+	 * @return The map containing the objects
+	 */
+	public <T> Map<? extends Object, T> getObjectMap(Map<? extends Object, ? extends Object> ids, Class<T> expectedElement);
 	
 	/**
 	 * Call to execute a named query against the container.

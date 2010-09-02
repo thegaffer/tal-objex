@@ -229,6 +229,12 @@ public class InMemoryMiddleware implements ContainerMiddleware {
         
         public InMemoryIDStrategy() {
             lastId = objects != null ? objects.size() : 1;
+            
+            // Addjust for any in cache if we are a suspended transaction
+            if( cache != null ) {
+                Map<ObjexID, ObjexObjStateBean> newObjs = cache.getObjects(ObjectRole.NEW);
+                if( newObjs != null ) lastId += newObjs.size();
+            }
         }
         
         public ObjexID createId(Container container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj) {

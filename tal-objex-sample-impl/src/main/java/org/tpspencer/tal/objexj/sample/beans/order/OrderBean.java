@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.jdo.annotations.PersistenceCapable;
 
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
@@ -27,8 +28,13 @@ public class OrderBean extends BaseBean {
 	public OrderBean() {
 	}
 	
-	public OrderBean(ObjexID parentId) {
-	    super(parentId);
+	public ObjexObjStateBean cloneState() {
+	    OrderBean ret = new OrderBean();
+	    ret.setId(this.getId());
+	    ret.setParentId(this.getParentId());
+	    ret.setAccount(account);
+	    ret.setItems(items);
+	    return ret;
 	}
 	
 	/*

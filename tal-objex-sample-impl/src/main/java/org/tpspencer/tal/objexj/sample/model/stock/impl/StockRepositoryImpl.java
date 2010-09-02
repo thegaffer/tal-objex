@@ -3,7 +3,6 @@ package org.tpspencer.tal.objexj.sample.model.stock.impl;
 import java.util.List;
 
 import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.EditableContainer;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.sample.api.repository.StockRepository;
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
@@ -11,19 +10,12 @@ import org.tpspencer.tal.objexj.sample.api.stock.Product;
 
 public class StockRepositoryImpl implements StockRepository {
     
-    private final Container container;
-    private EditableContainer editableContainer;
+    private Container container;
     
     public StockRepositoryImpl(Container container) {
         this.container = container;
-        this.editableContainer = null;
     }
     
-    public StockRepositoryImpl(EditableContainer container) {
-        this.container = container;
-        this.editableContainer = container;
-    }
-
     public Category createNewCategory(Object parentCategoryId) {
         Category cat = findCategory(parentCategoryId != null ? parentCategoryId.toString() : null);
         if( cat == null ) throw new IllegalArgumentException("Cannot create category if not parent!");
@@ -39,52 +31,44 @@ public class StockRepositoryImpl implements StockRepository {
     }
     
     public Category findCategory(String id) {
-        Container c = editableContainer != null ? editableContainer : container;
-        return id != null ? c.getObject(id, Category.class) : c.getRootObject().getBehaviour(Category.class);
+        return id != null ? container.getObject(id, Category.class) : container.getRootObject().getBehaviour(Category.class);
     }
     
     public Product findProduct(String id) {
-        Container c = editableContainer != null ? editableContainer : container;
-        return c.getObject(id, Product.class);
+        return container.getObject(id, Product.class);
     }
     
-    public Category[] getRootCategories() {
+    public List<Category> getRootCategories() {
         ObjexObj obj = container.getRootObject();
-        // TODO: Not sure about this method
-        return null;
+        return obj.getBehaviour(Category.class).getCategories();
     }
     
-    public Category[] findCategoriesByName(String name) {
+    public List<Category> findCategoriesByName(String name) {
         throw new UnsupportedOperationException("Requires search capability");
     }
     
-    public Product[] findExpiredProducts() {
+    public List<Product> findExpiredProducts() {
         throw new UnsupportedOperationException("Requires search capability");
     }
     
-    public Product[] findProductsByCategory(String categoryId) {
-        Product[] ret = null;
-        
+    public List<Product> findProductsByCategory(String categoryId) {
         Category cat = findCategory(categoryId);
-        List<Product> products = cat != null ? cat.getProducts() : null;
-        ret = products != null ? products.toArray(new Product[products.size()]) : null;
-    
-        return ret;
+        return cat != null ? cat.getProducts() : null;
     }
     
-    public Product[] findProductsByName(String name) {
+    public List<Product> findProductsByName(String name) {
         throw new UnsupportedOperationException("Requires search capability");
     }
     
-    public Product[] findProductsByPrice(double priceFrom, double priceTo) {
+    public List<Product> findProductsByPrice(double priceFrom, double priceTo) {
         throw new UnsupportedOperationException("Requires search capability");
     }
     
     public String suspend() {
-        return editableContainer.suspend();
+        return container.suspend();
     }
     
     public void persist() {
-        editableContainer.saveContainer();
+        container.saveContainer();
     }
 }

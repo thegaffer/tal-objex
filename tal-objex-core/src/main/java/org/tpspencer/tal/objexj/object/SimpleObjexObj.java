@@ -47,7 +47,7 @@ import org.tpspencer.tal.objexj.exceptions.ObjectFieldInvalidException;
  * 
  * @author Tom Spencer
  */
-public class SimpleObjexObj extends BaseObjexObj {
+public final class SimpleObjexObj extends BaseObjexObj {
 
 	/** The strategy for this object */
 	private final ObjectStrategy strategy;

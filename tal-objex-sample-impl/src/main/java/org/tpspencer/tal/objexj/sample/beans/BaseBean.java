@@ -6,6 +6,7 @@ import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -32,18 +33,22 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	private String id;
 	
 	/** Holds the parent objects' id (if any) */
+	@Persistent
 	private String parentId;
+	
+	@NotPersistent
+	private transient boolean editable = false;
 	
 	public BaseBean() {
 	}
 	
-	public BaseBean(ObjexID parentId) {
+	public void create(ObjexID parentId) {
 	    this.parentId = parentId != null ? parentId.toString() : null;
 	}
 	
-	public void init(Object id) {
-        this.id = id.toString();
-    }
+	public void preSave(Object id) {
+	    this.id = id.toString();
+	}
 	
 	public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
 	    parentId = ObjectUtils.updateTempReferences(parentId, refs);
@@ -76,5 +81,13 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	 */
 	public void setParentId(Object parentId) {
 		this.parentId = parentId != null ? parentId.toString() : null;
+	}
+	
+	public boolean isEditable() {
+	    return editable;
+	}
+	
+	public void setEditable() {
+	    this.editable = true;
 	}
 }

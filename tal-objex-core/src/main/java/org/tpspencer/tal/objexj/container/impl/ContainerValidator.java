@@ -202,7 +202,7 @@ public final class ContainerValidator {
         public final int addParent(final ObjexObj obj) {
             ObjexObj parent = obj.getParent();
             
-            if( parent == null ) {
+            if( parent == null || parent == obj || parent.getId().equals(obj.getId()) ) {
                 return 0;
             }
             else if( !parents.containsKey(parent.getId()) ) {

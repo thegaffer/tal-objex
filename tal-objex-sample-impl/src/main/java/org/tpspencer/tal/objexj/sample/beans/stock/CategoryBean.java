@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.jdo.annotations.PersistenceCapable;
 
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
@@ -41,8 +42,15 @@ public class CategoryBean extends BaseBean {
 	public CategoryBean() {
     }
     
-    public CategoryBean(ObjexID parentId) {
-        super(parentId);
+	public ObjexObjStateBean cloneState() {
+        CategoryBean ret = new CategoryBean();
+        ret.setId(this.getId());
+        ret.setParentId(this.getParentId());
+        ret.setName(name);
+        ret.setDescription(description);
+        ret.setProducts(products);
+        ret.setCategories(categories);
+        return ret;
     }
     
     /*

@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.container.InternalContainer;
 import org.tpspencer.tal.objexj.exceptions.ObjectFieldInvalidException;
 
@@ -275,6 +276,19 @@ public abstract class BaseObjexObj implements InternalObjexObj {
     protected void checkUpdateable() {
         checkInitialised();
         if( !isUpdateable() ) throw new IllegalStateException("Cannot update an object that is not inside a transaction: " + this);
+    }
+    
+    /**
+     * Helper to ensure an object is updateable before it
+     * is updated. This method checks the container is open
+     * and adds this object to the transaction if 
+     * neccessary.
+     * 
+     * @param state The state bean
+     */
+    protected void ensureUpdateable(ObjexObjStateBean state) {
+        checkUpdateable();
+        if( !state.isEditable() ) container.addObjectToTransaction(this, state);
     }
     
     /**

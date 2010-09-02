@@ -2,7 +2,7 @@ package org.tpspencer.tal.objexj.sample.beans.order;
 
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -36,8 +36,19 @@ public class OrderItemBean extends BaseBean {
 	public OrderItemBean() {
     }
     
-    public OrderItemBean(ObjexID parentId) {
-        super(parentId);
+	public ObjexObjStateBean cloneState() {
+        OrderItemBean ret = new OrderItemBean();
+        ret.setId(this.getId());
+        ret.setParentId(this.getParentId());
+        ret.setRef(ref);
+        ret.setName(name);
+        ret.setDescription(description);
+        ret.setStockItem(stockItem);
+        ret.setQuantity(quantity);
+        ret.setMeasure(measure);
+        ret.setPrice(price);
+        ret.setCurrency(currency);
+        return ret;
     }
 	
 	/*

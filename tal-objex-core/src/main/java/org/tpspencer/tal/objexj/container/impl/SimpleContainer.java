@@ -213,6 +213,27 @@ public final class SimpleContainer implements InternalContainer {
     }
     
     /**
+     * Gets the objects using the normal method and creates
+     * a new list of the expected element by calling
+     * getBehaviour on the objects.
+     * 
+     * @throws ClassCastException If any object is not of the expected type
+     */
+    public <T> List<T> getObjectList(List<? extends Object> ids, Class<T> expectedElement) {
+        List<ObjexObj> objs = getObjectList(ids);
+        List<T> ret = objs != null ? new ArrayList<T>(objs.size()) : null;
+        
+        if( objs != null ) {
+            Iterator<ObjexObj> it = objs.iterator();
+            while( it.hasNext() ) {
+                ret.add(it.next().getBehaviour(expectedElement));
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
      * Simply gets each object on the list
      * 
      * FUTURE: Work out objects not held locally and get in one op
@@ -226,6 +247,29 @@ public final class SimpleContainer implements InternalContainer {
             Object k = it.next();
             Object ref = ids.get(k);
             ret.put(k, getObject(ref));
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Gets the objects using the normal method and creates
+     * a new map of the expected element by calling
+     * getBehaviour on the objects.
+     * 
+     * @throws ClassCastException If any object is not of the expected type
+     */
+    public <T> Map<? extends Object, T> getObjectMap(Map<? extends Object, ? extends Object> ids, Class<T> expectedElement) {
+        Map<? extends Object, ObjexObj> objs = getObjectMap(ids);
+        Map<Object, T> ret = objs != null ? new HashMap<Object, T>(objs.size()) : null;
+        
+        if( objs != null ) {
+            Iterator<? extends Object> it = objs.keySet().iterator();
+            while( it.hasNext() ) {
+                Object key = it.next();
+                ObjexObj obj = objs.get(key);
+                ret.put(key, obj != null ? obj.getBehaviour(expectedElement) : null);
+            }
         }
         
         return ret;
@@ -406,7 +450,7 @@ public final class SimpleContainer implements InternalContainer {
         transactionCache.addObject(ObjectRole.NEW, newId, newState);
         
         // c. Create ObjexObj, add it to cache and return it
-        ObjexObj ret = objectStrategy.getObjexObjInstance(this, parentId, newId, state);
+        ObjexObj ret = objectStrategy.getObjexObjInstance(this, parentId, newId, newState);
         if( objexObjCache == null ) objexObjCache = new HashMap<ObjexID, ObjexObj>();
         objexObjCache.put(newId, ret);
         return ret;

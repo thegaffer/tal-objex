@@ -1,101 +1,141 @@
 package org.tpspencer.tal.objexj.sample.model.order.impl;
 
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.Container;
+import org.tpspencer.tal.objexj.ObjexObj;
+import org.tpspencer.tal.objexj.ValidationRequest;
+import org.tpspencer.tal.objexj.locator.SingletonContainerLocator;
+import org.tpspencer.tal.objexj.object.BaseObjexObj;
 import org.tpspencer.tal.objexj.object.ObjectStrategy;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
 import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
-import org.tpspencer.tal.objexj.object.SimpleObjexObj;
 import org.tpspencer.tal.objexj.sample.api.order.OrderItem;
 import org.tpspencer.tal.objexj.sample.api.stock.Product;
 import org.tpspencer.tal.objexj.sample.beans.order.OrderItemBean;
 
-public class OrderItemImpl extends SimpleObjexObj implements OrderItem {
-    
+/**
+ * Manual simple {@link ObjexObj} implementation of the {@link OrderItem}
+ * domain object interface. Note in here how the set's are protected
+ * against re-setting the same value and how they call ensureUpdateable,
+ * which makes sure the object is in the transaction.
+ *
+ * @author Tom Spencer
+ */
+public class OrderItemImpl extends BaseObjexObj implements OrderItem {
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class);
-
-    public OrderItemImpl(ObjexObjStateBean state) {
-        super(STRATEGY, state);
+    
+    private final OrderItemBean bean;
+    
+    public OrderItemImpl(OrderItemBean bean) {
+        this.bean = bean;
     }
 
 	public String getName() {
-		return getLocalState(OrderItemBean.class).getName();
+		return bean.getName();
 	}
 	
 	public void setName(String name) {
-		checkUpdateable();
-		getLocalState(OrderItemBean.class).setName(name);
+	    if( name == bean.getName() ) return;
+	    if( name != null && name.equals(bean.getName()) ) return;
+	    
+		ensureUpdateable(bean);
+		bean.setName(name);
 	}
 	
 	public String getDescription() {
-		return getLocalState(OrderItemBean.class).getDescription();
+		return bean.getDescription();
 	}
 	
 	public void setDescription(String description) {
+	    if( description == bean.getDescription() ) return;
+	    if( description != null && description.equals(description) ) return;
+	    
 		checkUpdateable();
-		getLocalState(OrderItemBean.class).setDescription(description);
+		bean.setDescription(description);
 	}
 	
 	public Product getStockItem() {
-		String ref = getLocalState(OrderItemBean.class).getStockItem();
-		return ref != null ? getContainer().getObject(ref, Product.class) : null;
+		String ref = bean.getStockItem();
+		if( ref == null ) return null;
+		
+		Container stock = SingletonContainerLocator.getInstance().get("Stock");
+		return stock.getObject(ref).getBehaviour(Product.class);
 	}
 	
 	public String getStockItemRef() {
-        return getLocalState(OrderItemBean.class).getStockItem();
+        return bean.getStockItem();
     }
 	
 	public void setStockItem(Product item) {
-		String ref = ObjectUtils.getObjectRef(item);
+	    String ref = ObjectUtils.getObjectRef(item);
 		setStockItemRef(ref);
 	}
 	
 	public void setStockItemRef(String item) {
-        checkUpdateable();
-        getLocalState(OrderItemBean.class).setStockItem(item);
+	    if( item == bean.getStockItem() ) return;
+	    if( item != null && item.equals(bean.getStockItem()) ) return;
+	    
+	    ensureUpdateable(bean);
+        bean.setStockItem(item);
     }
 	
 	public String getRef() {
-		return getLocalState(OrderItemBean.class).getRef();
+		return bean.getRef();
 	}
 	
 	public void setRef(String ref) {
-		checkUpdateable();
-		getLocalState(OrderItemBean.class).setRef(ref);
+	    if( ref == bean.getRef() ) return;
+	    if( ref != null && ref.equals(bean.getRef()) ) return;
+	    
+	    ensureUpdateable(bean);
+        bean.setRef(ref);
 	}
 	
 	public double getQuantity() {
-		return getLocalState(OrderItemBean.class).getQuantity();
+		return bean.getQuantity();
 	}
 	
 	public void setQuantity(double quantity) {
-		checkUpdateable();
-		getLocalState(OrderItemBean.class).setQuantity(quantity);
+	    if( quantity == bean.getQuantity() ) return;
+	    
+	    ensureUpdateable(bean);
+        bean.setQuantity(quantity);
 	}
 	
 	public String getMeasure() {
-		return getLocalState(OrderItemBean.class).getMeasure();
+		return bean.getMeasure();
 	}
 	
 	public void setMeasure(String measure) {
-		checkUpdateable();
-		getLocalState(OrderItemBean.class).setMeasure(measure);
+	    if( measure == bean.getMeasure() ) return;
+	    if( measure != null && measure.equals(bean.getMeasure()) ) return;
+	    
+	    ensureUpdateable(bean);
+        bean.setMeasure(measure);
 	}
 	
 	public double getPrice() {
-		return getLocalState(OrderItemBean.class).getPrice();
+		return bean.getPrice();
 	}
 	
 	public void setPrice(double price) {
-		checkUpdateable();
-		getLocalState(OrderItemBean.class).setPrice(price);
+	    if( price == bean.getPrice() ) return;
+	    
+	    ensureUpdateable(bean);
+        bean.setPrice(price);
 	}
 	
 	public String getCurrency() {
-		return getLocalState(OrderItemBean.class).getCurrency();
+		return bean.getCurrency();
 	}
 	
 	public void setCurrency(String currency) {
-		checkUpdateable();
-		getLocalState(OrderItemBean.class).setCurrency(currency);
+	    if( currency == bean.getCurrency() ) return;
+	    if( currency != null && currency.equals(bean.getCurrency()) ) return;
+	    
+	    ensureUpdateable(bean);
+        bean.setCurrency(currency);
+	}
+	
+	public void validate(ValidationRequest request) {
 	}
 }

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import javax.jdo.annotations.PersistenceCapable;
 
-import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.sample.beans.BaseBean;
 
 /**
@@ -32,8 +32,17 @@ public class ProductBean extends BaseBean {
 	public ProductBean() {
     }
     
-    public ProductBean(ObjexID parentId) {
-        super(parentId);
+	public ObjexObjStateBean cloneState() {
+        ProductBean ret = new ProductBean();
+        ret.setId(this.getId());
+        ret.setParentId(this.getParentId());
+        ret.setName(name);
+        ret.setDescription(description);
+        ret.setEffectiveFrom(effectiveFrom);
+        ret.setEffectiveTo(effectiveTo);
+        ret.setPrice(price);
+        ret.setCurrency(currency);
+        return ret;
     }
 	
 	/*

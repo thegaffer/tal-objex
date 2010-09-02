@@ -30,7 +30,6 @@ public interface OrderRepository {
 	 * objects obtained from the repository cannot be
 	 * edited with re-getting them.
 	 */
-	@Deprecated
 	public void open();
 	
 	/**
