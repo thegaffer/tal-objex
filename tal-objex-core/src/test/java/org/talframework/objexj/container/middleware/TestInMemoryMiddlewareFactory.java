@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.container.middleware;
+package org.talframework.objexj.container.middleware;
 
 import java.util.ArrayList;
 
@@ -9,9 +9,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.exceptions.ContainerExistsException;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.exceptions.ContainerExistsException;
 
 /**
  * Simple test for the in memory middleware factory

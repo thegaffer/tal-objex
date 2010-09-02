@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.tpspencer.tal.objexj.container;
+package org.talframework.objexj.container;
 
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.TransactionCache.ObjectRole;
 
 /**
  * This interface represents the container internally.

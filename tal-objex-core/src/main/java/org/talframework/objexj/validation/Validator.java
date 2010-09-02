@@ -1,13 +1,13 @@
-package org.tpspencer.tal.objexj.validation;
+package org.talframework.objexj.validation;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ValidationError;
-import org.tpspencer.tal.objexj.ValidationRequest;
-import org.tpspencer.tal.objexj.ValidationRequest.ValidationType;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ValidationError;
+import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.ValidationRequest.ValidationType;
 
 /**
  * This helper class can be used to perform the validation

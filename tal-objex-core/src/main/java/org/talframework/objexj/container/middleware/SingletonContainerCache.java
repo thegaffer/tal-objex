@@ -1,9 +1,9 @@
-package org.tpspencer.tal.objexj.container.middleware;
+package org.talframework.objexj.container.middleware;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.container.TransactionCache;
+import org.talframework.objexj.container.TransactionCache;
 
 /**
  * This acts as a cache for the in-memory middleware to use

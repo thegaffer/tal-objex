@@ -1,6 +1,7 @@
-package org.tpspencer.tal.objexj.locator;
+package org.talframework.objexj.locator;
 
-import org.tpspencer.tal.objexj.Container;
+import org.talframework.objexj.Container;
+
 
 /**
  * This interface represents something that create container

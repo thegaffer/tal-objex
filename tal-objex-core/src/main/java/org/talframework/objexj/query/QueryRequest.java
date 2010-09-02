@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.query;
+package org.talframework.objexj.query;
 
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.exceptions;
+package org.talframework.objexj.exceptions;
 
 /**
  * Indicates that the object being changed/validated is

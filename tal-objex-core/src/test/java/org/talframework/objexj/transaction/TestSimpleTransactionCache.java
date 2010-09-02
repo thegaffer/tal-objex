@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.transaction;
+package org.talframework.objexj.transaction;
 
 import org.junit.Test;
 

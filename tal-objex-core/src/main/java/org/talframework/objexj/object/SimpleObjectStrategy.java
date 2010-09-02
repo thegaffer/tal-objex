@@ -1,13 +1,13 @@
-package org.tpspencer.tal.objexj.object;
+package org.talframework.objexj.object;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexIDStrategy;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.InternalContainer;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexIDStrategy;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.InternalContainer;
 
 /**
  * Very basic implementation of ObjectStrategy that requires

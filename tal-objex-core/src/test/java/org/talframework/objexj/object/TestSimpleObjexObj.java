@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.object;
+package org.talframework.objexj.object;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,11 +11,11 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.container.InternalContainer;
-import org.tpspencer.tal.objexj.exceptions.ObjectFieldInvalidException;
-import org.tpspencer.tal.objexj.service.beans.CategoryBean;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
+import org.talframework.objexj.service.beans.CategoryBean;
 
 /**
  * This class tests the behaviour of the {@link SimpleObjexObj}

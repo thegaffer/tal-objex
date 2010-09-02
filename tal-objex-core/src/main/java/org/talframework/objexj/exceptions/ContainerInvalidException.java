@@ -1,6 +1,6 @@
-package org.tpspencer.tal.objexj.exceptions;
+package org.talframework.objexj.exceptions;
 
-import org.tpspencer.tal.objexj.ValidationRequest;
+import org.talframework.objexj.ValidationRequest;
 
 /**
  * Indicates that an attempt to save a container failed 

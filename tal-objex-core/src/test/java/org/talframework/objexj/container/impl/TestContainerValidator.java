@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.container.impl;
+package org.talframework.objexj.container.impl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,15 +10,15 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.ValidationError;
-import org.tpspencer.tal.objexj.ValidationRequest;
-import org.tpspencer.tal.objexj.container.TransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
-import org.tpspencer.tal.objexj.object.DefaultObjexID;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ValidationError;
+import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.container.TransactionCache;
+import org.talframework.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.object.DefaultObjexID;
 
 public class TestContainerValidator {
     

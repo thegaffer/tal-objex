@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.object;
+package org.talframework.objexj.object;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,11 +8,11 @@ import java.util.Map;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.ValidationRequest;
-import org.tpspencer.tal.objexj.exceptions.ObjectFieldInvalidException;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
 
 /**
  * Although ObjexObj objects should be behaviourally rich

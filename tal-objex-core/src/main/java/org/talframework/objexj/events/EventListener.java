@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.events;
+package org.talframework.objexj.events;
 
 /**
  * This interface represents an event listener. Containers

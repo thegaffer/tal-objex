@@ -1,11 +1,11 @@
-package org.tpspencer.tal.objexj;
+package org.talframework.objexj;
 
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.events.Event;
-import org.tpspencer.tal.objexj.query.QueryRequest;
-import org.tpspencer.tal.objexj.query.QueryResult;
+import org.talframework.objexj.events.Event;
+import org.talframework.objexj.query.QueryRequest;
+import org.talframework.objexj.query.QueryResult;
 
 /**
  * This interface represents wrapper (or container) or related

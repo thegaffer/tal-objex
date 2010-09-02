@@ -1,8 +1,8 @@
-package org.tpspencer.tal.objexj.query;
+package org.talframework.objexj.query;
 
 import java.util.List;
 
-import org.tpspencer.tal.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObj;
 
 public final class DefaultQueryResult implements QueryResult {
 

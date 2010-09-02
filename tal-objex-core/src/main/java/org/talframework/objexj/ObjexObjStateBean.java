@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj;
+package org.talframework.objexj;
 
 import java.io.Serializable;
 import java.util.Map;

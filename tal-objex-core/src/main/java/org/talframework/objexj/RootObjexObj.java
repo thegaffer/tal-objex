@@ -1,9 +1,9 @@
-package org.tpspencer.tal.objexj;
+package org.talframework.objexj;
 
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.events.EventListener;
+import org.talframework.objexj.events.EventListener;
 
 /**
  * This interface is implemented by any object that is

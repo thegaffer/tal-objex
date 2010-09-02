@@ -1,9 +1,9 @@
-package org.tpspencer.tal.objexj.container;
+package org.talframework.objexj.container;
 
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObjStateBean;
 
 /**
  * This interface represents a cache of objects that are 

@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.exceptions;
+package org.talframework.objexj.exceptions;
 
 /**
  * This exception represents an attempt to access an invalid

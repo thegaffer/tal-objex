@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tpspencer.tal.objexj.container.impl;
+package org.talframework.objexj.container.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,17 +22,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.ValidationError;
-import org.tpspencer.tal.objexj.ValidationRequest;
-import org.tpspencer.tal.objexj.ValidationRequest.ValidationType;
-import org.tpspencer.tal.objexj.container.TransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
-import org.tpspencer.tal.objexj.validation.CurrentValidationRequest;
-import org.tpspencer.tal.objexj.validation.SimpleValidationRequest;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ValidationError;
+import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.ValidationRequest.ValidationType;
+import org.talframework.objexj.container.TransactionCache;
+import org.talframework.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.validation.CurrentValidationRequest;
+import org.talframework.objexj.validation.SimpleValidationRequest;
 
 /**
  * This class validates a container. It does this currently in

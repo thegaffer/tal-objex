@@ -1,8 +1,8 @@
-package org.tpspencer.tal.objexj.object;
+package org.talframework.objexj.object;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.container.InternalContainer;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.container.InternalContainer;
 
 public interface InternalObjexObj extends ObjexObj {
 

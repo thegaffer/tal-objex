@@ -1,6 +1,6 @@
-package org.tpspencer.tal.objexj.object;
+package org.talframework.objexj.object;
 
-import org.tpspencer.tal.objexj.ObjexID;
+import org.talframework.objexj.ObjexID;
 
 public final class TempObjexID implements ObjexID {
     private static final long serialVersionUID = 1L;

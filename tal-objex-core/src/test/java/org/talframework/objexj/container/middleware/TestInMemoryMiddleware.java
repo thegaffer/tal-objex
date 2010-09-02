@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.container.middleware;
+package org.talframework.objexj.container.middleware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +9,13 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.TransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
-import org.tpspencer.tal.objexj.container.impl.SimpleTransactionCache;
-import org.tpspencer.tal.objexj.object.DefaultObjexID;
-import org.tpspencer.tal.objexj.service.beans.CategoryBean;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.TransactionCache;
+import org.talframework.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.container.impl.SimpleTransactionCache;
+import org.talframework.objexj.object.DefaultObjexID;
+import org.talframework.objexj.service.beans.CategoryBean;
 
 /**
  * Tests the in memory middleware works

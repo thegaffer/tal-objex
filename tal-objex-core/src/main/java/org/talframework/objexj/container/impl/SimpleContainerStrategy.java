@@ -1,19 +1,19 @@
-package org.tpspencer.tal.objexj.container.impl;
+package org.talframework.objexj.container.impl;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.events.EventHandler;
-import org.tpspencer.tal.objexj.events.EventListener;
-import org.tpspencer.tal.objexj.exceptions.EventHandlerNotFoundException;
-import org.tpspencer.tal.objexj.exceptions.ObjectTypeNotFoundException;
-import org.tpspencer.tal.objexj.exceptions.QueryNotFoundException;
-import org.tpspencer.tal.objexj.object.DefaultObjexID;
-import org.tpspencer.tal.objexj.object.ObjectStrategy;
-import org.tpspencer.tal.objexj.query.Query;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.events.EventHandler;
+import org.talframework.objexj.events.EventListener;
+import org.talframework.objexj.exceptions.EventHandlerNotFoundException;
+import org.talframework.objexj.exceptions.ObjectTypeNotFoundException;
+import org.talframework.objexj.exceptions.QueryNotFoundException;
+import org.talframework.objexj.object.DefaultObjexID;
+import org.talframework.objexj.object.ObjectStrategy;
+import org.talframework.objexj.query.Query;
 
 public final class SimpleContainerStrategy implements ContainerStrategy {
 	

@@ -1,13 +1,13 @@
-package org.tpspencer.tal.objexj.validation;
+package org.talframework.objexj.validation;
 
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ValidationError;
-import org.tpspencer.tal.objexj.ValidationRequest;
-import org.tpspencer.tal.objexj.exceptions.ObjectErrorException;
-import org.tpspencer.tal.objexj.exceptions.ObjectFieldErrorException;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ValidationError;
+import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.exceptions.ObjectErrorException;
+import org.talframework.objexj.exceptions.ObjectFieldErrorException;
 
 /**
  * This class provides access to the current validation

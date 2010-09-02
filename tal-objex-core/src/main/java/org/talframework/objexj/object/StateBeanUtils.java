@@ -1,11 +1,11 @@
-package org.tpspencer.tal.objexj.object;
+package org.talframework.objexj.object;
 
 import java.util.Collection;
 import java.util.Currency;
 import java.util.Date;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexObjStateBean;
 
 /**
  * Contains various helper and utility methods for dealing

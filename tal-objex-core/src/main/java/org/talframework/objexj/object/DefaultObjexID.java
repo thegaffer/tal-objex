@@ -1,7 +1,7 @@
-package org.tpspencer.tal.objexj.object;
+package org.talframework.objexj.object;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.exceptions.ObjectIDInvalidException;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.exceptions.ObjectIDInvalidException;
 
 /**
  * Default implementation of ObjexID. This will be fine for most

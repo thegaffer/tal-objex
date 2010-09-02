@@ -1,16 +1,16 @@
-package org.tpspencer.tal.objexj.locator;
+package org.talframework.objexj.locator;
 
 import org.springframework.util.Assert;
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.ContainerMiddleware;
-import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
-import org.tpspencer.tal.objexj.container.impl.SimpleContainer;
-import org.tpspencer.tal.objexj.exceptions.ContainerNotFoundException;
-import org.tpspencer.tal.objexj.object.ObjectStrategy;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.ContainerMiddleware;
+import org.talframework.objexj.container.ContainerMiddlewareFactory;
+import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.container.impl.SimpleContainer;
+import org.talframework.objexj.exceptions.ContainerNotFoundException;
+import org.talframework.objexj.object.ObjectStrategy;
 
 /**
  * This class can be configured to create instances of a

@@ -1,15 +1,15 @@
-package org.tpspencer.tal.objexj.object;
+package org.talframework.objexj.object;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.InternalContainer;
-import org.tpspencer.tal.objexj.exceptions.ObjectFieldInvalidException;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
 
 /**
  * Base class for an ObjexObj. Most basic methods are implemented

@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.exceptions;
+package org.talframework.objexj.exceptions;
 
 /**
  * This exception is thrown a type of object is not found.

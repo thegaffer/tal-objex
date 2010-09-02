@@ -1,12 +1,12 @@
-package org.tpspencer.tal.objexj.container;
+package org.talframework.objexj.container;
 
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexIDStrategy;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.events.EventListener;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexIDStrategy;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.events.EventListener;
 
 /**
  * This interface represents the connection between a

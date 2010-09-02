@@ -1,11 +1,11 @@
-package org.tpspencer.tal.objexj.locator;
+package org.talframework.objexj.locator;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.exceptions.ContainerTypeNotFoundException;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.exceptions.ContainerTypeNotFoundException;
 
 /**
  * This singleton class can find containers where the type of

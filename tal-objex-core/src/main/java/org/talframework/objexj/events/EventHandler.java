@@ -1,6 +1,6 @@
-package org.tpspencer.tal.objexj.events;
+package org.talframework.objexj.events;
 
-import org.tpspencer.tal.objexj.Container;
+import org.talframework.objexj.Container;
 
 /**
  * This interface represents something that can handle

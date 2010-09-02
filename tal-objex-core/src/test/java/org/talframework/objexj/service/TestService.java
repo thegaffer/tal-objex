@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.service;
+package org.talframework.objexj.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,19 +6,19 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.impl.SimpleContainerStrategy;
-import org.tpspencer.tal.objexj.container.middleware.InMemoryMiddlewareFactory;
-import org.tpspencer.tal.objexj.container.middleware.SingletonContainerStore;
-import org.tpspencer.tal.objexj.locator.ContainerFactory;
-import org.tpspencer.tal.objexj.locator.SimpleContainerFactory;
-import org.tpspencer.tal.objexj.object.SimpleObjectStrategy;
-import org.tpspencer.tal.objexj.service.beans.CategoryBean;
-import org.tpspencer.tal.objexj.service.beans.ProductBean;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.ContainerMiddlewareFactory;
+import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.container.impl.SimpleContainerStrategy;
+import org.talframework.objexj.container.middleware.InMemoryMiddlewareFactory;
+import org.talframework.objexj.container.middleware.SingletonContainerStore;
+import org.talframework.objexj.locator.ContainerFactory;
+import org.talframework.objexj.locator.SimpleContainerFactory;
+import org.talframework.objexj.object.SimpleObjectStrategy;
+import org.talframework.objexj.service.beans.CategoryBean;
+import org.talframework.objexj.service.beans.ProductBean;
 
 /**
  * This class represents a service that would be written

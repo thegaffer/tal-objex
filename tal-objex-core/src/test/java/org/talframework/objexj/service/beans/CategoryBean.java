@@ -1,10 +1,10 @@
-package org.tpspencer.tal.objexj.service.beans;
+package org.talframework.objexj.service.beans;
 
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObjStateBean;
 
 /**
  * This bean class represents the raw persistable version of

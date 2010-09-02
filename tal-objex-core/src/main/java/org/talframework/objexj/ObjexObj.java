@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj;
+package org.talframework.objexj;
 
 /**
  * This interface represents an actual object held by

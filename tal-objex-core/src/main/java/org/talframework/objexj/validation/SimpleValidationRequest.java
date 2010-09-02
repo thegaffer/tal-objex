@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.validation;
+package org.talframework.objexj.validation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ValidationError;
-import org.tpspencer.tal.objexj.ValidationRequest;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ValidationError;
+import org.talframework.objexj.ValidationRequest;
 
 /**
  * This class implements the validation request as simply

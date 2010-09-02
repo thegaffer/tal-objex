@@ -1,7 +1,7 @@
-package org.tpspencer.tal.objexj.query;
+package org.talframework.objexj.query;
 
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.InternalContainer;
+import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.container.InternalContainer;
 
 /**
  * This internal interface represents a query against a

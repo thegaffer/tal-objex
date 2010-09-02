@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.exceptions;
+package org.talframework.objexj.exceptions;
 
 /**
  * Indicates that an attempt to create a container that 

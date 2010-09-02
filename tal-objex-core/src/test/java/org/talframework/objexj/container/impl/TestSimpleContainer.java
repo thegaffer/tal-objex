@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.container.impl;
+package org.talframework.objexj.container.impl;
 
 import junit.framework.Assert;
 
@@ -7,27 +7,27 @@ import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexIDStrategy;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.RootObjexObj;
-import org.tpspencer.tal.objexj.ValidationRequest;
-import org.tpspencer.tal.objexj.container.ContainerMiddleware;
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.InternalContainer;
-import org.tpspencer.tal.objexj.container.TransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
-import org.tpspencer.tal.objexj.events.Event;
-import org.tpspencer.tal.objexj.events.EventHandler;
-import org.tpspencer.tal.objexj.exceptions.ContainerInvalidException;
-import org.tpspencer.tal.objexj.object.DefaultObjexID;
-import org.tpspencer.tal.objexj.object.ObjectStrategy;
-import org.tpspencer.tal.objexj.query.Query;
-import org.tpspencer.tal.objexj.query.QueryRequest;
-import org.tpspencer.tal.objexj.query.QueryResult;
-import org.tpspencer.tal.objexj.service.beans.CategoryBean;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexIDStrategy;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.RootObjexObj;
+import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.container.ContainerMiddleware;
+import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.container.TransactionCache;
+import org.talframework.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.events.Event;
+import org.talframework.objexj.events.EventHandler;
+import org.talframework.objexj.exceptions.ContainerInvalidException;
+import org.talframework.objexj.object.DefaultObjexID;
+import org.talframework.objexj.object.ObjectStrategy;
+import org.talframework.objexj.query.Query;
+import org.talframework.objexj.query.QueryRequest;
+import org.talframework.objexj.query.QueryResult;
+import org.talframework.objexj.service.beans.CategoryBean;
 
 /**
  * This class tests our simple container

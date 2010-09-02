@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj;
+package org.talframework.objexj;
 
 /**
  * This interface extends {@link Container} to represent a

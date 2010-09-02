@@ -1,9 +1,9 @@
-package org.tpspencer.tal.objexj.container.middleware;
+package org.talframework.objexj.container.middleware;
 
-import org.tpspencer.tal.objexj.container.ContainerMiddleware;
-import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.exceptions.ContainerExistsException;
+import org.talframework.objexj.container.ContainerMiddleware;
+import org.talframework.objexj.container.ContainerMiddlewareFactory;
+import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.exceptions.ContainerExistsException;
 
 /**
  * Implements the middleware factory interface over the internal

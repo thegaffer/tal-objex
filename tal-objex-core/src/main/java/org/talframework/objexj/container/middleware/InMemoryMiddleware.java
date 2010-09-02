@@ -1,22 +1,22 @@
-package org.tpspencer.tal.objexj.container.middleware;
+package org.talframework.objexj.container.middleware;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexIDStrategy;
-import org.tpspencer.tal.objexj.ObjexObj;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.ContainerMiddleware;
-import org.tpspencer.tal.objexj.container.TransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionCache.ObjectRole;
-import org.tpspencer.tal.objexj.container.impl.SimpleTransactionCache;
-import org.tpspencer.tal.objexj.events.EventListener;
-import org.tpspencer.tal.objexj.exceptions.ObjectIDInvalidException;
-import org.tpspencer.tal.objexj.object.DefaultObjexID;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexIDStrategy;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.ContainerMiddleware;
+import org.talframework.objexj.container.TransactionCache;
+import org.talframework.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.container.impl.SimpleTransactionCache;
+import org.talframework.objexj.events.EventListener;
+import org.talframework.objexj.exceptions.ObjectIDInvalidException;
+import org.talframework.objexj.object.DefaultObjexID;
 
 /**
  * This class provides an implementation of the middleware that

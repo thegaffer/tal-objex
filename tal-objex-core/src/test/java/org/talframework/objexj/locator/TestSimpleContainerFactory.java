@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.locator;
+package org.talframework.objexj.locator;
 
 import org.junit.Test;
 

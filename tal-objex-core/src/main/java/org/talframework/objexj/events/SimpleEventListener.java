@@ -1,4 +1,4 @@
-package org.tpspencer.tal.objexj.events;
+package org.talframework.objexj.events;
 
 import java.io.Serializable;
 import java.util.Arrays;

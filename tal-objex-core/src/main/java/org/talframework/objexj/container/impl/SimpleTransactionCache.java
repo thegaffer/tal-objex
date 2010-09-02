@@ -1,12 +1,12 @@
-package org.tpspencer.tal.objexj.container.impl;
+package org.talframework.objexj.container.impl;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
-import org.tpspencer.tal.objexj.container.TransactionCache;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.TransactionCache;
 
 /**
  * Simple implementation of the TransactionCache which just

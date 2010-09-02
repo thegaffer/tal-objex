@@ -1,15 +1,15 @@
-package org.tpspencer.tal.objexj.container;
+package org.talframework.objexj.container;
 
 import java.util.List;
 
-import org.tpspencer.tal.objexj.ObjexID;
-import org.tpspencer.tal.objexj.events.EventHandler;
-import org.tpspencer.tal.objexj.events.EventListener;
-import org.tpspencer.tal.objexj.exceptions.EventHandlerNotFoundException;
-import org.tpspencer.tal.objexj.exceptions.ObjectTypeNotFoundException;
-import org.tpspencer.tal.objexj.exceptions.QueryNotFoundException;
-import org.tpspencer.tal.objexj.object.ObjectStrategy;
-import org.tpspencer.tal.objexj.query.Query;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.events.EventHandler;
+import org.talframework.objexj.events.EventListener;
+import org.talframework.objexj.exceptions.EventHandlerNotFoundException;
+import org.talframework.objexj.exceptions.ObjectTypeNotFoundException;
+import org.talframework.objexj.exceptions.QueryNotFoundException;
+import org.talframework.objexj.object.ObjectStrategy;
+import org.talframework.objexj.query.Query;
 
 /**
  * This interface represents a strategy for a container.

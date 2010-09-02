@@ -1,10 +1,10 @@
-package org.tpspencer.tal.objexj.container.middleware;
+package org.talframework.objexj.container.middleware;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexObjStateBean;
 
 /**
  * This class acts as the source for the containers in an
