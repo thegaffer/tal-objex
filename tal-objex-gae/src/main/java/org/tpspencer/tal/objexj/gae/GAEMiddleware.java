@@ -24,6 +24,7 @@ import org.tpspencer.tal.objexj.gae.event.GAEEventListener;
 import org.tpspencer.tal.objexj.gae.object.ContainerBean;
 import org.tpspencer.tal.objexj.gae.persistence.PersistenceManagerFactorySingleton;
 
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.labs.taskqueue.Queue;
@@ -225,6 +226,10 @@ public final class GAEMiddleware implements ContainerMiddleware {
         try {
             tx.begin();
             
+            Map<ObjexID, ObjexObjStateBean> newObjects = cache.getObjects(ObjectRole.NEW);
+            Map<ObjexID, ObjexObjStateBean> updatedObjects = cache.getObjects(ObjectRole.UPDATED);
+            Map<ObjexID, ObjexObjStateBean> removedObjects = cache.getObjects(ObjectRole.REMOVED);
+            
             // Make the root persistent (only if changed!!)
             Key rootKey = root.getId();
             if( rootKey == null ) {
@@ -234,6 +239,11 @@ public final class GAEMiddleware implements ContainerMiddleware {
                 if( root.getContainerId() == null ) {
                     rootKey = GAEAllocateObjexIDStrategy.getInstance().createContainerId(root.getContainerId());
                     root.setContainerId(Long.toString(rootKey.getId()));
+                    
+                    // Reserve all the IDs create thus far - allocate does not protect from manual entries
+                    if( newObjects != null && newObjects.size() > 0 ) {
+                        DatastoreServiceFactory.getDatastoreService().allocateIds(rootKey, container.getType(), newObjects.size() + 1);
+                    }
                 }
                 
                 // Creating a store
@@ -246,11 +256,6 @@ public final class GAEMiddleware implements ContainerMiddleware {
             pm.makePersistent(root);
             
             // Save or create objects
-            Map<ObjexID, ObjexObjStateBean> newObjects = cache.getObjects(ObjectRole.NEW);
-            Map<ObjexID, ObjexObjStateBean> updatedObjects = cache.getObjects(ObjectRole.UPDATED);
-            Map<ObjexID, ObjexObjStateBean> removedObjects = cache.getObjects(ObjectRole.REMOVED);
-            
-            
             if( newObjects != null ) {
                 Iterator<ObjexID> it = newObjects.keySet().iterator();
                 while( it.hasNext() ) {

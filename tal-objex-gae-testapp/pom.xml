@@ -48,6 +48,14 @@
  		<artifactId>gwt-servlet</artifactId>
  		<version>2.0.3</version>
  	</dependency>
+ 	
+ 	<!-- Test -->
+ 	<dependency>
+    	<groupId>org.seleniumhq.selenium.client-drivers</groupId>
+    	<artifactId>selenium-java-client-driver</artifactId>
+    	<version>1.0.2</version>
+    	<scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>
@@ -69,6 +77,16 @@
 	          <webappDirectory>target/webapp</webappDirectory>
 	        </configuration>
 	    </plugin>
+	    
+	    <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<configuration>
+				<excludes>
+		            <exclude>**/selenium/*.java</exclude>
+		        </excludes>
+			</configuration>
+		</plugin>
   	</plugins>
   </build>
 </project>

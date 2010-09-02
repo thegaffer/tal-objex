@@ -192,6 +192,8 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     
     private void addParentIdField() {
         PropertyMetadataWrapper prop = new PropertyMetadataWrapper(new JavaSymbolName("parentId"), JavaType.STRING_OBJECT);
+        prop.addAnnotation("javax.jdo.annotations.Persistent", 
+                new StringAttributeValue(new JavaSymbolName("column"), "parentId"));
         prop.addMetadata(builder, governorTypeDetails, getId());
         
         MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName("getParentId"), prop.getType());

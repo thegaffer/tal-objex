@@ -17,7 +17,7 @@
 	<div><label for="account">Account: </label><input type="text" name="account" value="${order.account}" /></div>
 
 	<hr />
-	<input type="submit" value="Submit" />
+	<input type="submit" name="submit" value="Submit" />
 </form>
 
 </body>

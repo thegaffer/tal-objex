@@ -23,6 +23,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
     @Extension(vendorName = "datanucleus", key = "gae.encoded-pk", value = "true")
     private String ProductBean.id;
     
+    @Persistent(column = "parentId")
     private String ProductBean.parentId;
     
     @NotPersistent

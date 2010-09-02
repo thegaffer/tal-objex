@@ -35,7 +35,7 @@
 	</c:if>
 	
 	<hr />
-	<input type="submit" value="Submit" />
+	<input type="submit" name="submit" value="Submit" />
 </form>
 
 </body>

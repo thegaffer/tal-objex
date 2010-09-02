@@ -19,7 +19,7 @@ import org.tpspencer.tal.objexj.object.DefaultObjexID;
  */
 public final class GAENewObjexIDStrategy implements ObjexIDStrategy {
 
-    private long lastId = 1;
+    private long lastId;
     
     public GAENewObjexIDStrategy(long last) {
         this.lastId = last;
@@ -29,7 +29,7 @@ public final class GAENewObjexIDStrategy implements ObjexIDStrategy {
      * Simply creates a new ID and increments the last number
      */
     public ObjexID createId(Container container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj) {
-        return new DefaultObjexID(type, lastId++);
+        return new DefaultObjexID(type, ++lastId);
     }
 
     /**

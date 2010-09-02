@@ -49,7 +49,8 @@ public final class GAEAllocateObjexIDStrategy implements ObjexIDStrategy {
         
         Key root = KeyFactory.createKey(ContainerBean.class.getSimpleName(), container.getId());
         
-        KeyRange range = service.allocateIds(root, stateType.getSimpleName(), 1);
+        // KeyRange range = service.allocateIds(root, stateType.getSimpleName(), 1);
+        KeyRange range = service.allocateIds(root, container.getType(), 1);
         return new DefaultObjexID(type, range.getStart().getId());
     }
     
