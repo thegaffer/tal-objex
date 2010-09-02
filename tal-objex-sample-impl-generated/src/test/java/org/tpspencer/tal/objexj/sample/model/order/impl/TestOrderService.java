@@ -7,18 +7,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.tpspencer.tal.objexj.Container;
-import org.tpspencer.tal.objexj.EditableContainer;
-import org.tpspencer.tal.objexj.container.ContainerMiddleware;
-import org.tpspencer.tal.objexj.container.ContainerMiddlewareFactory;
-import org.tpspencer.tal.objexj.container.ContainerStrategy;
-import org.tpspencer.tal.objexj.container.SimpleTransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionCache;
-import org.tpspencer.tal.objexj.container.TransactionMiddleware;
 import org.tpspencer.tal.objexj.locator.ContainerFactory;
 import org.tpspencer.tal.objexj.sample.api.repository.OrderRepository;
 
 /**
- * Ensures the stock service will give us repository instances.
+ * Unit test of the service class
  * 
  * @author Tom Spencer
  */
@@ -28,19 +21,16 @@ public class TestOrderService {
     
     /** Mocked factory for service to use */
     private ContainerFactory containerFactory = null;
-    /** Mocked middleware factory for integration type unit tests */
-    private ContainerMiddlewareFactory middlewareFactory = null;
     
     @Before
     public void setup() {
         containerFactory = context.mock(ContainerFactory.class);
-        middlewareFactory = context.mock(ContainerMiddlewareFactory.class);
     }
     
     @Test
     public void create() {
         OrderServiceImpl service = new OrderServiceImpl(containerFactory);
-        final EditableContainer container = context.mock(EditableContainer.class);
+        final Container container = context.mock(Container.class);
         // final ObjexObj obj = context.mock(ObjexObj.class);
         
         context.checking(new Expectations() {{
@@ -51,25 +41,6 @@ public class TestOrderService {
         OrderRepository repo = service.createNewOrder();
         Assert.assertNotNull(repo);
         // Assert.assertNotNull(repo.getOrder());
-        context.assertIsSatisfied();
-    }
-    
-    @Test
-    public void createIntegration() {
-        OrderServiceImpl service = new OrderServiceImpl(middlewareFactory);
-        final TransactionMiddleware middleware = context.mock(TransactionMiddleware.class);
-        final TransactionCache cache = new SimpleTransactionCache();
-            
-        context.checking(new Expectations() {{
-            oneOf(middlewareFactory).createContainer(with(any(ContainerStrategy.class))); 
-              will(returnValue(middleware));
-            oneOf(middleware).init(with(any(Container.class)));
-            allowing(middleware).getCache(); will(returnValue(cache));
-        }});
-        
-        OrderRepository repo = service.createNewOrder();
-        Assert.assertNotNull(repo);
-        //Assert.assertNotNull(repo.getOrder());
         context.assertIsSatisfied();
     }
     
@@ -88,46 +59,12 @@ public class TestOrderService {
     }
     
     @Test
-    public void getIntegration() {
-        OrderServiceImpl service = new OrderServiceImpl(middlewareFactory);
-        final ContainerMiddleware middleware = context.mock(ContainerMiddleware.class);
-        
-        context.checking(new Expectations() {{
-            oneOf(middlewareFactory).getMiddleware(with(any(ContainerStrategy.class)), with("123")); will(returnValue(middleware));
-            oneOf(middleware).getContainerId(); will(returnValue("123"));
-            oneOf(middleware).init(with(any(Container.class)));
-        }});
-        
-        OrderRepository repo = service.getRepository("123");
-        Assert.assertNotNull(repo);
-        context.assertIsSatisfied();
-    }
-    
-    @Test
     public void open() {
         OrderServiceImpl service = new OrderServiceImpl(containerFactory);
-        final EditableContainer container = context.mock(EditableContainer.class);
+        final Container container = context.mock(Container.class);
         
         context.checking(new Expectations() {{
             oneOf(containerFactory).open("321"); will(returnValue(container));
-        }});
-        
-        OrderRepository repo = service.getOpenRepository("321");
-        Assert.assertNotNull(repo);
-        context.assertIsSatisfied();
-    }
-    
-    @Test
-    public void openIntegration() {
-        OrderServiceImpl service = new OrderServiceImpl(middlewareFactory);
-        final TransactionMiddleware middleware = context.mock(TransactionMiddleware.class);
-        final TransactionCache cache = context.mock(TransactionCache.class);
-        
-        context.checking(new Expectations() {{
-            oneOf(middlewareFactory).getTransaction(with(any(ContainerStrategy.class)), with("321")); will(returnValue(middleware));
-            oneOf(middleware).getContainerId(); will(returnValue("123"));
-            oneOf(middleware).init(with(any(EditableContainer.class)));
-            oneOf(middleware).getCache(); will(returnValue(cache));
         }});
         
         OrderRepository repo = service.getOpenRepository("321");

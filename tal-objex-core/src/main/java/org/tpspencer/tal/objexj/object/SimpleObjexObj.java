@@ -1,7 +1,5 @@
 package org.tpspencer.tal.objexj.object;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -329,40 +327,6 @@ public final class SimpleObjexObj extends BaseObjexObj {
                 ret = possibleRef;
             }
         }
-	    
-	    return ret;
-	}
-	
-	/**
-	 * This method will attempt to clone the basic value
-	 * if it is possible. Obviously this is not needed
-	 * for Strings and other immutable objects because 
-	 * they cannot be changed. It is also not needed for
-	 * primitives. However, any {@link Cloneable} object
-	 * is cloned and an array is copied into a new 
-	 * instance.
-	 * 
-	 * <p>Note that the clone, if one occurs, is a 
-	 * typically a shallow copy.</p>
-	 * 
-	 * @param val
-	 * @return
-	 */
-	protected Object cloneValue(Object val) {
-	    if( val == null ) return null;
-	    
-	    // Most basic types are immutable (primitives, Number, String etc) 
-	    Object ret = val;
-	    
-	    // Any object expositing cloneable, although we have to use reflection
-	    if( val instanceof Cloneable ) {
-	        try {
-	            Method clone = val.getClass().getMethod("clone", (Class<?>[])null);
-	            if( Modifier.isPublic(clone.getModifiers()) ) ret = clone.invoke(val, (Object[])null);
-	        }
-	        catch( RuntimeException e ) { throw e; }
-	        catch( Exception e ) {}
-	    }
 	    
 	    return ret;
 	}

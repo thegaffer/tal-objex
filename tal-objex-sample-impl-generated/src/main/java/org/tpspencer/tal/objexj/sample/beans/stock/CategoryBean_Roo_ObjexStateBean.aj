@@ -4,13 +4,13 @@ import java.lang.Object;
 import java.lang.String;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
-import org.tpspencer.tal.objexj.sample.beans.stock.CategoryBean;
 
 privileged aspect CategoryBean_Roo_ObjexStateBean {
     
@@ -25,24 +25,12 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     
     private String CategoryBean.parentId;
     
+    @NotPersistent
+    private transient boolean CategoryBean._editable;
+    
     public CategoryBean.new() {
         super();
-        // Nothing
-    }
-
-    public CategoryBean.new(CategoryBean src) {
-        super();
-        this.name = src.name;
-        this.description = src.description;
-        this.products = src.products;
-        this.categories = src.categories;
-        this.id = src.id;
-        this.parentId = src.parentId;
-    }
-
-    public CategoryBean.new(ObjexID parentId) {
-        super();
-        this.parentId = parentId != null ? parentId.toString() : null;
+        _editable = false;
     }
 
     public String CategoryBean.getId() {
@@ -53,11 +41,23 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         return this.parentId;
     }
     
+    public boolean CategoryBean.isEditable() {
+        return _editable;
+    }
+    
+    public void CategoryBean.setEditable() {
+        _editable = true;
+    }
+    
     public String CategoryBean.getObjexObjType() {
         return "Category";
     }
     
-    public void CategoryBean.init(Object id) {
+    public void CategoryBean.create(ObjexID parentId) {
+        this.parentId = parentId != null ? parentId.toString() : null;
+    }
+    
+    public void CategoryBean.preSave(Object id) {
         this.id = id != null ? id.toString() : null;
     }
     
@@ -65,6 +65,17 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         parentId = ObjectUtils.updateTempReferences(parentId, refs);
         products = ObjectUtils.updateTempReferences(products, refs);
         categories = ObjectUtils.updateTempReferences(categories, refs);
+    }
+    
+    public ObjexObjStateBean CategoryBean.cloneState() {
+        CategoryBean ret = new CategoryBean();
+        ret.name = this.name;
+        ret.description = this.description;
+        ret.products = this.products;
+        ret.categories = this.categories;
+        ret.id = this.id;
+        ret.parentId = this.parentId;
+        return ret;
     }
     
 }

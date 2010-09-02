@@ -108,8 +108,8 @@ public class CollectionPropHelper extends PropHelper {
     private void addStandardGetter() {
         JavaSymbolName name = new JavaSymbolName(getGetterName());
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, getNatualContainerType());
-        if( prop.isMapReferenceProp() ) method.addBody("return ObjectUtils.getObjectMap(bean." + getGetterName() + "());");
-        else method.addBody("return ObjectUtils.getObjectList(this, bean." + getGetterName() + "(), " + prop.getMemberType().getSimpleTypeName() + ".class);");
+        if( prop.isMapReferenceProp() ) method.addBody("return getContainer().getObjectMap(bean." + getGetterName() + "(), " + prop.getMemberType().getSimpleTypeName() + ".class);");
+        else method.addBody("return getContainer().getObjectList(bean." + getGetterName() + "(), " + prop.getMemberType().getSimpleTypeName() + ".class);");
         methods.add(method);
     }
     
@@ -127,8 +127,7 @@ public class CollectionPropHelper extends PropHelper {
     private void addRefGetter() {
         JavaSymbolName name = new JavaSymbolName(getRefGetterName());
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, prop.getType());
-        method.addBody("return bean." + getGetterName() + "();");
-        // TODO: This returns the list directly and changes can be made!!!
+        method.addBody("return cloneValue(bean." + getGetterName() + "());");
         methods.add(method);
     }
     
@@ -140,8 +139,11 @@ public class CollectionPropHelper extends PropHelper {
         JavaSymbolName name = new JavaSymbolName(getRefSetterName());
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
         method.addParameter(new JavaSymbolName("val"), prop.getType(), null);
-        method.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
-        method.addBody("bean." + getSetterName() + "(val);");
+
+        method.addBody("ensureUpdateable(bean);");
+        addGetRefsSnippet(method, "refs", true);
+        method.addBody("refs.add(val);");
+        
         methods.add(method);
     }
     
@@ -151,11 +153,15 @@ public class CollectionPropHelper extends PropHelper {
         JavaSymbolName name = new JavaSymbolName(getCreateName());
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, prop.getMemberType());
         if( newType == null ) method.addParameter("type", String.class.getName(), null);
-        method.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
-        if( newType == null ) method.addBody("ObjexObj val = ObjectUtils.createObject(this, type);");
-        else method.addBody("ObjexObj val = ObjectUtils.createObject(this, \"" + newType + "\");");
-        method.addBody("if( bean." + getGetterName() + "() == null ) bean." + getSetterName() + "(new ArrayList<String>());");
-        method.addBody("bean." + getGetterName() + "().add(val.getId().toString());");
+        method.addBody("checkUpdateable();");
+        
+        if( newType == null ) method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, type);");
+        else method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, \"" + newType + "\");");
+        
+        method.addBody("ensureUpdateable(bean);");
+        addGetRefsSnippet(method, "refs", true);
+        method.addBody("refs.add(val.getId().toString());");
+        
         method.addBody("return val.getBehaviour(" + prop.getMemberType().getSimpleTypeName() + ".class);");
         methods.add(method);
     }
@@ -164,11 +170,13 @@ public class CollectionPropHelper extends PropHelper {
         JavaSymbolName name = new JavaSymbolName(getAddName());
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
         method.addParameter(new JavaSymbolName("val"), prop.getMemberType(), null);
-        method.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
+        method.addBody("checkUpdateable();");
         method.addBody("String ref = ObjectUtils.getObjexId(val);");
         
-        method.addBody("if( bean." + getGetterName() + "() == null ) bean." + getSetterName() + "(new ArrayList<String>());");
-        method.addBody("bean." + getGetterName() + "().add(ref);");
+        method.addBody("ensureUpdateable(bean);");
+        addGetRefsSnippet(method, "refs", true);
+        method.addBody("refs.add(ref);");
+        
         methods.add(method);
     }
     
@@ -176,17 +184,25 @@ public class CollectionPropHelper extends PropHelper {
         JavaSymbolName name = new JavaSymbolName(getRemoveName() + "ById");
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
         method.addParameter("id", "java.lang.Object", null);
-        method.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
+        method.addBody("checkUpdateable();");
         
         method.addBody("String ref = ObjectUtils.getObjectRef(this, id);");
         
-        method.addBody("Iterator<String> it = bean." + getGetterName() + "().iterator();");
+        addGetRefsSnippet(method, "refs", false);
+        method.addBody("if( refs == null || refs.size() == 0 ) return;");
+        if( prop.isOwned() ) method.addBody("int size = refs.size();");
+        
+        method.addBody("Iterator<String> it = refs.iterator();");
         method.addBody("while( it.hasNext() ) {");
-        method.addBody("\tif( ref.equals(it.next()) ) it.remove();");
+        method.addBody("\tif( ref.equals(it.next()) ) {");
+        method.addBody("\t\tensureUpdateable(bean);");
+        method.addBody("\t\tit.remove();");
+        method.addBody("\t}");
         method.addBody("}");
         
         if( prop.isOwned() ) {
-            method.addBody("ObjectUtils.removeObject(this, ref);");
+            method.addBody("if( refs.size() == size ) return;");
+            method.addBody("ObjectUtils.removeObject(this, bean, ref);");
         }
         
         methods.add(method);
@@ -196,14 +212,15 @@ public class CollectionPropHelper extends PropHelper {
         JavaSymbolName name = new JavaSymbolName(getRemoveName());
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
         method.addParameter(new JavaSymbolName("index"), JavaType.INT_PRIMITIVE, null);
-        method.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
+        method.addBody("checkUpdateable();");
         
-        method.addBody("List<String> refs = bean." + getGetterName() + "();");
-        method.addBody("if( refs != null && index >= 0 && index < refs.size() ) {");
-        method.addBody("\tString ref = refs.get(index);");
-        if( prop.isOwned() ) method.addBody("\tObjectUtils.removeObject(this, ref);");
-        method.addBody("\trefs.remove(index);");
-        method.addBody("}");
+        addGetRefsSnippet(method, "refs", false);
+        method.addBody("if( refs == null || index < 0 || index >= refs.size() ) return;");
+        
+        if( prop.isOwned() ) method.addBody("String ref = refs.get(index);");
+        method.addBody("ensureUpdateable(bean);");
+        method.addBody("refs.remove(index);");
+        if( prop.isOwned() ) method.addBody("ObjectUtils.removeObject(this, bean, ref);");
         
         methods.add(method);
     }
@@ -215,19 +232,37 @@ public class CollectionPropHelper extends PropHelper {
     private void addRemoveAll() {
         JavaSymbolName name = new JavaSymbolName(getRemoveAllName());
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        method.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
+        
+        addGetRefsSnippet(method, "refs", false);
+        method.addBody("if( refs == null || refs.size() == 0 ) return;");
+        method.addBody("checkUpdateable();");
         
         // Remove all refs from container if owned
         if( prop.isOwned() ) {
-            method.addBody("Iterator<String> it = bean." + getGetterName() + "().iterator();");
+            method.addBody("Iterator<String> it = refs.iterator();");
             method.addBody("while( it.hasNext() ) {");
             method.addBody("\tString ref = it.next();");
-            method.addBody("\tObjectUtils.removeObject(this, ref);");
+            method.addBody("\tObjectUtils.removeObject(this, bean, ref);");
             method.addBody("\tit.remove();");
             method.addBody("}");
         }
-        
+        method.addBody("ensureUpdateable(bean);");
         method.addBody("bean." + getSetterName() + "(null);");
+        
         methods.add(method);
+    }
+    
+    /**
+     * Helper to get the existing refs, create them
+     * if they do not exist.
+     */
+    private void addGetRefsSnippet(MethodMetadataWrapper method, String refs, boolean create) {
+        method.addBody("List<String> " + refs + " = bean." + getGetterName() + "();");
+        if( !create ) return;
+        
+        method.addBody("if( " + refs + " == null ) {");
+        method.addBody("\trefs = new ArrayList<String>();");
+        method.addBody("\tbean." + getSetterName() + "(refs);");
+        method.addBody("}");
     }
 }

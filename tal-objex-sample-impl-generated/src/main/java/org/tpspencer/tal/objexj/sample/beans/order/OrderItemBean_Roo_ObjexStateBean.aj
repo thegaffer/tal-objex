@@ -4,13 +4,13 @@ import java.lang.Object;
 import java.lang.String;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import org.tpspencer.tal.objexj.ObjexID;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
-import org.tpspencer.tal.objexj.sample.beans.order.OrderItemBean;
 
 privileged aspect OrderItemBean_Roo_ObjexStateBean {
     
@@ -25,28 +25,12 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
     
     private String OrderItemBean.parentId;
     
+    @NotPersistent
+    private transient boolean OrderItemBean._editable;
+    
     public OrderItemBean.new() {
         super();
-        // Nothing
-    }
-
-    public OrderItemBean.new(OrderItemBean src) {
-        super();
-        this.ref = src.ref;
-        this.name = src.name;
-        this.description = src.description;
-        this.stockItem = src.stockItem;
-        this.quantity = src.quantity;
-        this.measure = src.measure;
-        this.price = src.price;
-        this.currency = src.currency;
-        this.id = src.id;
-        this.parentId = src.parentId;
-    }
-
-    public OrderItemBean.new(ObjexID parentId) {
-        super();
-        this.parentId = parentId != null ? parentId.toString() : null;
+        _editable = false;
     }
 
     public String OrderItemBean.getId() {
@@ -57,17 +41,44 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         return this.parentId;
     }
     
+    public boolean OrderItemBean.isEditable() {
+        return _editable;
+    }
+    
+    public void OrderItemBean.setEditable() {
+        _editable = true;
+    }
+    
     public String OrderItemBean.getObjexObjType() {
         return "OrderItem";
     }
     
-    public void OrderItemBean.init(Object id) {
+    public void OrderItemBean.create(ObjexID parentId) {
+        this.parentId = parentId != null ? parentId.toString() : null;
+    }
+    
+    public void OrderItemBean.preSave(Object id) {
         this.id = id != null ? id.toString() : null;
     }
     
     public void OrderItemBean.updateTemporaryReferences(java.util.Map<ObjexID, ObjexID> refs) {
         parentId = ObjectUtils.updateTempReferences(parentId, refs);
         stockItem = ObjectUtils.updateTempReferences(stockItem, refs);
+    }
+    
+    public ObjexObjStateBean OrderItemBean.cloneState() {
+        OrderItemBean ret = new OrderItemBean();
+        ret.ref = this.ref;
+        ret.name = this.name;
+        ret.description = this.description;
+        ret.stockItem = this.stockItem;
+        ret.quantity = this.quantity;
+        ret.measure = this.measure;
+        ret.price = this.price;
+        ret.currency = this.currency;
+        ret.id = this.id;
+        ret.parentId = this.parentId;
+        return ret;
     }
     
 }

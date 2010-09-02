@@ -34,10 +34,10 @@ public class CategoryBean {
 	private String description;
 	
 	/** The products in this category */
-	@ObjexRefProp(owned=true, type=Product.class, newType="ProductBean")
+	@ObjexRefProp(owned=true, type=Product.class, newType="Product")
 	private List<String> products;
 	
 	/** The sub-cateogories */
-	@ObjexRefProp(owned=true, type=Category.class, newType="CategoryBean")
+	@ObjexRefProp(owned=true, type=Category.class, newType="Category")
 	private List<String> categories;
 }

@@ -24,6 +24,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.tpspencer.tal.objexj.ObjexID;
+import org.tpspencer.tal.objexj.ObjexObjStateBean;
 import org.tpspencer.tal.objexj.annotations.ObjexStateBean;
 import org.tpspencer.tal.objexj.roo.fields.ObjexObjProperty;
 import org.tpspencer.tal.objexj.roo.fields.PropertyCompiler;
@@ -67,14 +68,14 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         // Add extra bits for the state bean
         addIdField();
         addParentIdField();
+        addEditable();
         addTypeGetter();
         addInit();
         addTempRefs();
         
         // Add in constructors
         addDefaultCons();
-        addCopyCons();
-        addNewCons(true); // TODO: Determine if we should have parent
+        addCloneState();
         
         // Create the ITD Type
         itdTypeDetails = builder.build();
@@ -122,26 +123,16 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         ConstructorMetadataWrapper con = new ConstructorMetadataWrapper();
         
         con.addBody("super();");
-        con.addBody("// Nothing");
+        con.addBody("_editable = false;");
         
         con.addMetadata(builder, governorTypeDetails, getId());
     }
     
-    private void addNewCons(boolean includeParent) {
-        ConstructorMetadataWrapper newCon = new ConstructorMetadataWrapper();
-        newCon.addParameter("parentId", ObjexID.class.getName(), null);
+    private void addCloneState() {
+        MethodMetadataWrapper clone = new MethodMetadataWrapper("cloneState", ObjexObjStateBean.class.getName());
         
-        newCon.addBody("super();");
-        if( includeParent ) newCon.addBody("this.parentId = parentId != null ? parentId.toString() : null;");
-        
-        newCon.addMetadata(builder, governorTypeDetails, getId());
-    }
-    
-    private void addCopyCons() {
-        ConstructorMetadataWrapper copyCon = new ConstructorMetadataWrapper();
-        copyCon.addParameter(new JavaSymbolName("src"), governorTypeDetails.getName(), null);
-        
-        copyCon.addBody("super();");
+        String beanName = governorTypeDetails.getName().getSimpleTypeName(); 
+        clone.addBody(beanName + " ret = new " + beanName + "();");
         
         boolean idFound = false;
         boolean parentFound = false;
@@ -151,16 +142,18 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
             ObjexObjProperty prop = it.next();
             String name = prop.getName().getSymbolName();
             
-            copyCon.addBody("this." + name + " = src." + name + ";");
+            clone.addBody("ret." + name + " = this." + name + ";");
             
             if( name.equals("id") ) idFound = true;
             else if( name.equals("parentId") ) parentFound = true;
         }
         
-        if( !idFound ) copyCon.addBody("this.id = src.id;");
-        if( !parentFound ) copyCon.addBody("this.parentId = src.parentId;");
+        if( !idFound ) clone.addBody("ret.id = this.id;");
+        if( !parentFound ) clone.addBody("ret.parentId = this.parentId;");
         
-        copyCon.addMetadata(builder, governorTypeDetails, getId());
+        clone.addBody("return ret;");
+        
+        clone.addMetadata(builder, governorTypeDetails, getId());
     }
     
     /**
@@ -206,6 +199,25 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         getter.addMetadata(builder, governorTypeDetails, getId());
     }
     
+    private void addEditable() {
+        // editable property
+        PropertyMetadataWrapper prop = new PropertyMetadataWrapper(new JavaSymbolName("_editable"), JavaType.BOOLEAN_PRIMITIVE);
+        prop.addAnnotation("javax.jdo.annotations.NotPersistent");
+        prop.addModifier(Modifier.PRIVATE);
+        prop.addModifier(Modifier.TRANSIENT);
+        prop.addMetadata(builder, governorTypeDetails, getId());
+        
+        // isEditable method
+        MethodMetadataWrapper isMethod = new MethodMetadataWrapper(new JavaSymbolName("isEditable"), JavaType.BOOLEAN_PRIMITIVE);
+        isMethod.addBody("return _editable;");
+        isMethod.addMetadata(builder, governorTypeDetails, getId());
+        
+        // setEditable method
+        MethodMetadataWrapper setMethod = new MethodMetadataWrapper(new JavaSymbolName("setEditable"), JavaType.VOID_PRIMITIVE);
+        setMethod.addBody("_editable = true;");
+        setMethod.addMetadata(builder, governorTypeDetails, getId());
+    }
+    
     private void addTypeGetter() {
         MethodMetadata mm = TypeDetailsUtil.getMethod(governorTypeDetails, "getObjexObjType", null);
         if( mm != null ) return;
@@ -225,13 +237,18 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     }
     
     private void addInit() {
-        MethodMetadata mm = TypeDetailsUtil.getMethod(governorTypeDetails, "init", null);
+        MethodMetadata mm = TypeDetailsUtil.getMethod(governorTypeDetails, "preSave", null);
         if( mm != null ) return;
         
-        MethodMetadataWrapper typeMethod = new MethodMetadataWrapper(new JavaSymbolName("init"), JavaType.VOID_PRIMITIVE);
-        typeMethod.addParameter("id", "java.lang.Object", null);
-        typeMethod.addBody("this.id = id != null ? id.toString() : null;");
-        typeMethod.addMetadata(builder, governorTypeDetails, getId());
+        MethodMetadataWrapper create = new MethodMetadataWrapper(new JavaSymbolName("create"), JavaType.VOID_PRIMITIVE);
+        create.addParameter("parentId", ObjexID.class.getName(), null);
+        create.addBody("this.parentId = parentId != null ? parentId.toString() : null;");
+        create.addMetadata(builder, governorTypeDetails, getId());
+        
+        MethodMetadataWrapper preSave = new MethodMetadataWrapper(new JavaSymbolName("preSave"), JavaType.VOID_PRIMITIVE);
+        preSave.addParameter("id", "java.lang.Object", null);
+        preSave.addBody("this.id = id != null ? id.toString() : null;");
+        preSave.addMetadata(builder, governorTypeDetails, getId());
     }
     
     private void addTempRefs() {
@@ -248,6 +265,7 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         
         // Update all reference properties
         builder.getImportRegistrationResolver().addImport(new JavaType("org.tpspencer.tal.objexj.object.ObjectUtils"));
+        
         typeMethod.addBody("parentId = ObjectUtils.updateTempReferences(parentId, refs);");
         Iterator<ObjexObjProperty> it = this.properties.iterator();
         while( it.hasNext() ) {

@@ -17,6 +17,6 @@ public class OrderImpl implements Order {
     public void confirmOrder() {
         bean.getAccount();
     }
-    
+
     
 }

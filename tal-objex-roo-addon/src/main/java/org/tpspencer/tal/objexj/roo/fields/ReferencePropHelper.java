@@ -35,6 +35,7 @@ public class ReferencePropHelper extends PropHelper {
     @Override
     public void build(DefaultItdTypeDetailsBuilder builder, ClassOrInterfaceTypeDetails typeDetails, String typeId) {
         builder.getImportRegistrationResolver().addImport(new JavaType("org.tpspencer.tal.objexj.object.ObjectUtils"));
+        builder.getImportRegistrationResolver().addImport(new JavaType("org.tpspencer.tal.objexj.object.StateBeanUtils"));
         builder.getImportRegistrationResolver().addImport(new JavaType("org.tpspencer.tal.objexj.ObjexObj"));
 
         super.build(builder, typeDetails, typeId);
@@ -53,8 +54,9 @@ public class ReferencePropHelper extends PropHelper {
         
         MethodMetadataWrapper setter = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
         setter.addParameter(new JavaSymbolName("val"), prop.getMemberType(), null);
-        setter.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
         setter.addBody("String ref = ObjectUtils.getObjectRef(val);");
+        setter.addBody("if( !StateBeanUtils.hasChanged(bean.get" + prop.getName().getSymbolNameCapitalisedFirstLetter() + "(), ref) ) return;");
+        setter.addBody("ensureUpdateable(bean);");
         setter.addBody("bean." + getSetterName() + "(ref);");
         methods.add(setter);
     }
@@ -65,14 +67,14 @@ public class ReferencePropHelper extends PropHelper {
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, prop.getMemberType());
         if( prop.getNewTypeName() == null ) method.addParameter("type", String.class.getName(), null);
         
-        method.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
+        method.addBody("ensureUpdateable(bean);");
         
         // Remove if already present
         method.addBody("if( bean." + getGetterName() + "() != null )");
-        method.addBody("\tObjectUtils.removeObject(this, bean." + getGetterName() + "());");
+        method.addBody("\tObjectUtils.removeObject(this, bean, bean." + getGetterName() + "());");
         
-        if( prop.getNewTypeName() == null ) method.addBody("ObjexObj val = ObjectUtils.createObject(this, type);");
-        else method.addBody("ObjexObj val = ObjectUtils.createObject(this, \"" + prop.getNewTypeName() + "\");");
+        if( prop.getNewTypeName() == null ) method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, type);");
+        else method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, \"" + prop.getNewTypeName() + "\");");
         method.addBody("bean." + getSetterName() + "(val.getId().toString());");
         method.addBody("return val.getBehaviour(" + prop.getMemberType().getSimpleTypeName() + ".class);");
         
@@ -84,9 +86,9 @@ public class ReferencePropHelper extends PropHelper {
         
         MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
         
-        method.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
+        method.addBody("ensureUpdateable(bean);");
         method.addBody("if( bean." + getGetterName() + "() != null )");
-        method.addBody("\tObjectUtils.removeObject(this, bean." + getGetterName() + "());");
+        method.addBody("\tObjectUtils.removeObject(this, bean, bean." + getGetterName() + "());");
         
         methods.add(method);
     }
@@ -104,7 +106,8 @@ public class ReferencePropHelper extends PropHelper {
         
         MethodMetadataWrapper setter = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
         setter.addParameter(new JavaSymbolName("val"), prop.getType(), null);
-        setter.addBody("checkUpdateable();"); // TODO: Or Annotation and Aspect!!??
+        setter.addBody("if( !StateBeanUtils.hasChanged(bean.get" + prop.getName().getSymbolNameCapitalisedFirstLetter() + "(), val) ) return;");
+        setter.addBody("ensureUpdateable(bean);");
         setter.addBody("bean.set" + prop.getName().getSymbolNameCapitalisedFirstLetter() + "(val);");
         methods.add(setter);
     }

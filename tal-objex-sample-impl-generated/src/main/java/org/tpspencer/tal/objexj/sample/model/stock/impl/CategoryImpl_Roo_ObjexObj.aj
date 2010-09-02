@@ -7,8 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import org.tpspencer.tal.objexj.ObjexObj;
 import org.tpspencer.tal.objexj.ObjexObjStateBean;
+import org.tpspencer.tal.objexj.ValidationRequest;
 import org.tpspencer.tal.objexj.object.BaseObjexObj;
 import org.tpspencer.tal.objexj.object.ObjectUtils;
+import org.tpspencer.tal.objexj.object.StateBeanUtils;
 import org.tpspencer.tal.objexj.sample.api.stock.Category;
 import org.tpspencer.tal.objexj.sample.api.stock.Product;
 import org.tpspencer.tal.objexj.sample.beans.stock.CategoryBean;
@@ -23,29 +25,35 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     
     public ObjexObjStateBean CategoryImpl.getStateObject() {
         if( isUpdateable() ) return bean;
-        else return new CategoryBean(bean);
+        else return bean.cloneState();
+    }
+    
+    public void CategoryImpl.validate(ValidationRequest request) {
+        return;
     }
     
     public String CategoryImpl.getName() {
-        return bean.getName();
+        return cloneValue(bean.getName());
     }
     
     public void CategoryImpl.setName(String val) {
-        checkUpdateable();
+        if( !StateBeanUtils.hasChanged(bean.getName(), val) ) return;
+        ensureUpdateable(bean);
         bean.setName(val);
     }
     
     public String CategoryImpl.getDescription() {
-        return bean.getDescription();
+        return cloneValue(bean.getDescription());
     }
     
     public void CategoryImpl.setDescription(String val) {
-        checkUpdateable();
+        if( !StateBeanUtils.hasChanged(bean.getDescription(), val) ) return;
+        ensureUpdateable(bean);
         bean.setDescription(val);
     }
     
     public java.util.List<Product> CategoryImpl.getProducts() {
-        return ObjectUtils.getObjectList(this, bean.getProducts(), Product.class);
+        return getContainer().getObjectList(bean.getProducts(), Product.class);
     }
     
     public Product CategoryImpl.getProductById(Object id) {
@@ -54,50 +62,65 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     }
     
     public List<String> CategoryImpl.getProductRefs() {
-        return bean.getProducts();
+        return cloneValue(bean.getProducts());
     }
     
     public Product CategoryImpl.createProduct() {
         checkUpdateable();
-        ObjexObj val = ObjectUtils.createObject(this, "ProductBean");
-        if( bean.getProducts() == null ) bean.setProducts(new ArrayList<String>());
-        bean.getProducts().add(val.getId().toString());
+        ObjexObj val = ObjectUtils.createObject(this, bean, "Product");
+        ensureUpdateable(bean);
+        List<String> refs = bean.getProducts();
+        if( refs == null ) {
+        	refs = new ArrayList<String>();
+        	bean.setProducts(refs);
+        }
+        refs.add(val.getId().toString());
         return val.getBehaviour(Product.class);
     }
     
     public void CategoryImpl.removeProductById(Object id) {
         checkUpdateable();
         String ref = ObjectUtils.getObjectRef(this, id);
-        Iterator<String> it = bean.getProducts().iterator();
+        List<String> refs = bean.getProducts();
+        if( refs == null || refs.size() == 0 ) return;
+        int size = refs.size();
+        Iterator<String> it = refs.iterator();
         while( it.hasNext() ) {
-        	if( ref.equals(it.next()) ) it.remove();
+        	if( ref.equals(it.next()) ) {
+        		ensureUpdateable(bean);
+        		it.remove();
+        	}
         }
-        ObjectUtils.removeObject(this, ref);
+        if( refs.size() == size ) return;
+        ObjectUtils.removeObject(this, bean, ref);
     }
     
     public void CategoryImpl.removeProduct(int index) {
         checkUpdateable();
         List<String> refs = bean.getProducts();
-        if( refs != null && index >= 0 && index < refs.size() ) {
-        	String ref = refs.get(index);
-        	ObjectUtils.removeObject(this, ref);
-        	refs.remove(index);
-        }
+        if( refs == null || index < 0 || index >= refs.size() ) return;
+        String ref = refs.get(index);
+        ensureUpdateable(bean);
+        refs.remove(index);
+        ObjectUtils.removeObject(this, bean, ref);
     }
     
     public void CategoryImpl.removeProducts() {
+        List<String> refs = bean.getProducts();
+        if( refs == null || refs.size() == 0 ) return;
         checkUpdateable();
-        Iterator<String> it = bean.getProducts().iterator();
+        Iterator<String> it = refs.iterator();
         while( it.hasNext() ) {
         	String ref = it.next();
-        	ObjectUtils.removeObject(this, ref);
+        	ObjectUtils.removeObject(this, bean, ref);
         	it.remove();
         }
+        ensureUpdateable(bean);
         bean.setProducts(null);
     }
     
     public java.util.List<Category> CategoryImpl.getCategories() {
-        return ObjectUtils.getObjectList(this, bean.getCategories(), Category.class);
+        return getContainer().getObjectList(bean.getCategories(), Category.class);
     }
     
     public Category CategoryImpl.getCategoryById(Object id) {
@@ -106,45 +129,60 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     }
     
     public List<String> CategoryImpl.getCategoryRefs() {
-        return bean.getCategories();
+        return cloneValue(bean.getCategories());
     }
     
     public Category CategoryImpl.createCategory() {
         checkUpdateable();
-        ObjexObj val = ObjectUtils.createObject(this, "CategoryBean");
-        if( bean.getCategories() == null ) bean.setCategories(new ArrayList<String>());
-        bean.getCategories().add(val.getId().toString());
+        ObjexObj val = ObjectUtils.createObject(this, bean, "Category");
+        ensureUpdateable(bean);
+        List<String> refs = bean.getCategories();
+        if( refs == null ) {
+        	refs = new ArrayList<String>();
+        	bean.setCategories(refs);
+        }
+        refs.add(val.getId().toString());
         return val.getBehaviour(Category.class);
     }
     
     public void CategoryImpl.removeCategoryById(Object id) {
         checkUpdateable();
         String ref = ObjectUtils.getObjectRef(this, id);
-        Iterator<String> it = bean.getCategories().iterator();
+        List<String> refs = bean.getCategories();
+        if( refs == null || refs.size() == 0 ) return;
+        int size = refs.size();
+        Iterator<String> it = refs.iterator();
         while( it.hasNext() ) {
-        	if( ref.equals(it.next()) ) it.remove();
+        	if( ref.equals(it.next()) ) {
+        		ensureUpdateable(bean);
+        		it.remove();
+        	}
         }
-        ObjectUtils.removeObject(this, ref);
+        if( refs.size() == size ) return;
+        ObjectUtils.removeObject(this, bean, ref);
     }
     
     public void CategoryImpl.removeCategory(int index) {
         checkUpdateable();
         List<String> refs = bean.getCategories();
-        if( refs != null && index >= 0 && index < refs.size() ) {
-        	String ref = refs.get(index);
-        	ObjectUtils.removeObject(this, ref);
-        	refs.remove(index);
-        }
+        if( refs == null || index < 0 || index >= refs.size() ) return;
+        String ref = refs.get(index);
+        ensureUpdateable(bean);
+        refs.remove(index);
+        ObjectUtils.removeObject(this, bean, ref);
     }
     
     public void CategoryImpl.removeCategories() {
+        List<String> refs = bean.getCategories();
+        if( refs == null || refs.size() == 0 ) return;
         checkUpdateable();
-        Iterator<String> it = bean.getCategories().iterator();
+        Iterator<String> it = refs.iterator();
         while( it.hasNext() ) {
         	String ref = it.next();
-        	ObjectUtils.removeObject(this, ref);
+        	ObjectUtils.removeObject(this, bean, ref);
         	it.remove();
         }
+        ensureUpdateable(bean);
         bean.setCategories(null);
     }
     

@@ -12,7 +12,7 @@ public class OrderBean {
 
     private long account;
     
-    @ObjexRefProp(owned=true, type=OrderItem.class, newType="OrderItemBean")
+    @ObjexRefProp(owned=true, type=OrderItem.class, newType="OrderItem")
     private List<String> items;
     
     @ObjexRefProp(owned=true, type=OrderItem.class)

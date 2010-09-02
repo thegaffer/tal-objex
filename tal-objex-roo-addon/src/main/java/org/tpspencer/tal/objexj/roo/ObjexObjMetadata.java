@@ -64,6 +64,7 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
         }
         else if( baseObj ) {
             addStateAccessors();
+            addValidate();
         }
         
         // Add in the methods for the properties
@@ -93,8 +94,16 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
         
         MethodMetadataWrapper getter = new MethodMetadataWrapper("getStateObject", ObjexObjStateBean.class.getName());
         getter.addBody("if( isUpdateable() ) return bean;");
-        getter.addBody("else return new " + annotationValues.getValue().getSimpleTypeName() + "(bean);");
+        getter.addBody("else return bean.cloneState();");
         getter.addMetadata(builder, governorTypeDetails, getId());
+    }
+    
+    private void addValidate() {
+        MethodMetadataWrapper validate = new MethodMetadataWrapper(new JavaSymbolName("validate"), JavaType.VOID_PRIMITIVE);
+        validate.addParameter("request", "org.tpspencer.tal.objexj.ValidationRequest", null);
+        // TODO: Default validation
+        validate.addBody("return;");
+        validate.addMetadata(builder, governorTypeDetails, getId());
     }
     
     private void addStrategy() {

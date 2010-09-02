@@ -2,6 +2,7 @@ package org.tpspencer.tal.objexj.object;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import org.tpspencer.tal.objexj.Container;
 import org.tpspencer.tal.objexj.ObjexID;
@@ -328,6 +329,41 @@ public abstract class BaseObjexObj implements InternalObjexObj {
             ret = this.getClass().getMethod(name, params);
         }
         catch( NoSuchMethodException e ) {}
+        
+        return ret;
+    }
+    
+    /**
+     * This method will attempt to clone the basic value
+     * if it is possible. Obviously this is not needed
+     * for Strings and other immutable objects because 
+     * they cannot be changed. It is also not needed for
+     * primitives. However, any {@link Cloneable} object
+     * is cloned and an array is copied into a new 
+     * instance.
+     * 
+     * <p>Note that the clone, if one occurs, is a 
+     * typically a shallow copy.</p>
+     * 
+     * @param val
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> T cloneValue(T val) {
+        if( val == null ) return null;
+        
+        // Most basic types are immutable (primitives, Number, String etc) 
+        T ret = val;
+        
+        // Others should cloneable
+        if( val instanceof Cloneable ) {
+            try {
+                Method clone = val.getClass().getMethod("clone", (Class<?>[])null);
+                if( Modifier.isPublic(clone.getModifiers()) ) ret = (T)clone.invoke(val, (Object[])null);
+            }
+            catch( RuntimeException e ) { throw e; }
+            catch( Exception e ) {}
+        }
         
         return ret;
     }
