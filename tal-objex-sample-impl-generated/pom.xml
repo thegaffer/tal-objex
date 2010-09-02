@@ -7,7 +7,6 @@
   	<version>0.1-SNAPSHOT</version>
   </parent>
   
-  <groupId>org.talframework.objex</groupId>
   <artifactId>tal-objex-sample-impl-generated</artifactId>
   <name>Objex Sample Generated Implementation</name>
   <description>Implementation of the Sample UI using Objex and the Generators</description>
