@@ -1,0 +1,5 @@
+  The first main runtime environment I've targetted is the Google App Engine. The main
+  reason for this is the data storage engine is not based on a RDBMS and, therefore,
+  shows how Objex can be used in such an environment. Also the unique constraints about
+  transactions on the Google App Engine play nicely into the strengths of Objex and
+  its view about Containers, particularly Document Containers. 

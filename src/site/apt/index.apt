@@ -1,0 +1,55 @@
+Objex
+
+  Welcome to the site for the Tal Framework Objex project.
+  
+  Objex is a framework for creating behaviourally rich persistable business domains.
+  Objex strives to put the concepts of Object Orientism OO first and abstract away
+  the actual persistence. Objex is not, however, an ORM tool - you will still potentially
+  need one of these if using a relational database. Objex simply provides a framework
+  where you can describe you objects and define rich behaviour and collaboration
+  between the objects, relegating the actual persistence into it's own separate layer 
+  where you can concentrate on it separately.
+  
+  This project is currently incubational and will likely stay that away. It is not
+  aimed as a mass open-source framework, although it would be nice if some of the
+  ideas in Objex provoked thought and made their way into mainstream frameworks.
+  If you disagree and think there is value in Objex itself let me know!
+  
+Releases
+
+  The current release is 0.9. See {{{./releases.apt}Releases}} page for information.
+
+Installation
+
+  See {{{./download.apt}Download}} page for information.
+
+Roadmap
+
+  The roadmap right now is to get to a 1.0 release. See {{{./roadmap.apt}Roadmap}} for
+  more information.
+
+History
+
+  I can trace Objex back to some of the earliest work I did in IT. I've kind of started
+  Objex a number of times on a number of different platforms and languages, but never
+  really finished it. It has become, therefore, kind of a pet project that I've had
+  on the go for some time and I have used it to keep myself relatively up to date as
+  my day-job doesn't allow me to do much coding anymore :(.
+
+License
+
+  Copyright 2009 Thomas Spencer.
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+      http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  The license is also available {{{./license.apt}here}}

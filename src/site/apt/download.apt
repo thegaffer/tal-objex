@@ -1,0 +1,52 @@
+Installation
+
+  I use Maven to build and release my software and encourage you to do this same. To
+  get hold of Objex you need to point to my Maven repository. There are two ways to
+  do this; firstly by adding the repository definition to your pom.xml files, or
+  secondly (and more preferred) is to use Nexus or similar and point that to proxy
+  my repository.
+  
+  * Release Repository - http://dev.tpspencer.org/maven/repo/
+  
+  * Snapshot Repository - http://dev.tpspencer.org/maven/snap_repo/
+  
+  Both are standard Maven2 layouts.
+  
+  The relevant Maven declarations (excluding version) then are:
+  
++--
+<!-- The source annotations to use in your implementations -->
+<dependency>
+  <groupId>org.talframework.objex</groupId>
+  <artifactId>tal-objex-annotations</artifactId>
+</dependency>
+
+<!-- The core which your code or generated code will depend upon --> 
+<dependency>
+  <groupId>org.talframework.objex</groupId>
+  <artifactId>tal-objex-core</artifactId>
+</dependency>
+
+<!-- A runtime environment, here we use Google App Engine -->
+<dependency>
+  <groupId>org.talframework.objex</groupId>
+  <artifactId>tal-objex-gae</artifactId>
+  <scope>runtime</scope> <!-- You should not compile against this -->
+</dependency>
++--
+
+  The only other installation is if you want to use the Objex generators to generate
+  the boiler plate code. This is implemented as a Spring Roo Add-On. It is currently
+  tested against roo-1.0.2.RELEASE of Roo. To install you will need to download both
+  the add-on, the core and the annotations and place them in the /dist folder under
+  root. Then you can run Roo on your projects dir and the Magic happens. See Roo
+  documentation for information on Spring Roo.
+  
+  The Maven coordinates for core and annotations are above, but for the roo-addon it is
+  
++--
+<dependency>
+  <groupId>org.talframework.objex</groupId>
+  <artifactId>tal-objex-roo-addon</artifactId>
+</dependency>
++--

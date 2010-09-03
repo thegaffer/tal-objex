@@ -1,0 +1,13 @@
+  As part of the Objex release is a Sample App. There are a number of features this
+  Sample App aims to demonstrate.
+  
+    * How to complete hide Objex via an API exposing a fairly common service and
+    repository interface. The API project has no Objex dependencies
+    
+    * An implementation project which shows how to implement Objex objects & containers
+    without using the generators, i.e. the manual approach
+    
+    * An implementation project which shows how to implement Objex objects & containers
+    using the Roo based generators
+    
+    * Demonstrate all the capabilities of Objex 

@@ -1,0 +1,6 @@
+  Objex, by design, completely separates out the runtime environment from the core logic.
+  The idea being that you can plug in different runtime environments without changing the
+  core logic. Of course this is not entirely achievable as the runtime environment will
+  place constraints.
+  
+  Therefore, there are a number of runtime engines produced as part of the Objex project. 

@@ -1,0 +1,33 @@
+Releases
+
+  The current release is 0.9 and was made in April 2010. However, due to an environment
+  issue I had to re-release this in September 2010.
+  
+Release 0.9 - April 2010
+
+  This is the first version I have released via Maven into my own repository. It is
+  the first version that I have used on a number of other projects. The key features
+  are:
+  
+    * Core Container and ObjexObj interfaces
+    
+    * Implementations of the Container and Base classes for ObjexObj created and tested
+    
+    * Validation support added, but not extensively stretched and will likely change
+    
+    * Support for the Google App Engine runtime environment (this is the main driver
+    for the release)
+    
+    * Basic query support added, but more scaffolding is likely required to support this
+    
+    * Base evening model between containers added, but this requires further refinement.
+    
+    * Test In-Memory runtime environment created
+    
+    * Sample App created as part of the project, this will need to be expanded
+    
+Earlier Releases - 2001 to 2009
+
+  There are earlier versions, but these have not been released via Maven and beside
+  include versions using other languages (C++ for instance). These are not going to
+  be made public.  
