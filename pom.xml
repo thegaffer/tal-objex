@@ -13,9 +13,14 @@
   
   <modules>
   	<module>tal-objex-parent</module>
+  	<module>tal-objex-annotations</module>
   	<module>tal-objex-core</module>
+  	<module>tal-objex-roo-addon</module>
+  	
+  	<!-- Sample -->
   	<module>tal-objex-sample-api</module>
   	<module>tal-objex-sample-impl</module>
+  	<module>tal-objex-sample-impl-generated</module>
   	
   	<!-- Modules below provide runtime implementations of Objex -->
   	<module>tal-objex-gae</module>
