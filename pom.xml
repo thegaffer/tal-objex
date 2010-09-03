@@ -5,7 +5,7 @@
   
   <groupId>org.talframework.objex</groupId>
   <artifactId>tal-objex</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.9</version>
   <packaging>pom</packaging>
   
   <name>Objex</name>
@@ -62,9 +62,9 @@
   </developers>
   
   <scm>
-  	<connection>scm:svn:https://dev.tpspencer.org/svn/repo/tps-objexj/trunk/</connection>
-  	<developerConnection>scm:svn:https://dev.tpspencer.org/svn/repo/tps-objexj/trunk/</developerConnection>
-  	<url>https://dev.tpspencer.org/svn/repo/tps-objexj/trunk/</url>
+  	<connection>scm:svn:https://dev.tpspencer.org/svn/repo/tps-objexj/tags/tal-objex-0.9</connection>
+  	<developerConnection>scm:svn:https://dev.tpspencer.org/svn/repo/tps-objexj/tags/tal-objex-0.9</developerConnection>
+  	<url>https://dev.tpspencer.org/svn/repo/tps-objexj/tags/tal-objex-0.9</url>
   </scm>
   
   <properties>
