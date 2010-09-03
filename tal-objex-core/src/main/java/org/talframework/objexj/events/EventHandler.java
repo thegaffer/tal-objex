@@ -17,6 +17,7 @@
 package org.talframework.objexj.events;
 
 import org.talframework.objexj.Container;
+import org.talframework.objexj.Event;
 
 /**
  * This interface represents something that can handle

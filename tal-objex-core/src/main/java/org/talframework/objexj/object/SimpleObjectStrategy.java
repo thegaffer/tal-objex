@@ -24,6 +24,7 @@ import org.talframework.objexj.ObjexIDStrategy;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.container.ObjectStrategy;
 
 /**
  * Very basic implementation of ObjectStrategy that requires

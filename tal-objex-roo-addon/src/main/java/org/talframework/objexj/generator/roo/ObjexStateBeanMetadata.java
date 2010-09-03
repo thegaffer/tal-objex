@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.DefaultFieldMetadata;
@@ -58,8 +56,6 @@ import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
  * @author Tom Spencer
  */
 public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
-    private static final Log logger = LogFactory.getLog(ObjexStateBeanMetadata.class);
-    
     private static final String PROVIDES_TYPE_STRING = ObjexStateBeanMetadata.class.getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
     
@@ -69,7 +65,6 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     public ObjexStateBeanMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjStateBeanAnnotationValues annotationValues) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         this.annotationValues = annotationValues;
-        logger.debug(">>> Creating ObjexStateBean metadata for: " + governorTypeDetails.getName());
         
         // Annotation, UID and ObjexObj interface
         builder.addTypeAnnotation(getJDOAnnotation());

@@ -12,10 +12,9 @@
   <description>Core interfaces and elements of the Tal Objex Framework</description>
   
   <dependencies>
-  	<!-- Spring Added to efficient reflection access to properties -->
   	<dependency>
-  		<groupId>org.springframework</groupId>
-  		<artifactId>spring-beans</artifactId>
+  		<groupId>org.talframework.tal</groupId>
+		<artifactId>tal-util-beans</artifactId>
   	</dependency>
   </dependencies>
   

@@ -24,7 +24,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public class TransactionNotFoundException extends RuntimeException {
+public final class TransactionNotFoundException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     
     private final String id;

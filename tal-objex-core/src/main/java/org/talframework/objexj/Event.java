@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.events;
+package org.talframework.objexj;
 
 import java.util.Map;
 

@@ -24,7 +24,7 @@ package org.talframework.objexj.exceptions;
  *
  * @author Tom Spencer
  */
-public class ObjectFieldInvalidException extends RuntimeException {
+public final class ObjectFieldInvalidException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the field name */

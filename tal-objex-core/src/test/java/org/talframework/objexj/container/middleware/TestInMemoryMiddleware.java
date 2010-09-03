@@ -27,10 +27,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.container.impl.SimpleTransactionCache;
-import org.talframework.objexj.object.DefaultObjexID;
 import org.talframework.objexj.service.beans.CategoryBean;
 
 /**

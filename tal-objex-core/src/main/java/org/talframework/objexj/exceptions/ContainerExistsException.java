@@ -25,7 +25,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public class ContainerExistsException extends RuntimeException {
+public final class ContainerExistsException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the ID of the container that was not found */

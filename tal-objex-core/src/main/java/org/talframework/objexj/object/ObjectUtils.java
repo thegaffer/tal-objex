@@ -25,6 +25,7 @@ import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
 
 /**

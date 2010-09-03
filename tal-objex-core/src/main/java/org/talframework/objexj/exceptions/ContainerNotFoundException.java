@@ -23,7 +23,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public class ContainerNotFoundException extends RuntimeException {
+public final class ContainerNotFoundException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the ID of the container that was not found */

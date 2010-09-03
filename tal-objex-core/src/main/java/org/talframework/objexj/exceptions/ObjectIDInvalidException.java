@@ -23,7 +23,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public class ObjectIDInvalidException extends RuntimeException {
+public final class ObjectIDInvalidException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the ID of the object that is invalid */

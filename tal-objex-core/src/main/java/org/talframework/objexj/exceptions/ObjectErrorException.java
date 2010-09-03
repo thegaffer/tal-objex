@@ -26,7 +26,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public class ObjectErrorException extends RuntimeException {
+public final class ObjectErrorException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the error code */

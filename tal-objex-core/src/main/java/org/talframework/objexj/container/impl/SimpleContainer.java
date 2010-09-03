@@ -22,8 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.util.Assert;
 import org.talframework.objexj.Container;
+import org.talframework.objexj.Event;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexIDStrategy;
 import org.talframework.objexj.ObjexObj;
@@ -32,16 +32,15 @@ import org.talframework.objexj.RootObjexObj;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ContainerMiddleware;
 import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
-import org.talframework.objexj.events.Event;
 import org.talframework.objexj.events.EventHandler;
 import org.talframework.objexj.exceptions.ContainerInvalidException;
 import org.talframework.objexj.exceptions.EventHandlerNotFoundException;
 import org.talframework.objexj.exceptions.ObjectNotFoundException;
-import org.talframework.objexj.object.DefaultObjexID;
-import org.talframework.objexj.object.ObjectStrategy;
 import org.talframework.objexj.query.Query;
 import org.talframework.objexj.query.QueryRequest;
 import org.talframework.objexj.query.QueryResult;
@@ -79,8 +78,8 @@ public final class SimpleContainer implements InternalContainer {
             ContainerStrategy strategy, 
             ContainerMiddleware middleware,
             boolean open) {
-        Assert.notNull(strategy, "The container strategy must be present");
-        Assert.notNull(middleware, "The container middleware must be present");
+        if( strategy == null ) throw new IllegalArgumentException("The container strategy must be present");
+        if( middleware == null ) throw new IllegalArgumentException("The container middleware must be present");
         
         this.id = id;
         this.strategy = strategy;

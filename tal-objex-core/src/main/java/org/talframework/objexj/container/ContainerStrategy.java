@@ -24,7 +24,6 @@ import org.talframework.objexj.events.EventListener;
 import org.talframework.objexj.exceptions.EventHandlerNotFoundException;
 import org.talframework.objexj.exceptions.ObjectTypeNotFoundException;
 import org.talframework.objexj.exceptions.QueryNotFoundException;
-import org.talframework.objexj.object.ObjectStrategy;
 import org.talframework.objexj.query.Query;
 
 /**

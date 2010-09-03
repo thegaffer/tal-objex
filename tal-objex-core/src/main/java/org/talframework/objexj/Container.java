@@ -19,7 +19,6 @@ package org.talframework.objexj;
 import java.util.List;
 import java.util.Map;
 
-import org.talframework.objexj.events.Event;
 import org.talframework.objexj.query.QueryRequest;
 import org.talframework.objexj.query.QueryResult;
 

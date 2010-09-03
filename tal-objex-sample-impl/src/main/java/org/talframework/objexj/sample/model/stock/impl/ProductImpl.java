@@ -20,8 +20,8 @@ import java.util.Date;
 
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.ObjectStrategy;
 import org.talframework.objexj.object.SimpleObjectStrategy;
 import org.talframework.objexj.sample.api.stock.Product;
 import org.talframework.objexj.sample.beans.stock.ProductBean;

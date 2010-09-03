@@ -16,17 +16,16 @@
 
 package org.talframework.objexj.locator;
 
-import org.springframework.util.Assert;
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.ContainerMiddleware;
 import org.talframework.objexj.container.ContainerMiddlewareFactory;
 import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.container.impl.SimpleContainer;
 import org.talframework.objexj.exceptions.ContainerNotFoundException;
-import org.talframework.objexj.object.ObjectStrategy;
 
 /**
  * This class can be configured to create instances of a
@@ -58,8 +57,8 @@ public final class SimpleContainerFactory implements ContainerFactory {
 	public SimpleContainerFactory(
 			ContainerStrategy strategy, 
 			ContainerMiddlewareFactory middlewareFactory) {
-		Assert.notNull(strategy, "You must provide a valid ContainerStrategy for the factory");
-		Assert.notNull(middlewareFactory, "You must provide a valid ContainerMiddlewareFactry for the factory");
+		if( strategy == null ) throw new IllegalArgumentException("You must provide a valid ContainerStrategy for the factory");
+		if( middlewareFactory == null ) throw new IllegalArgumentException("You must provide a valid ContainerMiddlewareFactry for the factory");
 		
 		this.strategy = strategy;
 		this.middlewareFactory = middlewareFactory;
@@ -78,7 +77,7 @@ public final class SimpleContainerFactory implements ContainerFactory {
      * @param strategy the strategy to set
      */
     public void setStrategy(ContainerStrategy strategy) {
-        Assert.notNull(strategy, "You must provide a valid ContainerStrategy for the factory");
+        if( strategy == null ) throw new IllegalArgumentException("You must provide a valid ContainerStrategy for the factory");
         this.strategy = strategy;
     }
 
@@ -95,7 +94,7 @@ public final class SimpleContainerFactory implements ContainerFactory {
      * @param middlewareFactory the middlewareFactory to set
      */
     public void setMiddlewareFactory(ContainerMiddlewareFactory middlewareFactory) {
-        Assert.notNull(middlewareFactory, "You must provide a valid ContainerMiddlewareFactry for the factory");
+        if( middlewareFactory == null ) throw new IllegalArgumentException("You must provide a valid ContainerMiddlewareFactry for the factory");
         this.middlewareFactory = middlewareFactory;
     }
 

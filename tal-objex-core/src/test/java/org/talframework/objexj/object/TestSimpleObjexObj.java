@@ -29,7 +29,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
 import org.talframework.objexj.service.beans.CategoryBean;
 

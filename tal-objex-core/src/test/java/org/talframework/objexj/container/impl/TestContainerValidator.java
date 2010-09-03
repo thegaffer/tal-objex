@@ -32,9 +32,9 @@ import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
-import org.talframework.objexj.object.DefaultObjexID;
 
 public class TestContainerValidator {
     

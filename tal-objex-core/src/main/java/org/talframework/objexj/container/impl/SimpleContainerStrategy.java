@@ -22,13 +22,13 @@ import java.util.Map;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.container.ContainerStrategy;
+import org.talframework.objexj.container.DefaultObjexID;
+import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.events.EventHandler;
 import org.talframework.objexj.events.EventListener;
 import org.talframework.objexj.exceptions.EventHandlerNotFoundException;
 import org.talframework.objexj.exceptions.ObjectTypeNotFoundException;
 import org.talframework.objexj.exceptions.QueryNotFoundException;
-import org.talframework.objexj.object.DefaultObjexID;
-import org.talframework.objexj.object.ObjectStrategy;
 import org.talframework.objexj.query.Query;
 
 public final class SimpleContainerStrategy implements ContainerStrategy {

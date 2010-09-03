@@ -22,7 +22,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.talframework.objexj.events.Event;
+import org.talframework.objexj.Event;
 
 /**
  * Implements the Event interface wrapping the request

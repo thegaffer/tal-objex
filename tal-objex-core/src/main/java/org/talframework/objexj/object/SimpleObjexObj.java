@@ -28,6 +28,7 @@ import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
 
 /**
@@ -58,6 +59,7 @@ import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
  * </ul>
  * 
  * FUTURE: Allow implementation of simple interfaces via use of a proxy
+ * FUTURE: Remove direct use of BeanWrapper
  * 
  * @author Tom Spencer
  */
@@ -141,7 +143,7 @@ public final class SimpleObjexObj extends BaseObjexObj {
         
         String realName = convertReferencePropertyName(name);
         
-        BeanWrapper wrapper = new BeanWrapperImpl(getState());
+        BeanWrapper wrapper = new BeanWrapperImpl(state);
         Object ret = wrapper.getPropertyValue(realName);
         
         // See if it is a reference prop and convert
