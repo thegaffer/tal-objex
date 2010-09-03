@@ -1,0 +1,85 @@
+Objex Overview
+
+ Objex is a lightweight mechanism for storing and accessing information
+ inside an application. It is kind of an abstraction over a raw database 
+ layer.
+ 
+* Principles
+
+ Objex contains a number of basic principles:
+ 
+  [] Object Orientated - All information is ultimately broken down into
+  individual objects that carry both state (data) and behaviour around 
+  that state.
+  
+  [] Containers - All objects are arranged into containers. All objects
+  are uniquely identified by their own ID and the container they are
+  within. There are two types of containers, Documents and Stores below, 
+  but both share the simple fact that they hold objects.
+  
+  [] Object Relationships - In a DB objects of the same type are related
+  to one other (by virtue of being in the same table), then there are 
+  explicit relationships via primary/foreign keys. In Objex objects are
+  related to one another by being in the same container (regardless of
+  their type) or by explicit relationships via their container and object
+  ID.  
+  
+  [] Stores - Stores are fixed containers. In any business the most obvious
+  store would be that companies stock or product list. Although the objects
+  inside the store change (price, description etc) the store or items
+  always remains.
+  
+  [] Documents - Documents are containers that typically relate to a 
+  business process. As such an application will create many documents of
+  the same type. The most obvious types of documents in a business are
+  its Order document. Documents typically have a lifecycle state, i.e.
+  they are created/draft, confirmed, fulfilled, paid for and finally
+  closed.
+  
+* Motivation
+
+ Objex has been a pet project/concept for pretty much most of most working
+ life. There are two main motivations for it:
+ 
+  [[a]] Relational DB - One of the main reasons for Objex existing is because
+  I never really liked the Relational DB model when applied to object models.
+  Although recent tools like Hibernate and JPA have improved things I still
+  feel that the RDBMS approach is not neccessarily the right approach for
+  data storage in all situations. You can read more here.
+  
+  [[b]] The Non Tech Enterprise - Although not a motivation for Objex 
+  originally, I have begun to form a view that all enterprise applications can
+  be specified in terms of considering the enterprise with absolutely no
+  technology. This view neatly fits in with Objex. You can read more here.
+  
+* History
+
+ The history of Objex is one where I have picked it up every few years...
+ 
+  [[]] Inception - Back in the mid-90s I created my first commercial application. 
+  This application naturally created the concept of documents and stores and
+  so I credit it with forming the idea of Objex. The next few years I worked in
+  London and although did a bit of work formalising Objex in reality I was too
+  busy with work.
+  
+  [[]] Elaboration - My first really attempt to create Objex was in 2000/1 
+  when I was in South Africa farming Ostriches and had some time. This was a C++
+  engine. When we returned to the UK I did try and and finish the engine and
+  to a certain degree I did. But, I was struggling with how to generate a lot
+  of the code and the only data store I supported was an XML file. I worked on
+  it a little all the way to 2003. In 2004 though have done some Java work I
+  decided to write a Java version of the core. But a new real job came and that
+  worked was unfinished, although the core concepts I would say were proven.
+  
+  [[]] Construction - I then recently (2009/10) picked up Objex again. There were 
+  a number of drivers. Firstly there is the Domain Driven Design approach that
+  gained some traction. I felt that Objex fitted into that paradigm quite neatly.
+  Also I done some work with Aspect J and ITD, when Spring Roo, a generation
+  framework came out I realised it could be used to solve me earlier generation
+  problem. I also came more and more convinced over my idea to describe an
+  enterprise in non-tech terms. The final driver was the realisation that the
+  cloud is going to make some dramatic changes in enterprise development and I
+  felt that with Objex and it's generators I could prepare for this.
+  
+  ... I am now hoping to use Objex for a number of projects.
+   

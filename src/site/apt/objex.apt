@@ -1,0 +1,62 @@
+Objex
+
+ Objex is a concept of how to visual enterprise systems and it is a
+ framework supporting that concept.
+ 
+ The main driver behind Objex is to support true Object Orientated 
+ systems whereby both data and processes are considered together.
+ Very often, particularly in Enterprise systems, largely I think due
+ to the widespread use of Relational Databases the object view becomes
+ obscured. Objex is a way to put OO at the very heart of applications.
+ 
+** Concept
+
+ The wide view of the concept is that Objex views systems and applications
+ as a set of Containers. The containers hold a bunch of related object
+ instances. There are two types of Containers; Documents and Stores.
+ 
+ A document container is best thought of as a suspension file in a filing
+ cabinet. Typically you will have a type of document - for instance a system
+ representing a sales or ordering system will likely have documents
+ representing each order or sale. Basically, just like a filing cabinets
+ hold a whole bunch of files that are often of the same type, but each
+ contain separate information. Documents are very transactional, you open
+ them up, read them, potentially update or add to them and then save them
+ away. Although you may have many documents of the same type, each one is
+ by and large independent of one another.
+ 
+ A store container on the other hand represents a catalogue of information.
+ You could think of it as the filing cabinet, but even better would be to
+ think of akin to a rolodex or directory listing. In a company you might
+ have documents for each person or employee in the company. As each person
+ is updated by HR the corresponding summary entry in the internal address
+ book (the store) is updated and periodically this address book is 
+ distributed to everyone in the company.
+ 
+ Fundamentally though regardless of the type of containers all containers
+ hold is objects. The hold a special object called the root object and then
+ there can be a hierarchy of other object instances. When updating you change
+ or add objects in the container and then save it as a whole. Because the
+ container exists to enforce OO principles all the objects in the container
+ collaborate with one another - so a change in one object may cause changes
+ in other objects in the same container. When you save the container all objects
+ are validated both with respect to themselves and each other. After the
+ actual persistence (save) events are triggered so that other related 
+ containers are aware of the changes.
+ 
+ All of this is done without any real reference to the underlying data
+ persistence mechanism allowing this to change as the system grows and
+ mutates during it's evolution.
+ 
+** The Framework
+
+ All well and good, but above the concept there is Objex the framework that
+ allows this concept to be realised. This framework is currently a Java
+ based framework, however, earlier incarnations have been with C++ and C# -
+ like the underlying database, the language is unimportant next to the concept.
+ 
+ << To-do: Image of framework >>
+ 
+ This framework is further elaborated in two further documents, one on how
+ to implement an Objex container and another on how to use an Objex container.
+ 

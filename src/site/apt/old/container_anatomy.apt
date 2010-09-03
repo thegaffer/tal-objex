@@ -1,0 +1,115 @@
+Container Anatomy
+
+ This section describes the anatomy of the contents of a container.
+ 
+* High Level
+
+ At the high level a container consists of a number of objects. There is always a special
+ object that is considered the root object for the container. It can be retrieved from the
+ container without knowing its ID.
+ 
+ A valid container can contain just one object (the root object) or many. The objects are
+ related to one another primarily through a parent/child relationship, and additionally
+ through more general references to one another.
+ 
+* Development View
+
+ When constructing a container we recommend separating out your API from your 
+ Implementation. This just serves to keep things cleaner and also allow you to switch away
+ from Objex at a later date.
+ 
+ Then the main implementation should be in a seperate project. This project will reference
+ and implement the API's, but it will do so using Objex. The tal-objex-roo-addon project
+ aids in the construction of the internals of this project.
+ 
+** API Project
+ 
+ When constructing your API's we recommend the following:
+ 
+  [[a]] 'Container'Service - The service API provides you access to a repository (see below).
+  As well as this for documents it will typically provide search capability to find your
+  documents.
+  
+  [[b]] 'Container'Repository - The container should be wrapped in a repository interface.
+  The interface allows you to get at objects inside the container and persist changes.
+  There is a new instance of this class for each and every container you open. 
+  
+  [[c]] 'Object' - API's representing the various objects in your model. 
+  
+ Note that there should be no dependency on Objex in this project and Objex is not exposed
+ on your interfaces. The above pattern is a fairly common pattern that you will find in
+ many good references, including much of the Spring course and documentation.
+ 
+** Implementation Project
+
+ The independent implementation project should create the actual implementation. To 
+ build this I recommend the steps below which are described and also demonstrated using
+ the tal-objex-roo-addon module for generation within this project.
+ 
+ We use Spring Roo for our generation which makes heavy use of Aspect J ITD files to mixin
+ generated code with real code, always ensuring that if you declare a method manually then
+ it will not generate one for you. There are some limitations, most notably that if we
+ have APIs in a seperate project (which we do) then it is not possible to generate from an
+ API.
+ 
+ Regardless of whether you do use the roo-addon or not we still recommend the following 
+ pattern:
+ 
+  [[a]] A state bean object that handles the basic persistence
+  
+  [[b]] The behavioural object that has access to the state bean
+  
+*** The State Bean
+
+ The state bean should be a really simple object whose main job is to be persisted. Either
+ into a datastore or, if inside an EditableContainer that is suspended, into some form of
+ temporary storage (memory or DB) that we can retrieve the object from.
+ 
+ The state bean very simply holds all the properties of the object as members with 
+ getters and setters. It is then marked as serialisable. Typically it will also hold
+ the relevant persistence annotations and the ID/Parent ID fields. When using the Objex 
+ Spring Roo addon you don't need to worry about anything, but your fields. For instance
+ 
+--+
+@ObjexStateBean(name="Item")
+public class ItemBean {
+  
+  private String ref;
+  private String description;
+  private int quantity;
+  private double price;
+}
+--+
+
+ The Roo add-on takes care of the rest which includes:
+ 
+  [[]] Add in the id/parent id fields
+  
+  [[]] Implementing the ObjexObjStateBean interface
+  
+  [[]] Adding getters and setters around your fields
+  
+  [[]] Adding a default constructor, copy constructor and constructor taking in the id
+  and parent ID for the runtime engine to use.
+  
+  [[]] Adding in the JDO annotations.
+  
+ A quick word on JDO. I favour JDO over JPA because JDO is more mature and supports far 
+ more data sources than just relational DBs. One of the key drivers for Objex is that
+ a RDBMS is not neccessarily the right type of data store for all situations. I'd
+ encourage you to take a look at the history of JPA and it's support to form your own
+ view as to why we have JPA.
+ 
+ You are of course welcome to use JPA, but I haven't written a Spring Add-on to generate
+ those annotations. You could also use Hibernate or other persistence frameworks. 
+ 
+*** The Behaviour Class
+
+ The behaviour class actually implements the object as seen from the outside world. The
+ idea is for this class to hold an instance of your state bean and operate upon it. 
+ Similar to the state bean class the Roo addon generates getter/setters around the
+ properties on the state bean class - although these are more sophisticated than direct
+ getter/setter for references to other objects.
+ 
+ 
+ 

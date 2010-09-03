@@ -1,0 +1,147 @@
+The Non-Technology Enterprise
+
+ Where I work, but I think this is true in many enterprises, requirements of
+ a system are not specified as requirements, but instead of specified in terms
+ of solution. The people often writing the requirements can only think in terms
+ of the final solution so they tend to skip the part about explaining why the 
+ solution is needed in the first place.
+ 
+ Although in many companies designers often blame business analysts for poor
+ requirements capture. I think the tendency to describe requirements in terms 
+ of solutions is so strong that we have to accept it and find a way or working
+ with it.
+ 
+ I think there are basically two ways of doing this ..
+ 
+  [[a]] To cut down the cycle so that solution is created, at least partially,
+  as the requirements are being specified and elaborated by the real users or
+  product owners.
+  
+  [[b]] To provide a divorced language to specify the business and its problem
+  domain that is completely non-technical and, therefore, minimises references
+  to the actual issues.
+  
+ I actually believe in both these approaches. In terms of point a) I think there
+ are two ways of acheiving this. The first is through the use of agile development
+ and the second is through prototyping. The issue with the first is that true
+ agile development requires a lot of people of have a general purpose skill set.
+ This invariably means someone who can code. The issue is that not everyone in IT
+ can code and those that can are often expensive. Prototyping seems a more sensible
+ way whereby something can be produced that works very easily and can then be
+ used to mechanically specify (by contract) what is required to be produced in a
+ more robust fashion. Requirements are documented in the form of the prototype.
+ Of course prototyping is most suited to UI applications and not everything is a
+ UI app.
+ 
+ That said the rest of this article describes my approach for approach b).
+ 
+* The Non-Tech Company
+
+ In order to describe the problem domain it is important to remove all technology
+ where possible. The way I do this is to envisage that the enterprise works in
+ a very large building. The building is split up into sections that the real 
+ departments operate within. The specific departments will be dependent on the
+ individual company, but I would imagine there is a customer services department,
+ a finance and admin department, a sales department, one or more operations
+ departments etc. etc.  
+ 
+ In multi-national companies we may envisage the office has lots of floors and 
+ each floor represents a different country, but it otherwise the same or similar. 
+ The idea is that everyone is operating in the same physical building.
+ 
+ This can even be fleshed out on a big A3 or bigger sheet of paper to give the
+ problem domain a kind of blueprint.
+ 
+* Services 
+ 
+ Each department operates pretty much independently of one another, but they will
+ have counter services that offer services to others. These services are either 
+ internal (to other departments) or to external people who walk in (typically
+ customers).
+ 
+ For instance the customer services department offers a service that a customer can
+ come up to order some goods from, or make a complaint. The finance department will
+ typically offer a service that obtains a price or a quote for a customer given a
+ set of input.
+ 
+ Services might also be out services. For instance the operations departments may
+ well offer a counter that holds all fulfilled orders so that another department
+ can come up to and see - for instance the finance department may use this to 
+ produce an invoice or reconcile payment with.
+ 
+* Files & Filing Cabinets
+
+ Behind each department primarily there are a series of files that exist in filing
+ cabinets. The files are owned by that department. A file often represents a unit
+ of work for that department. One of the most basic services any department can
+ offer is the service to retrieve a file. For instance the admin department may well
+ contain a file describing each produce we sell and other departments can access 
+ these files to better understand each product.
+ 
+ Often though files are private to that department, even though different files in
+ different departments are essentially about the same thing. Think here about the
+ pads that contains duplicate forms in multiple colours. You would write on the
+ top/white form, which would be copied to the blue, green, yellow forms (etc) 
+ underneath. The blue would go to the warehouse, green to finance etc. These 
+ departments would evolve their copy of the original form independently although
+ they would all share the same reference number.
+ 
+ Although modern systems allow us to break down these kind of pads where all 
+ departments share the same data, care should be taken at this stage to really
+ consider whether it is desirable to share the same data or maintain it separately
+ in different departments - either way is possible, just make sure you consider it.
+ 
+* Rolodex's
+
+ The next piece is the idea of a rolodex. This contains a quick index
+ of something to enable fast lookup. For instance the customers of the company may
+ well be placed in a rolodex and distributed to the departments. 
+ 
+ As customer details are updated this would require a change in all the rolodex's.
+ Some thought should be taken to determine how quickly this needs to happen. Often
+ the searches are not nearly as sensitive to change as we might think and there can
+ be significant time delays before the update needs to appear everywhere. This may
+ depend on the type of update.
+ 
+ Also note that different departments may actually only contain a subset of the 
+ information in their rolodex's. This is particularly true of multi-national 
+ companies.
+ 
+ Again most IT systems just share all the information between all the departments
+ (and in many cases around the world). And this may be fine as a solution, but it
+ should not be assumed and the problem domain should clearly try to state what
+ rolodexes are needed and why.
+ 
+* Gophers
+
+ Finally we come to the gophers (or go'fers) - so called because they 'go for this' 
+ and they 'go for that'.
+ 
+ These are the guys that takes files and requests between the departments. It is
+ these guys that will be replaced by the IT system. Very often because we already
+ have IT systems they don't exist anyway. But the flow of these guys are very often
+ the core of the business processes. There are a number of different kinds of
+ gophers ...
+ 
+  [[a]] The quick fast guys who go and get information whilst you wait.
+  
+  [[b]] The guys who what around at other departments counters to being information
+  back to you. i.e. the finance gopher who hangs around at the warehouse 'out'
+  counter to notify finance whenever an order is fulfilled.
+  
+  [[c]] The smart gophers who are given a bunch of instructions to first go to one
+  department and then to the next - often with conditional instructions so if dept
+  a say no then go to dept b, otherwise go straight to dept c. These are very likely
+  your true business processes or your workflow requirements.
+  
+* Objex and the Non-Tech Enterprise
+
+ Objex fulfils the files and rolodex's part of the non-tech enterprise very neatly.
+ Files are documents in Objex talk and rolodex's are Stores. Behind objex you can
+ of course use a relational database so all the information is shared, but you don't
+ have to and can represent the enterprise more closely. In particular you files or
+ documents do not really have any relationship to one another so instead can be
+ stored separately - as long as you update your Stores (or rolodex's) in a timely
+ fashion.  
+ 
+   

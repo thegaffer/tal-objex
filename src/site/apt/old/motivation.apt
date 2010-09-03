@@ -1,0 +1,67 @@
+The Relation DB Motivation
+
+--- WIP ---
+
+** How I (Might) View Data
+
+ Lets imagine a fairly typical simple company. The company sells things.
+ Each time is makes a sale it is called an order. The order consists of
+ order items that relate to stock items. The order also contains other
+ elements such as the name and address of the customer.
+ 
+ For the majority of the time I will want to access this data order by 
+ order. I will typically know the order I want to work with, typically
+ because I created it, and then work with the objects in that order.
+ Therefore, I see no relationship between order items in one order and
+ order items in another order. Crucially I do not want to be slowed
+ down by the weight of other order items that exist.
+ 
+ There will seperately be some searches that I will explictly want to
+ perform. For instance tell me 
+ 
+ On top of this there are some Business Intelligence (BI) queries I 
+ might want to perform. For instance give me all the orders above a
+ certain value for the day, and given 
+ 
+ 
+
+
+ I live in a house on a street in a town. My house is made up of lots of
+ things. Notably bricks, tiles, windows, carpets etc, etc. My house 
+ references some other houses. Most directly it references the houses to
+ either side (my neighbours), but also in my house is an address book 
+ where you can find my brothers house (who is in the same town).
+ 
+ In terms of the processes that I engage with in this town I simply 
+ navigate (drive or walk) to the street and house I need. For instance
+ to visit my brother I go to his house, to go shopping I go to the
+ house (or building) the shop is in.
+ 
+** How a RDBMS Views the same Data
+
+ A RDBMS does not view the data in this way. Instead it takes all of the
+ town and then takes every apart. It then places everything that is the
+ same type of thing together. So all of the bricks are placed together,
+ all of the tiles are placed together, all of the windows are placed
+ together ... you get the picture. Of course references are still made
+ to link these items together (primary and foreign keys).
+ 
+ The real point to this analogy is that the data is now now organised
+ in a way that is natural for me to live. Sure there will be some processes
+ that would like to say find me all houses in my town that have more than
+ 20 windows - and here of course a RDBMS is well suited - but for most
+ life the RDBMS's view would simply slow me down.
+ 
+* Key Points
+
+** Data Access
+
+ For basic data access I would argue that the RDBMS data is not arranged
+ how I am likely to want to access it. 
+ 
+ The RDBMS is structured to allow me to query across all the data set, i.e.
+ find me all the houses in my town with more than 20 windows. There will be
+ applications that wish to make such queries, and so RDBMS is clearly a
+ strong candidate. But for the processes I typically engage  
+ 
+** 

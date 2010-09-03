@@ -1,0 +1,139 @@
+Using Objex
+
+ This page details how to use Objex when writing applications that make
+ use of it. If you want to know how to write containers this is contained
+ in the page on Writing Containers.
+ 
+** Brief
+
+ Lets look at the steps involved in using an Objex container. The rest
+ of the section will guide us through this. The easiest way is with a
+ small code snippet
+ 
++--
+class MyApplicationService
+
+  private ContainerFactory factory;
+  
+  public void viewSomething() {
+    Container doc = factory.get("MyDocumentID");
+    ObjexObj root = doc.getRootObject();
+    MyInterface collaborator = root.getBehaviour(MyInterface.class);
+    // Use collaborator to get fields, other objects etc, etc
+  }
+  
+  public void saveSomething() {
+  	Container doc = factory.open("MyDocumentID");
+  	ObjexObj root = doc.getRootObject();
+    MyInterface collaborator = root.getBehaviour(MyInterface.class);
+    collaborator.setSomeField("value");
+    collaborator.someMethod();
+    // Other changes calls ...
+    
+    dov.validate(); // Checking for errors not shown
+    doc.save();
+  }
+}
++--
+
+ Hopefully that should immediately provide you with some idea of how to use
+ Objex. In simple terms it takes a couple of lines to get to the objects and
+ then you use them as you would if you were not using Objex.
+ 
+** The Container Factory
+
+ First element in the example of the ContainerFactory. This interface
+ provides access to the containers. Every container has an ID and this
+ is used to get the instance you want. A container factory instance
+ typically serves up only a single type of container.
+ 
+ There are three methods of the ContainerFactory instance. One to get
+ the container (the resulting container will be, initially at least, 
+ read-only. Another to open the container (this will make the container
+ editable from the outset). And a third to create a new instance of
+ the container type the ContainerFactory represents.
+ 
+ Once you've got a container you don't look at the factory again!
+ 
+** The Container
+
+ This interface represents the container, be that document or store.
+ It's primary purpose is to serve up the objects that it contains. Shown
+ in the example is the root object. 
+ 
+ However, you can also get any object in the container by it's ID. All 
+ objects inside a container have an ID that is unique to that container.
+ If you know the ID you want then you can query for the object from the
+ container. There are also methods to get a bunch of objects in one go,
+ which depending on how the container connects to the data storage will
+ likely be more efficient.
+ 
+ The container also contains a method to perform queries for objects
+ inside the container. All queries are pre-defined and then accessed via
+ name. Setting up queries is detailed on a separate page.
+ 
+ Finally the container contains a bunch of transaction methods to save,
+ suspend or close the container - see below. 
+ 
+** The Objects
+
+ Every single object inside the container exposes itself as an instance
+ of the ObjexObj interface. This interface does provide you, the client,
+ with the ability to get hold of the objects ID, it's parent object,
+ another mechanism to get the root object and even provides generic
+ methods to get at the objects state fields.
+ 
+ However, in keeping with OO principles you are far more likely to define
+ you own non-Objex polluted interfaces representing your domain objects.
+ The ObjexObj objects will therefore expose these interfaces. Although it
+ is possible in simple cases to test the objects for your interfaces via
+ instanceof, it is safer to use the getBehaviour method. This is because
+ Objex will support some advanced polymorphic features including forming
+ true compound objects and will allow objects to expose interfaces only
+ at certain points in their lifecycle.
+ 
+** Saving Containers
+
+  The final point is how to make changes. Put simply instead of calling
+  get on the factory you call open. Then you can get hold of the objects
+  in exactly the same way and make whatever changes you want. When
+  finished you make a call to save().
+  
+  At this point the container is validated and if there are any errors
+  a ContainerInvalidException is thrown. Although not a checked exception
+  you may want to catch this exception explicitly. However, the preferred
+  mechanism is that you call validate on the container before call save()
+  (as shown). It is not possible to save a container with errors on it.
+  
+  However, you may also see on the container interface a method called
+  suspend() and be intrigued. Objex recognises the fact that changes to a
+  document, in particular, may occur over multiple interactions with the
+  end user. Therefore, temporary changes can be made and then suspended.
+  The return from suspend() is an ID that you can use with the factory to
+  re-open the container and make further changes to. For instance ...
+  
++--
+public String firstInteraction() {
+  Container doc = factory.open("ID");
+  // Use doc and make some changes
+  return doc.suspend();
+}
+
+public void secondInteraction(String transId) {
+  Container doc = factory.open(transId);
+  // Make further changes to objects in the document
+  
+  doc.validate();
+  doc.save();
+}
++--
+
+  It is possible that containers might not support suspend(), but we encourage
+  it as it's application is very powerful and I think extremely common in
+  Enterprise applications.
+  
+  The final lifecycle method is the closeContainer() method. This effectively
+  aborts any changes that have not been persisted. The container will only go
+  back to the state of the last open, save or suspend. In the future it is
+  my hope that we will support a richer undo/redo functionality as part of the
+  containers interaction.
