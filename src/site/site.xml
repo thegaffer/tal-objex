@@ -1,30 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="Objex">
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-application-skin</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </skin>
+  
   <bannerLeft>
     <name>TAL Framework - Objex</name>
-    <src>http://maven.apache.org/images/apache-maven-project.png</src>
-    <href>http://maven.apache.org/</href>
+    <src>images/objex-project.png</src>
+    <href>http://www.tpspencer.com/site/objexj/index.html</href>
   </bannerLeft>
   <bannerRight>
-    <src>http://maven.apache.org/images/maven-small.gif</src>
+    <src>images/tal-project.png</src>
   </bannerRight>
+  
   <body>
     <links>
       <item name="Tom Spencer" href="http://www.tpspencer.com/" />
     </links>
+    
+    <menu ref="parent" />
 
     <menu name="Objex">
-      <item name="What is Objex" href="index.html"/>
-      <item name="Overview" href="overview.html"/>
-      <item name="Download" href="download.html"/>
-      <item name="Release Notes" href="release-notes.html" />
-      <item name="General Information" href="about.html"/>
-      <item name="Road Map" href="roadmap.html" />
+      <item name="Welcome" href="/index.html"/>
+      <item name="Overview" href="/objex.html"/>
+      <item name="Download" href="/download.html"/>
+      <item name="Releases" href="/releases.html" />
+      <item name="Road Map" href="/roadmap.html" />
+      <item name="General Information" href="/about.html"/>
     </menu>
     
     <menu name="Documentation">
-      <item name="Overview" href="docs/overview.html"/>
+      <item name="How To Use" href="/docs/usage.html"/>
+      <item name="How To Implement" href="/docs/implementation.html"/>
+      <item name="Understanding Validation" href="/docs/validation.html"/>
+    </menu>
+    
+    <menu ref="modules" />
+    
+    <menu name="Components">
+      <item name="tal-objex-annotations" href="/tal-objex-annotations/index.html"/>
+      <item name="tal-objex-core" href="/tal-objex-core/index.html"/>
+      <item name="tal-objex-roo-addon" href="/tal-objex-roo-addon/index.html"/>
+      
+      <item name="Sample App" collapse="true" href="/modules/sample.html">
+	      <item name="tal-objex-sample-api" href="/tal-objex-sample-api/index.html"/>
+	      <item name="tal-objex-sample-impl" href="/tal-objex-sample-impl/index.html"/>
+	      <item name="tal-objex-sample-impl-generated" href="/tal-objex-sample-impl-generated/index.html"/>
+      </item>
+      
+      <item name="Runtime Modules" collapse="true" href="/modules/runtime.html">
+		<item name="Google App Engine" collapse="true" href="/modules/runtime-gae.html">
+	      <item name="tal-objex-gae" href="/tal-objex-gae/index.html"/>
+	      <item name="tal-objex-gae-testapp" href="/tal-objex-gae-testapp/index.html"/>
+	    </item>
+      </item>
     </menu>
 
     <menu ref="reports"/>

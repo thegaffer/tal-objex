@@ -2,7 +2,7 @@ The Relation DB Motivation
 
 --- WIP ---
 
-** How I (Might) View Data
+* How I (Might) View Data
 
  Lets imagine a fairly typical simple company. The company sells things.
  Each time is makes a sale it is called an order. The order consists of
@@ -37,7 +37,7 @@ The Relation DB Motivation
  to visit my brother I go to his house, to go shopping I go to the
  house (or building) the shop is in.
  
-** How a RDBMS Views the same Data
+* How a RDBMS Views the same Data
 
  A RDBMS does not view the data in this way. Instead it takes all of the
  town and then takes every apart. It then places everything that is the
@@ -64,4 +64,4 @@ The Relation DB Motivation
  applications that wish to make such queries, and so RDBMS is clearly a
  strong candidate. But for the processes I typically engage  
  
-** 
+** ...

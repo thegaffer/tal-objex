@@ -9,7 +9,7 @@ Objex
  to the widespread use of Relational Databases the object view becomes
  obscured. Objex is a way to put OO at the very heart of applications.
  
-** Concept
+Concept
 
  The wide view of the concept is that Objex views systems and applications
  as a set of Containers. The containers hold a bunch of related object
@@ -48,7 +48,7 @@ Objex
  persistence mechanism allowing this to change as the system grows and
  mutates during it's evolution.
  
-** The Framework
+The Framework
 
  All well and good, but above the concept there is Objex the framework that
  allows this concept to be realised. This framework is currently a Java

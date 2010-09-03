@@ -43,9 +43,10 @@
   
     <site>
       <id>siteServer</id>
-      <url>scpexe://tps.tpspencer.com/home/tspencer/objexj/</url>
+      <url>scpexe://tps.tpspencer.com/home/tspencer/site/objexj/</url>
     </site>
   </distributionManagement>
+  <url>http://dev.tpspencer.org/site/objexj/</url>
   
   <developers>
   	<developer>
@@ -61,10 +62,14 @@
   </developers>
   
   <scm>
-  	<connection>scm:svn:https://dev.tpspencer.org/svn/repo/objex-j/trunk/</connection>
-  	<developerConnection>scm:svn:https://dev.tpspencer.org/svn/repo/objex-j/trunk/</developerConnection>
-  	<url>https://dev.tpspencer.org/svn/repo/objex-j/trunk/</url>
+  	<connection>scm:svn:https://dev.tpspencer.org/svn/repo/tps-objexj/trunk/</connection>
+  	<developerConnection>scm:svn:https://dev.tpspencer.org/svn/repo/tps-objexj/trunk/</developerConnection>
+  	<url>https://dev.tpspencer.org/svn/repo/tps-objexj/trunk/</url>
   </scm>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   
   <build>
   	<plugins>
@@ -72,7 +77,7 @@
         <artifactId>maven-release-plugin</artifactId>
         <version>2.0</version>
         <configuration>
-          <tagBase>https://dev.tpspencer.org/svn/repo/objex-j/tags</tagBase>
+          <tagBase>https://dev.tpspencer.org/svn/repo/tps-objexj/tags</tagBase>
         </configuration>
       </plugin>
     </plugins>
