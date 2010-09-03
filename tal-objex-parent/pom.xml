@@ -19,7 +19,7 @@
   	<dependency>
   		<groupId>org.talframework.tal</groupId>
   		<artifactId>tal-util-test</artifactId>
-  		<version>1.0-SNAPSHOT</version>
+  		<version>0.9</version>
   		<scope>test</scope>
   	</dependency>
   	<dependency>
@@ -43,19 +43,19 @@
 	  	<dependency>
 			<groupId>org.tpspencer.tal</groupId>
 			<artifactId>tal-aspects</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talframework.tal</groupId>
 			<artifactId>tal-util-beans</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>0.9</version>
 		</dependency>
 		
 		<!-- Google -->
 		<dependency>
 	 		<groupId>org.tpspencer.tal</groupId>
 			<artifactId>tal-gae-runtime</artifactId>
-			<version>1.3.2-SNAPSHOT</version>
+			<version>1.3.2</version>
 			<type>pom</type>
 	 	</dependency>
   	</dependencies>
