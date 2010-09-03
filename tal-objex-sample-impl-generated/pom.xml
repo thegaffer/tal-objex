@@ -49,7 +49,6 @@
  	<dependency>
 		<groupId>org.tpspencer.tal</groupId>
 		<artifactId>tal-aspects</artifactId>
-		<version>1.0-SNAPSHOT</version>
 	</dependency>
   </dependencies>
   

@@ -1,3 +1,9 @@
+/*
+ * Generated as part of Google Eclipse Plugin Sample.
+ * This source is governed by any license Google places
+ * on it. 
+ */
+
 package org.talframework.objexj.sample.gaetest.server;
 
 import org.talframework.objexj.sample.gaetest.client.GreetingService;
