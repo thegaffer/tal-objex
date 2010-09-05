@@ -19,6 +19,8 @@
   <body>
     <links>
       <item name="Tom Spencer" href="http://www.tpspencer.com/" />
+      <item name="Objex" href="http://www.tpspencer.com/site/objexj/" />
+      <item name="Tal UI" href="http://www.tpspencer.com/site/talui/" />
     </links>
     
     <menu ref="parent" />
@@ -37,8 +39,6 @@
       <item name="How To Implement" href="/docs/implementation.html"/>
       <item name="Understanding Validation" href="/docs/validation.html"/>
     </menu>
-    
-    <menu ref="modules" />
     
     <menu name="Components">
       <item name="Core" href="/tal-objex-core/index.html"/>
