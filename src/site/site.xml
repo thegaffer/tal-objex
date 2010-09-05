@@ -41,9 +41,9 @@
     <menu ref="modules" />
     
     <menu name="Components">
-      <item name="tal-objex-annotations" href="/tal-objex-annotations/index.html"/>
-      <item name="tal-objex-core" href="/tal-objex-core/index.html"/>
-      <item name="tal-objex-roo-addon" href="/tal-objex-roo-addon/index.html"/>
+      <item name="Core" href="/tal-objex-core/index.html"/>
+      <item name="Annotations" href="/tal-objex-annotations/index.html"/>
+      <item name="Generator" href="/tal-objex-roo-addon/index.html"/>
       
       <item name="Sample App" collapse="true" href="/modules/sample.html">
 	      <item name="tal-objex-sample-api" href="/tal-objex-sample-api/index.html"/>

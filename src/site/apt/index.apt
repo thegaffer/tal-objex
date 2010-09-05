@@ -10,10 +10,10 @@ Objex
   between the objects, relegating the actual persistence into it's own separate layer 
   where you can concentrate on it separately.
   
-  This project is currently incubational and will likely stay that away. It is not
-  aimed as a mass open-source framework, although it would be nice if some of the
-  ideas in Objex provoked thought and made their way into mainstream frameworks.
-  If you disagree and think there is value in Objex itself let me know!
+  I use Objex for development and therefore, support it for that purpose. Although
+  licensed as Open Source, it is not aimed as mass open-source framework. I'd welcome
+  comments and would like the framework to provoke thought and perhaps for some of
+  the ideas to make their way into mainstream frameworks.
   
 Releases
 

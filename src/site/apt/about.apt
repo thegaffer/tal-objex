@@ -1,11 +1,12 @@
-  Objex is a personal project of me, Tom Spencer. It is part of a wider set of utilities
-  called the TAL Framework.
+  Objex is somewhat a labour of love, the ideas of which I have worked with for over
+  a decade. It encapsulates what I think are the best patterns surrounding OO domains
+  and exists to make it both easier to create those elements of a system and crucially
+  to make them more maintainable.
   
-  I think there are some interesting ideas in my work and would love some of them to
-  make their way into more mainstream frameworks. But, these really are pet projects
-  that I use to keep some basic programming skills up to date - I don't get to do much
-  of that these days.
+  I use Objex for my development and projects and license it as open-source, however, 
+  I do not propose it as a wide spread open source framework. It allows me to increase
+  the value of my own projects such that the core can be maintained and developed
+  independently of me.
   
-  I'll continue developing the Tal Framework whilst I still have interest. If anyone
-  else starts using it then I (or they) will formalise it further, i.e. put it on 
-  sourceforce or similar and put some tighter project management around it.
+  I also use Objex and the wider Tal Framework to demonstrate my own skill set, and
+  to keep my skills up to date, even if not actually using the framework in anger.
