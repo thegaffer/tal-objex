@@ -35,9 +35,13 @@
     </menu>
     
     <menu name="Documentation">
+      <!-- <item name="Overview" href="/docs/overview.html" />  -->
+      <item name="Objex Viewpoint" href="/docs/understanding.html" />
+      <item name="10 Minute Domain" href="/docs/implementation.html"/>
       <item name="How To Use" href="/docs/usage.html"/>
-      <item name="How To Implement" href="/docs/implementation.html"/>
-      <item name="Understanding Validation" href="/docs/validation.html"/>
+      <item name="Cookbooks" collapse="true" href="/docs/cookbooks.html"> 
+      	<item name="Understanding Validation" href="/docs/validation.html"/>
+      </item>
     </menu>
     
     <menu name="Components">

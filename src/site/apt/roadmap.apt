@@ -30,3 +30,7 @@ Version 1.1
     
     * Testing around Major RDBMS, potentially by adding JPA to the generators, although
     I am not that committed to this because I don't like JPA in terms of its history.
+    
+    * Support for aggregation relationships as 'compound' objects
+    
+    * Support for foreign references

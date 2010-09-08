@@ -1,0 +1,18 @@
+Cook Books
+
+  To further support using Objex the following example based guides are given to
+  show more detail or highlight particular patterns.
+  
+    * {{{cookbook_validation.html}Validation}} - A guide to adding validation
+    
+    * {{{cookbook_customvalidation.html}Custom Validation}} - A guide to writing and declaring
+    custom validation routines.
+    
+    * {{{cookbook_events.html}Firing Events}} - How to fire events to other containers and
+    some common use cases for this.
+    
+    * {{{cookbook_implicitbehaviour.html}Implicit Behaviour}} - A guide on how to write and
+    declare implicit behaviour on your objects.
+    
+    * {{{cookbook_statebeans.html}Implementing a State Bean}} - A guide to writing the state
+    bean manually or adding custom persistence technology to it.

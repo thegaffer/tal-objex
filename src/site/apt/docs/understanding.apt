@@ -1,0 +1,222 @@
+Understanding Objex
+
+  This page explains Objex's view of the world. It is worth spending a little time 
+  reading this page before moving on to the samples.
+  
+Domains
+
+  Objex's place in a system is at the domain level. Specifically a domain representing
+  some kind of core business entity within your system. Obviously what these domains are
+  depends on your system, but in most organisations you will have high-level business
+  concepts such as Customers, Orders, Products, Suppliers, People etc, etc. But, your
+  concepts could be wildly different or more abstract. A airport system would have
+  domains represent Aeroplanes, Runways, Terminals etc.
+  
+  Not always, but typically these high-level entities would actually contain a whole
+  set of related objects. Orders would have various elements such as the items or
+  products in the order, the delivery address, the invoice address etc.
+  
+  Objex aims to make it easy to create these domains by modelling them as a set of
+  objects. There will always be one root object (typically the entity) and then a
+  whole bunch of other objects (the items, addresses etc). All of these objects need
+  to collaborate with one another, and again Objex aims to make it easy for this to
+  happen.
+  
+Containers; Documents and Stores
+
+  The next point to understand is Objex's view of a container. A container represents
+  an instance of any of your high-level domains. They are separated into Documents and
+  Stores.
+  
+[../images/uml/containers.png] Stores and Documents
+  
+  A document is a container whose type exists many times in your application. The more
+  the system is used, the more documents you are going to create. Most entities will
+  actually represent a document, i.e. orders, customers. You can think of a document as
+  a file in a filing cabinet.
+  
+  A store on the other hand is a container of which there is a single instance of. The
+  only real difference is that a Store has a known 'ID', whereas a document has a 
+  new generated ID for each instance. You can think of a store as a catalogue or a
+  rolodex. They typically represent an index on your documents, and hold a reference
+  that points to the document.
+  
+  The container, document or store, simply holds a bunch of objects starting with a
+  special root object. The container provides methods to get at the objects within it.
+  You can open a container, get at the objects, make changes and then save it - at which
+  point validation is performed and, assuming no errors, saved. Additionally external 
+  events are fired off at this point, but more on that later.
+  
+Objects
+
+[../images/uml/object.png] An Objex Object
+
+  Objex has a very strict view of what an object is. Specifically an object has identity,
+  state and behaviour.
+  
+  Every object has a unique ID that allows you to find it. The objects ID is unique within
+  the container it is part of. An object only belongs to 1 container. This ID is a 
+  special object, ObjexID.
+  
+  An objects state is it's properties or fields. The state may be data values, Strings,
+  numbers, dates etc. Or they may be references (ObjexID's) to other objects in the same
+  container (or even a different container). I should say I am using the formal term
+  state here to describe all fields of the object. This is different from any lifecycle
+  state the object may have, but as far as Objex is concerned that is just one field on
+  the object that you define (and control).
+  
+  An objects behaviour boils down to two key elements. Firstly there is implicit behaviour
+  where changing the state causes other side effects inside the same or collaborating 
+  objects in the container. It is also possible that changing state can trigger 
+  side-effects in other containers, but these are not acted upon until the container is
+  saved. Secondly there is explicit behaviour where an object offers up an operation that can
+  be performed on it.
+  
+State
+
+[../images/uml/objectstate.png] Object and its State
+
+  The state of an object is the sum of all its properties or fields. An ObjexObj instance
+  does not, however, hold all those fields as, for example, member variables. Instead
+  you place all of the state into a separate object we refer to as a state bean.
+  
+  This is important because the state bean represents the persisted form of the object.
+  By holding it as a separate object you are free to inject in different versions of
+  this object and can more easily change your persistence strategy without affecting the
+  core behaviour. It should be noted however that field level validations are documented
+  (via annotations) against the state bean.
+  
+  The state bean is never directly exposed to clients. You purposefully expose it if
+  you wanted to, but it is not recommended. This is because the state bean is the
+  preserve of the persistence and this should never be exposed to your clients.
+
+Object Relationships
+
+[../images/uml/object_relationships.png] Object Relationships
+
+  Key to making use of Objex is to form relationships between the objects
+
+* Parent / Child
+
+  All objects reference a parent object, with the exception of the root object in a
+  container - indeed lack of a parent is what marks a root object. Objex enforces this
+  relationship at the time of creation. The special thing is that if you try to change
+  an object before saving it's parent, even if it has not changed, will be asked to
+  validate it's children.
+  
+  Although every object has a parent, this is not necessarily a bi-directional
+  relationship. So an object might not hold a direct reference to all or any of its
+  children. Were it to do so it would be a form of aggregation or composition.
+
+* Reference
+
+  The simplest form of relationship is a reference to another object in the same
+  container. This is shown in the diagram by the relationship between ChildObjectB
+  and ChildObjectA.
+  
+  A reference is held as either an ObjexID directly or its stringified form. You can
+  express multiplicity by either using a List or a Map. Although only a reference to
+  the object is held as part of that objects state, you can (and probably will) expose
+  it either as an ObjexObj or a more natural interface for your application.
+  
+  You can also make use of this relationship during validation or implicit behaviour.
+  
+* Aggregation
+
+  The next step up from a simple reference is aggregation. Here you are hold references
+  to child object. This is shown from the RootObject to ChildObjectB in the diagram.
+  Objex terms this as 'owned' objects, where direct references are 'unowned' objects.
+  
+  As with simple references holding an aggregation is simply a matter of holding the
+  references as a string or ObjexID. However, you will indicate to Objex that the
+  property is an owned property and, therefore, get the additional validation.
+
+* Composition
+
+  The final relationship is the stonger form of aggregation called composition. Here
+  the relationship is so strong the two objects kind of exist as one. Examples of
+  this may be a Plane object that is formed from the composition of a fuselage, wings,
+  engines etc.
+  
+  In a future version of Objex we are going to support the idea of a compound object.
+  So you can query the RootObject for an behaviour (interface) that ChildObjectA 
+  implements and Objex will return it, but any attempt to query for the ID or even
+  parentId on the return will make it look like you still have a reference to the
+  RootObject. This will support a form of dynamic polymorphism that typically you
+  would need a dynamically typed language for.
+
+* Foreign Reference
+
+  The final type of relationship is a normal reference to an object in another 
+  container. This will always be a reference though and there can be no hint of
+  it being an aggregation or composition.
+  
+  Although it is possible to hold such a reference, Objex provides no mechanics to
+  support this. In the future it will.
+  
+Validation
+
+  As mentioned when a container is about to be saved it validates each and every object
+  that has changed. It also asks the parents of those objects to validate that they
+  are still happy with their children. 
+  
+  It should be noted, however, that objects that have not changed (and their children
+  have not changed) are not invited to participate in the validation. This allows us
+  to support very big containers without the need to load all the objects. You are
+  still free, as part of the validation, to load/read any other object if required.
+  
+  Validation is actually supported internally by JSR 303 Validation. However, we wrap
+  it because we want to express the errors against the ID of the object that caused it
+  and not by its actual instance. JSR 303 allow you to create your own validation
+  routines that are fired automatically.
+  
+  Validation occurs at a number of levels:
+  
+    * Field - fires when you try to change the field, preventing the change if the
+    validation fails.
+    
+    * Intra-Object - applies to the object has a whole, i.e. if town is set so must
+    country (although both could be null in isolation). Field validation is also
+    applied here.
+    
+    * Inter-Object - the object should validate it is still valid against other objects.
+    For instance, fieldA cannot be set if the state of another object is Y.
+    
+    * Children - the object should make sure it is still happy with it's own children
+    when at least one of them has changed (the container provides a mechanism to 
+    determine which objects have changed and get their state before they changed).
+  
+  You can call validation on an object or against the container at any time. Although
+  again even explicit validation on the container is only performed against the objects
+  that have changed and their parents.
+
+Implicit Behaviour
+
+  The final key to understanding Objex is to understand the implicit behaviour it 
+  naturally allows you to express. Essentially whenever state changes handlers are
+  fired. These handlers are typically expressed as annotations (similar to the
+  validation annotations), but allow you to do a number of things ...
+  
+    * Clear, reset or re-calculate dependent fields
+    
+    * Invoke explicit behaviour in other collaborating objects
+    
+    * Create events that will be fired against other containers when this container
+    is finally saved.
+
+  Really you can do pretty much anything in a handler you wish.
+  
+  I personally feel it is there area that Objex adds value. Once you get into Objex
+  and, hopefully, see how it allows you to easily create the domains and gives you
+  a framework such as this to define this behaviour you can actually devote more
+  time to it. And as behaviour is the key to OO, hopefully it will allow you to create
+  richer applications.
+  
+Explicit Behaviour
+
+  Just to wrap it up you can of course define explicit behaviour on your objects.
+  These are just methods that can be invoked by a client. For instance it will be very
+  common in some objects, especially the root object in a container, to have a lifecycle
+  state field, but that this field cannot be just changed. Instead you would expose
+  methods that reflected the lifecycle state and calling the method, if successful,
+  would change the objects state.
