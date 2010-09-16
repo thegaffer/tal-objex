@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TODO: Insert your copyright notice -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<!-- A basic Integration test context that uses the In Memory middleware -->
+	
+	<import resource="classpath:/${package}/objex-context.xml" />
+
+	<!-- The middleware factory to use -->	
+	<bean id="${artifactId}-middleware" class="org.talframework.objexj.container.middleware.InMemoryMiddlewareFactory" />
+	 
+</beans>

@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>${groupId}</groupId>
+  <artifactId>${artifactId}</artifactId>
+  <version>${version}</version>
+  <packaging>jar</packaging>
+  
+  <name>${artifactId}</name>
+  <description>An Objex Domain</description>
+  <url>http://www.tpspencer.com/site/objexj</url>
+  
+  <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  	<objex.version>1.0</objex.version>
+  </properties>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-annotations</artifactId>
+  		<version>${objex.version}</version>
+  		<optional>true</optional>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-core</artifactId>
+  		<version>${objex.version}</version>
+  	</dependency>
+  	
+  	#if ( $useJdo )<dependency>
+ 		<groupId>javax.jdo</groupId>
+ 		<artifactId>jdo2-api</artifactId>
+ 		<version>2.3-eb</version>
+ 		<exclusions>
+ 			<exclusion>
+ 				<groupId>javax.transaction</groupId>
+ 				<artifactId>transaction-api</artifactId>
+ 			</exclusion>
+ 		</exclusions>
+ 	</dependency>#end
+ 	
+ 	<dependency>
+ 		<groupId>org.aspectj</groupId>
+ 		<artifactId>aspectjrt</artifactId>
+ 		<version>1.6.7</version>
+ 	</dependency>
+ 	
+ 	<!-- Testing -->
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.8.1</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.jmock</groupId>
+  		<artifactId>jmock-junit4</artifactId>
+  		<version>2.5.1</version>
+  		<scope>test</scope>
+  	</dependency>
+  </dependencies>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<configuration>
+				<source>1.5</source>
+				<target>1.5</target>
+			</configuration>
+		</plugin>
+		
+  		#if ( $useJdo )<plugin> 
+        	<groupId>org.datanucleus</groupId> 
+            <artifactId>maven-datanucleus-plugin</artifactId> 
+            <version>2.0.0-release</version>
+            <dependencies>
+            	<dependency>
+            		<groupId>javax.jdo</groupId>
+			 		<artifactId>jdo2-api</artifactId>
+			 		<version>2.3-eb</version>
+			 		<exclusions>
+			 			<exclusion>
+			 				<groupId>javax.transaction</groupId>
+			 				<artifactId>transaction-api</artifactId>
+			 			</exclusion>
+			 		</exclusions>
+				</dependency>
+            </dependencies>
+            <configuration> 
+                <log4jConfiguration>${basedir}/log4j.properties</log4jConfiguration>
+                <verbose>true</verbose> 
+            </configuration> 
+            <executions> 
+                <execution> 
+                    <phase>process-classes</phase> 
+                    <goals> 
+                        <goal>enhance</goal> 
+                    </goals> 
+				</execution> 
+        	</executions> 
+		</plugin>#end
+		
+		<plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>aspectj-maven-plugin</artifactId>
+			<version>1.0</version>
+			<dependencies>
+				<dependency>
+					<groupId>org.aspectj</groupId>
+					<artifactId>aspectjrt</artifactId>
+					<version>1.6.7</version>
+				</dependency>
+				<dependency>
+					<groupId>org.aspectj</groupId>
+					<artifactId>aspectjtools</artifactId>
+					<version>1.6.7</version>
+				</dependency>
+			</dependencies>
+			<executions>
+				<execution>
+					<goals>
+						<goal>compile</goal>
+						<goal>test-compile</goal>
+					</goals>
+				</execution>
+			</executions>
+			<configuration>
+				<outxml>true</outxml>
+				<source>1.5</source>
+				<target>1.5</target>
+			</configuration>
+		</plugin>
+  	</plugins>
+  </build>
+</project>

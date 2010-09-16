@@ -25,6 +25,7 @@
   	<!-- Modules below provide runtime implementations of Objex -->
   	<module>tal-objex-gae</module>
   	<module>tal-objex-gae-testapp</module>
+  	<module>tal-objex-archetype-domain</module>
   </modules>
   
   <licenses>

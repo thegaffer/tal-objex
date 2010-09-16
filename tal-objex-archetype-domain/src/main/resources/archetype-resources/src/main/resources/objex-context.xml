@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TODO: Insert your copyright notice -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<!-- The Spring Context defines the Domain Container -->
+	<!-- Externally the middleware must be defined - ${artifactId}-middleware -->
+
+	<bean id="${artifactId}-strategy" class="org.talframework.objexj.container.impl.SimpleContainerStrategy">
+		<constructor-arg value="${domainName}" /> <!-- Type of the Container -->
+		<!-- <constructor-arg value="${domainName}" /> Set ContainerID if its a Store -->
+		<constructor-arg value="${domainName}" /> <!-- Name of Root Object in Container -->
+		
+		<!-- Strategy Definition for each Type of Object -->
+		<constructor-arg><list>
+			<!-- Add in an Object Strategy for each type of object, i.e. -->
+			<!-- <bean p:typeName="~~Name~~" p:stateClass="~~StateBean~~" p:objexClass="~~ObjexImpl~~" class="org.talframework.objexj.object.SimpleObjectStrategy" /> -->
+		</list></constructor-arg>
+		
+		<!-- Optional Map of Queries Supported -->
+		<!-- <property name="namedQueries">
+			<map>
+				<entry key="~~queryName~~" value-ref="~~queryBean~~">
+			</map>
+		</property>  -->
+		
+		<!-- Optional Map of Event Handlers (External Events) Supported -->
+		<!-- <property name="eventHandlers">
+			<map>
+				<entry key="~~eventName~~" value-ref="~~handlerBean~~" />
+			</map>
+		</property>  -->
+	</bean>
+	
+	<bean id="${artifactId}-factory" class="org.talframework.objexj.locator.SimpleContainerFactory">
+		<property name="strategy" ref="${artifactId}-strategy" />
+		<property name="middlewareFactory" ref="${artifactId}-middleware" />
+	</bean>
+	 
+</beans>

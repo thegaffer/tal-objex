@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Objex Core">
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-application-skin</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </skin>
+  
+  <bannerLeft>
+    <name>${groupId} - ${artifactId}</name>
+    <src>images/objex-project.png</src>
+    <href>http://www.tpspencer.com/site/objexj/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>images/tal-project.png</src>
+  </bannerRight>
+  
+  <body>
+    <links>
+      <item name="Objex" href="http://www.tpspencer.com/site/objexj" />
+      <item name="Tal UI" href="http://www.tpspencer.com/site/tal-ui" />
+    </links>
+
+	<menu name="${artifactId}">
+    	<item name="About" href="index.html" />
+    </menu>
+    
+    <menu ref="reports"/>
+  </body>
+</project>
