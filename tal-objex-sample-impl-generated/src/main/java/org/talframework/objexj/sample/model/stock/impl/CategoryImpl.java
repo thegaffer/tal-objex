@@ -17,6 +17,7 @@
 package org.talframework.objexj.sample.model.stock.impl;
 
 import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.annotations.ObjexObj;
 import org.talframework.objexj.sample.api.stock.Category;
 import org.talframework.objexj.sample.beans.stock.CategoryBean;
@@ -28,6 +29,11 @@ public class CategoryImpl implements Category {
     
     public CategoryImpl(CategoryBean bean) {
         this.bean = bean;
+    }
+
+    @Override
+    protected ObjexObjStateBean getStateBean() {
+        return bean;
     }
 
     public String getParentCategoryId() {

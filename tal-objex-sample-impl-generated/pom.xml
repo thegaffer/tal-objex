@@ -32,6 +32,11 @@
   		<scope>provided</scope>
   	</dependency>
   	
+  	<dependency>
+  		<groupId>org.talframework.tal</groupId>
+		<artifactId>tal-aspects</artifactId>
+  	</dependency>
+  	
   	<!-- JDO -->
   	<dependency>
  		<groupId>javax.jdo</groupId>
@@ -44,12 +49,6 @@
  			</exclusion>
  		</exclusions>
  	</dependency>
- 	
- 	<!-- Aspect J -->
- 	<dependency>
-		<groupId>org.tpspencer.tal</groupId>
-		<artifactId>tal-aspects</artifactId>
-	</dependency>
   </dependencies>
   
   <build>

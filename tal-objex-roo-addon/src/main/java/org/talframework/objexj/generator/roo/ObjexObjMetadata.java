@@ -16,24 +16,21 @@
 
 package org.talframework.objexj.generator.roo;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.generator.roo.fields.CollectionPropHelper;
-import org.talframework.objexj.generator.roo.fields.ObjexObjProperty;
-import org.talframework.objexj.generator.roo.fields.PropHelper;
-import org.talframework.objexj.generator.roo.fields.ReferencePropHelper;
-import org.talframework.objexj.generator.roo.fields.SimplePropHelper;
-import org.talframework.objexj.generator.roo.utils.ConstructorMetadataWrapper;
-import org.talframework.objexj.generator.roo.utils.MethodMetadataWrapper;
+import org.talframework.objexj.generator.roo.annotations.ObjexObjAnnotation;
+import org.talframework.objexj.generator.roo.compiler.ValidationMethodsCompiler;
+import org.talframework.objexj.generator.roo.fields.ObjexField;
+import org.talframework.objexj.generator.roo.generator.object.ObjexObjFieldAccessorGenerator;
+import org.talframework.objexj.generator.roo.generator.object.ObjexObjGenerator;
+import org.talframework.objexj.generator.roo.generator.object.ObjexXmlWriterGenerator;
+import org.talframework.objexj.generator.roo.generator.object.ValidationGenerator;
 import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 
 /**
@@ -49,108 +46,38 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
     private static final String PROVIDES_TYPE_STRING = ObjexObjMetadata.class.getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
     
-    private final ObjexObjAnnotationValues annotationValues;
+    private ObjexObjGenerator objGenerator;
+    private ObjexObjFieldAccessorGenerator fieldGenerator;
+    private ValidationGenerator validationGenerator;
+    private ObjexXmlWriterGenerator xmlGenerator;
     
-    public ObjexObjMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjAnnotationValues values, List<ObjexObjProperty> properties) {
+    public ObjexObjMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjAnnotation values, List<ObjexField> properties) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        this.annotationValues = values;
+        initialiseGenerators();
         
-        boolean baseObj = TypeDetailsUtil.isExtending(governorTypeDetails, "org.talframework.objexj.object.BaseObjexObj");
-        boolean objexObj = TypeDetailsUtil.isExtending(governorTypeDetails, "org.talframework.objexj.object.SimpleObjexObj"); 
-        
-        // FUTURE: Should we consider full re-implementing of ObjexObj in aspect?
-        if( !baseObj && !objexObj ) {
-            
-            // Add base objex obj if we've defined a bean
-            if( TypeDetailsUtil.getField(governorTypeDetails, "bean") != null ) {
-                builder.addExtendsType(new JavaType("org.talframework.objexj.object.BaseObjexObj"));
-                baseObj = true;
-            }
-            
-            // Otherwise add simple objex obj
-            else {
-                builder.addExtendsType(new JavaType("org.talframework.objexj.object.SimpleObjexObj"));
-                objexObj = true;
-            }
+        if( !TypeDetailsUtil.isExtending(governorTypeDetails, "org.talframework.objexj.object.BaseObjexObj") ) {
+            builder.addExtendsType(new JavaType("org.talframework.objexj.object.BaseObjexObj"));
         }
         
-        if( objexObj ) {
-            addStrategy();
-            addDefaultCons();
-        }
-        else if( baseObj ) {
-            addStateAccessors();
-            addValidate();
-        }
-        
-        // Add in the methods for the properties
-        Iterator<ObjexObjProperty> it = properties.iterator();
-        while( it.hasNext() ) {
-            ObjexObjProperty prop = it.next();
-            
-            PropHelper helper = null;
-            if( prop.isMapReferenceProp() ) helper = new CollectionPropHelper(prop);
-            else if( prop.isListReferenceProp() ) helper = new CollectionPropHelper(prop);
-            else if( prop.isReferenceProp() ) helper = new ReferencePropHelper(prop);
-            else helper = new SimplePropHelper(prop);
-            
-            if( helper != null ) helper.build(builder, governorTypeDetails, getId());
-        }
+        // Call the generators
+        objGenerator.generate(values);
+        fieldGenerator.generate(properties);
+        validationGenerator.build(getValidationMethods());
         
         itdTypeDetails = builder.build();
     }
     
-    /**
-     * @return The metadata item for the ID field
-     */
-    private void addStateAccessors() {
-        MethodMetadataWrapper localGetter = new MethodMetadataWrapper(new JavaSymbolName("getLocalState"), annotationValues.getValue());
-        localGetter.addBody("return bean;");
-        localGetter.addMetadata(builder, governorTypeDetails, getId());
-        
-        MethodMetadataWrapper getter = new MethodMetadataWrapper("getStateObject", ObjexObjStateBean.class.getName());
-        getter.addBody("if( isUpdateable() ) return bean;");
-        getter.addBody("else return bean.cloneState();");
-        getter.addMetadata(builder, governorTypeDetails, getId());
+    private void initialiseGenerators() {
+        if( objGenerator == null ) objGenerator = new ObjexObjGenerator(builder, governorTypeDetails, getId());
+        if( fieldGenerator == null ) fieldGenerator = new ObjexObjFieldAccessorGenerator(builder, governorTypeDetails, getId());
+        if( validationGenerator == null ) validationGenerator = new ValidationGenerator(builder, governorTypeDetails, getId());
+        if( xmlGenerator == null ) xmlGenerator = new ObjexXmlWriterGenerator(builder, governorTypeDetails, getId());
     }
     
-    private void addValidate() {
-        MethodMetadataWrapper validate = new MethodMetadataWrapper(new JavaSymbolName("validate"), JavaType.VOID_PRIMITIVE);
-        validate.addParameter("request", "org.talframework.objexj.ValidationRequest", null);
-        // TODO: Default validation
-        validate.addBody("return;");
-        validate.addMetadata(builder, governorTypeDetails, getId());
-    }
-    
-    private void addStrategy() {
-        
-        // Get name
-        
-        // Get state bean
-        
-        // Static create
-        
-        // Static clone
-        
-        
-        
-        // TODO: Can't do this because Roo does not yet support non-default constructors on initialisers
-        return;
-        
-        /*
-        PropertyMetadataWrapper wrapper = new PropertyMetadataWrapper("STRATEGY", "org.talframework.objexj.object.ObjectStrategy");
-        wrapper.addModifier(Modifier.STATIC);
-        wrapper.addModifier(Modifier.FINAL);
-        ...
-        */
-    }
-    
-    private void addDefaultCons() {
-        ConstructorMetadataWrapper cons = new ConstructorMetadataWrapper();
-        cons.addParameter("bean", "org.talframework.objexj.ObjexObjStateBean", null);
-        cons.addBody("super(STRATEGY, bean);");
-        
-        cons.addMetadata(builder, governorTypeDetails, getId());
+    private ValidationMethodsCompiler getValidationMethods() {
+        ValidationMethodsCompiler validators = new ValidationMethodsCompiler();
+        validators.compile(governorTypeDetails);
+        return validators;
     }
     
     public static final String getMetadataIdentiferType() {
@@ -167,5 +94,9 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
 
     public static final Path getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, metadataIdentificationString);
+    }
+    
+    public static boolean isValid(String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 }

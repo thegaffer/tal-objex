@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.generator.roo;
+package org.talframework.objexj.generator.roo.annotations;
 
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
@@ -23,12 +23,25 @@ import org.springframework.roo.classpath.details.annotations.populator.AutoPopul
 import org.springframework.roo.model.JavaType;
 import org.talframework.objexj.annotations.ObjexObj;
 
-public class ObjexObjAnnotationValues extends AbstractAnnotationValues {
+public class ObjexObjAnnotation extends AbstractAnnotationValues {
     
     @AutoPopulate private JavaType value = null;
     
-    public ObjexObjAnnotationValues(PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-        super(governorPhysicalTypeMetadata, new JavaType(ObjexObj.class.getName()));
+    /**
+     * Helper to get the {@link ObjexObj} annotation and its values if
+     * it exists.
+     * 
+     * @param annotations The annotations
+     * @return The {@link ObjexObjAnnotation} instance if it exists in the annotations
+     */
+    //@Trace
+    public static ObjexObjAnnotation get(PhysicalTypeMetadata typeDetails) {
+        ObjexObjAnnotation ret = new ObjexObjAnnotation(typeDetails);
+        return ret;
+    }
+    
+    private ObjexObjAnnotation(PhysicalTypeMetadata typeDetails) {
+        super(typeDetails, new JavaType(ObjexObj.class.getName()));
         AutoPopulationUtils.populate(this, annotationMetadata);
     }
 

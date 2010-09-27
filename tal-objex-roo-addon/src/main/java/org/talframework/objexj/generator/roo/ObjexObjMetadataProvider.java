@@ -16,19 +16,17 @@
 
 package org.talframework.objexj.generator.roo;
 
-import org.springframework.roo.addon.tostring.ToStringMetadataProvider;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
-import org.springframework.roo.metadata.MetadataDependencyRegistry;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.lifecycle.ScopeDevelopment;
-import org.springframework.roo.support.util.Assert;
 import org.talframework.objexj.annotations.ObjexObj;
+import org.talframework.objexj.generator.roo.annotations.ObjexObjAnnotation;
 
 /**
  * This class links an class with the {@link ObjexObj} annotation
@@ -36,29 +34,31 @@ import org.talframework.objexj.annotations.ObjexObj;
  * 
  * @author Tom Spencer
  */
-@ScopeDevelopment
+@Component(immediate=true)
+@Service
 public class ObjexObjMetadataProvider extends AbstractItdMetadataProvider {
     
-    public ObjexObjMetadataProvider(MetadataService metadataService, MetadataDependencyRegistry metadataDependencyRegistry, FileManager fileManager, ToStringMetadataProvider toStringProvider) {
-        super(metadataService, metadataDependencyRegistry, fileManager);
-        
-        JavaType type = new JavaType(ObjexObj.class.getName());
-        toStringProvider.addMetadataTrigger(type); // Not sure about this, what about base!!
-        addMetadataTrigger(type);
+    protected void activate(ComponentContext context) {
+        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
+        addMetadataTrigger(new JavaType(ObjexObj.class.getName()));
     }
-
-    @Override
+    
+    protected void deactivate(ComponentContext context) {
+        metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
+        removeMetadataTrigger(new JavaType(ObjexObj.class.getName()));   
+    }
+    
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
         
-        ObjexObjAnnotationValues values = new ObjexObjAnnotationValues(governorPhysicalTypeMetadata);
-        Assert.notNull(values.getValue(), "Error, type does not appear to have ObjexObj annotation or a ObjexObj StateBean value: " + governorPhysicalTypeMetadata);
+        ObjexObjAnnotation values = ObjexObjAnnotation.get(governorPhysicalTypeMetadata);
+        if( values.getValue() == null ) throw new IllegalArgumentException("Error, type does not appear to have ObjexObj annotation or a ObjexObj StateBean value: " + governorPhysicalTypeMetadata);
         
         String stateMetadataKey = ObjexStateBeanMetadata.createIdentifier(values.getValue(), Path.SRC_MAIN_JAVA);
         ObjexStateBeanMetadata stateMetadata = (ObjexStateBeanMetadata)metadataService.get(stateMetadataKey);
-        Assert.notNull(stateMetadata, "Error, cannot find the state bean metadata for the ObjexObj state bean class: " + values.getValue() + " [" + stateMetadataKey + "]");
+        if( stateMetadata == null ) throw new IllegalArgumentException("Error, cannot find the state bean metadata for the ObjexObj state bean class: " + values.getValue() + " [" + stateMetadataKey + "]");
         
         return new ObjexObjMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, values, stateMetadata.getProperties());
     }
@@ -71,7 +71,6 @@ public class ObjexObjMetadataProvider extends AbstractItdMetadataProvider {
         return ObjexObjMetadata.getMetadataIdentiferType();
     }
     
-    @Override
     protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
         JavaType javaType = ObjexObjMetadata.getJavaType(metadataIdentificationString);
         Path path = ObjexObjMetadata.getPath(metadataIdentificationString);
@@ -79,7 +78,6 @@ public class ObjexObjMetadataProvider extends AbstractItdMetadataProvider {
         return physicalTypeIdentifier;
     }
     
-    @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
         return ObjexObjMetadata.createIdentifier(javaType, path);
     }

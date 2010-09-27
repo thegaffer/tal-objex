@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
@@ -46,6 +47,11 @@ public class CategoryImpl extends BaseObjexObj implements Category {
         this.bean = state;
     }
     
+    @Override
+    protected ObjexObjStateBean getStateBean() {
+        return bean;
+    }
+
     public String getParentCategoryId() {
         ObjexID parentId = getParentId();
         return parentId != null ? parentId.toString() : null;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.generator.roo;
+package org.talframework.objexj.generator.roo.annotations;
 
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
@@ -23,13 +23,26 @@ import org.springframework.roo.classpath.details.annotations.populator.AutoPopul
 import org.springframework.roo.model.JavaType;
 import org.talframework.objexj.annotations.ObjexStateBean;
 
-public class ObjexObjStateBeanAnnotationValues extends AbstractAnnotationValues {
+public class ObjexObjStateBeanAnnotation extends AbstractAnnotationValues {
     
     @AutoPopulate private String name = null;
     @AutoPopulate private long version = 1;
 
-    public ObjexObjStateBeanAnnotationValues(PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-        super(governorPhysicalTypeMetadata, new JavaType(ObjexStateBean.class.getName()));
+    /**
+     * Helper to get the {@link ObjexStateBean} annotation and its values if
+     * it exists.
+     * 
+     * @param annotations The annotations
+     * @return The {@link ObjexObjStateBeanAnnotation} instance if it exists in the annotations
+     */
+    //@Trace
+    public static ObjexObjStateBeanAnnotation get(PhysicalTypeMetadata typeDetails) {
+        ObjexObjStateBeanAnnotation ret = new ObjexObjStateBeanAnnotation(typeDetails);
+        return ret;
+    }
+    
+    private ObjexObjStateBeanAnnotation(PhysicalTypeMetadata typeDetails) {
+        super(typeDetails, new JavaType(ObjexStateBean.class.getName()));
         AutoPopulationUtils.populate(this, annotationMetadata);
     }
 

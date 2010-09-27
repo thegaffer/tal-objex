@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
@@ -191,8 +192,9 @@ public class TestBaseObjexObj {
             state.setEditable();
         }
         
-        public void validate(ValidationRequest request) {
-            
+        @Override
+        protected ObjexObjStateBean getStateBean() {
+            return state;
         }
         
         /**

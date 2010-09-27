@@ -18,6 +18,11 @@
   		<version>${project.version}</version>
   	</dependency>
   	
+  	<dependency>
+  		<groupId>org.talframework.tal</groupId>
+		<artifactId>tal-aspects</artifactId>
+  	</dependency>
+  	
   	<!-- Google App Engine -->
   	<dependency>
  		<groupId>org.tpspencer.tal</groupId>

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
@@ -45,7 +46,12 @@ public class OrderImpl extends BaseObjexObj implements Order {
 		this.bean = bean;
 	}
 	
-	public long getAccount() {
+	@Override
+    protected ObjexObjStateBean getStateBean() {
+        return bean;
+    }
+
+    public long getAccount() {
 		return bean.getAccount();
 	}
 	

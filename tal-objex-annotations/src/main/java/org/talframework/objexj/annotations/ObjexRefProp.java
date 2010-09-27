@@ -29,7 +29,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface ObjexRefProp {
+    /** Holds the optional name of the external property */
+    String externalName() default "";
+    /** Indicates if the property is considered owned */
     boolean owned() default true;
+    /** The type to expose the references as */
     Class<?> type();
+    /** The type of object to create against this property if fixed */
     String newType() default "";
+    /** Determines if the field is gettable externally */
+    boolean gettable() default true;
+    /** Determines if the field is settable externally */
+    boolean settable() default true;
 }

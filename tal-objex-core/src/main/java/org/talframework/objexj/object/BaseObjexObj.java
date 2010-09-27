@@ -19,13 +19,29 @@ package org.talframework.objexj.object;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.Validator;
+import javax.validation.groups.Default;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ValidationError;
+import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
+import org.talframework.objexj.validation.SimpleValidationRequest;
+import org.talframework.objexj.validation.groups.ChildGroup;
+import org.talframework.objexj.validation.groups.FieldGroup;
+import org.talframework.objexj.validation.groups.InterObjectEnrichmentGroup;
+import org.talframework.objexj.validation.groups.InterObjectGroup;
+import org.talframework.objexj.validation.groups.IntraObjectEnrichmentGroup;
+import org.talframework.objexj.validation.groups.IntraObjectGroup;
 
 /**
  * Base class for an ObjexObj. Most basic methods are implemented
@@ -66,6 +82,15 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	    this.id = id;
 	    this.parentId = parentId;
 	}
+	
+	/**
+	 * Called to get the state bean. This is mainly present so
+	 * we can mark the state bean for validation.
+	 * 
+	 * @return
+	 */
+	@Valid
+	protected abstract ObjexObjStateBean getStateBean();
 	
 	////////////////////////////////////////////
     // ObjexObj Methods
@@ -271,8 +296,52 @@ public abstract class BaseObjexObj implements InternalObjexObj {
             throw new UnsupportedOperationException("Creation not supported on property: " + name);
         }
     }
-	
-	//////////////////////////////////////////////////
+    
+    /**
+     * Standard validation implementation
+     */
+    public void validate(ValidationRequest request) {
+        Validator validator = request.getValidator();
+        
+        Set<ConstraintViolation<BaseObjexObj>> violations = null;
+        
+        switch(request.getValidationType()) {
+        case INTRA_OBJECT:
+            validator.validate(this, IntraObjectEnrichmentGroup.class);
+            violations = validator.validate(this, IntraObjectGroup.class, FieldGroup.class, Default.class);
+            break;
+            
+        case INTER_OBJECT:
+            validator.validate(this, InterObjectEnrichmentGroup.class);
+            violations = validator.validate(this, InterObjectGroup.class);
+            break;
+            
+        case CHILDREN:
+            violations = validator.validate(this, ChildGroup.class);
+            break;
+        }
+        
+        // Turn violations into errors
+        if( violations != null ) {
+            Iterator<ConstraintViolation<BaseObjexObj>> it = violations.iterator();
+            while( it.hasNext() ) {
+                ConstraintViolation<BaseObjexObj> violation = it.next();
+                
+                // TODO: Need to test no prop path = non-field error
+                String prop = violation.getPropertyPath().toString();
+                if( prop != null && prop.startsWith("stateBean.") ) prop = prop.substring(5);
+                else if( prop != null && prop.equals("stateBean") ) prop = null;
+                else if( prop != null && prop.length() == 0 ) prop = null;
+                
+                Object[] params = violation.getInvalidValue() != null ? new Object[]{violation.getInvalidValue()} : null;
+                
+                ValidationError error = new SimpleValidationRequest.SimpleValidationError(id, violation.getMessageTemplate(), prop, params);
+                request.addError(error);
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////
 	// Internal
 	
     /**

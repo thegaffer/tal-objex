@@ -98,6 +98,7 @@ public class TestService {
 	    Assert.assertTrue(container.isNew()); // Is new when just created
 	    
 	    // Changing the root object
+	    container.getRootObject().setProperty("name", "RootCat");
 	    container.getRootObject().setProperty("description", "This is the real description");
 	    
 	    container.saveContainer();
@@ -161,6 +162,7 @@ public class TestService {
 		
 		ObjexObj category = store.getObject("Category/4");
 		category.setProperty("name", "Cat1_edited_again");
+		category.setProperty("description", "Something");
 		Assert.assertEquals("Cat1_edited_again", store.getObject("Category/4").getProperty("name"));
 		
 		// ... Other things happen

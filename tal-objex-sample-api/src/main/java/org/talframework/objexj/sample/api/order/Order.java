@@ -45,13 +45,6 @@ public interface Order {
      */
     public abstract List<String> getItemRefs();
     
-    /**
-     * Helper to get an order item by ID
-     * 
-     * @param id The ID
-     */
-    public abstract OrderItem getItemById(Object id);
-    
     public abstract OrderItem createItem();
 	
 	public abstract void removeItemById(Object id);

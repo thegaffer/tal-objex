@@ -19,6 +19,7 @@ package org.talframework.objexj.sample.model.stock.impl;
 import java.util.Date;
 
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
@@ -43,6 +44,11 @@ public class ProductImpl extends BaseObjexObj implements Product {
         this.bean = state;
     }
     
+    @Override
+    protected ObjexObjStateBean getStateBean() {
+        return bean;
+    }
+
     public String getName() {
         return bean.getName();
     }

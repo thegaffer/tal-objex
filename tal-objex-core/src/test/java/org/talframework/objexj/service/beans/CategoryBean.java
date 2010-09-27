@@ -19,8 +19,11 @@ package org.talframework.objexj.service.beans;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.service.beans.rules.CategoryValid;
 
 /**
  * This bean class represents the raw persistable version of
@@ -53,7 +56,8 @@ public class CategoryBean implements ObjexObjStateBean {
 	private transient boolean editable = false;
 	
 	/** The name of the category */
-	private String name;
+	@NotNull
+    private String name;
 	/** The description of the category */
 	private String description;
 	

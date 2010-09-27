@@ -16,6 +16,8 @@
 
 package org.talframework.objexj.sample.model.order.impl;
 
+import org.talframework.objexj.annotations.ObjexCheck;
+import org.talframework.objexj.annotations.ObjexEnrich;
 import org.talframework.objexj.annotations.ObjexObj;
 import org.talframework.objexj.sample.api.order.Order;
 import org.talframework.objexj.sample.beans.order.OrderBean;
@@ -33,6 +35,31 @@ public class OrderImpl implements Order {
     public void confirmOrder() {
         bean.getAccount();
     }
-
+    
+    @ObjexCheck(message="no.item", postObjectCheck=true)
+    public boolean ensureStillNoItems() {
+        return true;
+    }
+    
+    /*@ObjexEnrich
+    public void enrichItems() {
+        
+    }*/
+    
+    /*@ObjexEnrich(postObjectCheck=true)
+    public void enrichMoreItems() {
+        
+    }*/
+ 
+    @ObjexCheck(message="item.invalid", childObjectCheck=true)
+    public boolean ensureItemOk() {
+        return true;
+    }
+    
+    @ObjexCheck(message="no.items")
+    public boolean ensureItems() {
+        return true;
+    }
+    
     
 }

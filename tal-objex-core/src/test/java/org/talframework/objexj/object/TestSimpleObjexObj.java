@@ -125,8 +125,6 @@ public class TestSimpleObjexObj {
 		Assert.assertEquals("Product/1", obj.getProperty("mainProductRef"));
 		Assert.assertNotNull(obj.getProperty("products"));
 		Assert.assertNotNull(obj.getProperty("categories"));
-		
-		obj.validate(null);
 	}
 	
 	/**

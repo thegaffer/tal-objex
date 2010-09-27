@@ -18,6 +18,7 @@ package org.talframework.objexj.sample.model.order.impl;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.locator.SingletonContainerLocator;
@@ -43,6 +44,11 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
     
     public OrderItemImpl(OrderItemBean bean) {
         this.bean = bean;
+    }
+    
+    @Override
+    protected ObjexObjStateBean getStateBean() {
+        return bean;
     }
 
 	public String getName() {

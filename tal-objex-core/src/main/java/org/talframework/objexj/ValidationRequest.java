@@ -19,6 +19,8 @@ package org.talframework.objexj;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Validator;
+
 
 /**
  * This class represents a request to validate an object
@@ -49,6 +51,11 @@ public interface ValidationRequest {
      * @return The type of validation to perform
      */
     public ValidationType getValidationType();
+    
+    /**
+     * @return The validator the objects should use to validate with
+     */
+    public Validator getValidator();
     
     /**
      * Call to record a generic error

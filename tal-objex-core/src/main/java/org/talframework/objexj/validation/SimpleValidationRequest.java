@@ -23,6 +23,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
@@ -39,6 +43,8 @@ public final class SimpleValidationRequest implements ValidationRequest {
     private ValidationType type;
     /** Holds all the errors, keyed by the object ID */
     private Map<ObjexID, List<ValidationError>> errors;
+    /** The validator */
+    private Validator validator;
     
     public SimpleValidationRequest(ValidationType initialType) {
         this.type = initialType;
@@ -62,6 +68,15 @@ public final class SimpleValidationRequest implements ValidationRequest {
      */
     public void setType(ValidationType type) {
         this.type = type;
+    }
+    
+    public javax.validation.Validator getValidator() {
+        if( validator == null ) {
+            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+            validator = factory.getValidator();
+        }
+        
+        return validator;
     }
 
     /**
@@ -219,6 +234,51 @@ public final class SimpleValidationRequest implements ValidationRequest {
         return ret;
     }
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((errors == null) ? 0 : errors.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ((validator == null) ? 0 : validator.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if( this == obj ) return true;
+        if( obj == null ) return false;
+        if( getClass() != obj.getClass() ) return false;
+        SimpleValidationRequest other = (SimpleValidationRequest)obj;
+        if( errors == null ) {
+            if( other.errors != null ) return false;
+        }
+        else if( !errors.equals(other.errors) ) return false;
+        if( type == null ) {
+            if( other.type != null ) return false;
+        }
+        else if( !type.equals(other.type) ) return false;
+        if( validator == null ) {
+            if( other.validator != null ) return false;
+        }
+        else if( !validator.equals(other.validator) ) return false;
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "SimpleValidationRequest [errors=" + errors + "]";
+    }
+
     /**
      * Simple validation error implementation class
      *
@@ -296,20 +356,20 @@ public final class SimpleValidationRequest implements ValidationRequest {
             if( this == obj ) return true;
             if( obj == null ) return false;
             if( getClass() != obj.getClass() ) return false;
-            SimpleValidationError other = (SimpleValidationError)obj;
+            ValidationError other = (ValidationError)obj;
             if( error == null ) {
-                if( other.error != null ) return false;
+                if( other.getError() != null ) return false;
             }
-            else if( !error.equals(other.error) ) return false;
+            else if( !error.equals(other.getError()) ) return false;
             if( field == null ) {
-                if( other.field != null ) return false;
+                if( other.getField() != null ) return false;
             }
-            else if( !field.equals(other.field) ) return false;
+            else if( !field.equals(other.getField()) ) return false;
             if( objectId == null ) {
-                if( other.objectId != null ) return false;
+                if( other.getObjectId() != null ) return false;
             }
-            else if( !objectId.equals(other.objectId) ) return false;
-            if( !Arrays.equals(params, other.params) ) return false;
+            else if( !objectId.equals(other.getObjectId()) ) return false;
+            if( !Arrays.equals(params, other.getParams()) ) return false;
             return true;
         }
     }

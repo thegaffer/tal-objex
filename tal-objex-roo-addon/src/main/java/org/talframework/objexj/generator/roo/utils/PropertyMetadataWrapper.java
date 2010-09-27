@@ -40,7 +40,7 @@ public class PropertyMetadataWrapper {
     /** The modifier */
     private int modifier = Modifier.PRIVATE;
     /** The initialiser for the field */
-    private JavaType initialiser = null;
+    private String initialiser = null;
     /** The annotations for the field */
     private List<AnnotationMetadata> annotations = null;
     
@@ -83,14 +83,14 @@ public class PropertyMetadataWrapper {
     /**
      * @return the initialiser
      */
-    public JavaType getInitialiser() {
+    public String getInitialiser() {
         return initialiser;
     }
 
     /**
      * @param initialiser the initialiser to set
      */
-    public void setInitialiser(JavaType initialiser) {
+    public void setInitialiser(String initialiser) {
         this.initialiser = initialiser;
     }
     

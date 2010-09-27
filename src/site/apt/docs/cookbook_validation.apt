@@ -1,81 +1,317 @@
-How To Implement Validation
+How To Implement Validation (& Enrichment)
 
   This page details how to provide validation in your Objex objects.
   
-Validation Lifecycle
+Validation Basics
+  
+  One of the most important pieces of behaviour that you need to provide in
+  all but the simplest of your business objects is to ensure it is valid.
+  The validity of an object can be separated into 4 distinct parts:
+  
+    * Field validation that applies as you change the fields
+    
+    * Intra object validation where the objects fields are checked that
+    they are valid against each other, i.e. if you provide field a, then
+    you must have a field b etc.
+    
+    * Inter object validation where you check your object is valid against
+    other related objects
+    
+    * Child validation where you check that any children, some of which
+    might have changed, are still valid as far as the parent is concerned.
+    
+  Objects applies all 4 levels of validation and allows you to separate 
+  them. All you need to decide is in what level your validation rule
+  applies.
+  
+  Field level validation applies as you change the fields, but the other
+  levels occurs when you either explicitly call validate on the container 
+  or automatically when you save your container.
+  
+How Objex Performs Validation
 
-  Firstly we need to understand what exactly is the validation lifecycle
-  inside Objex. Objex tries to run a pretty tight ship when it comes to
-  validation and will not let you save an invalid container. However, you
-  are always in charge of what constitutes an invalid container.
+  Very simply we don't, we use the standard Java mechanism for validation,
+  namely JSR 303 - Bean Validation.
   
-  There are 4 types of validation ...
+  The idea of bean validation is that you use annotations to clearly mark
+  your objects as requiring validation and the validator then hands
+  control to the Constraint Validator that goes with the validator.
   
-    [[a]] Field Validation is applied when setting fields. Field validation
-    takes no account of any other values. It just won't let you change a
-    value to something that's invalid.
+  This is not a tutorial on the JSR 303 spec so please read that for more
+  information on bean validation and the standard annotations.
+  
+* Validation Groups
+
+  JSR 303 supports the idea of marking your constraints with a group.
+  This allows us to tell the validator to run the rules in a
+  consistent order. It means we could, if we wanted, stop the validation
+  at a certain level.
+  
+  The groups are simple no-op interfaces and are defined in Objex core.
+  They are:
+  
+    * org.talframework.objexj.validation.FieldGroup
     
-    [[b]] Intra Object Validation means that each field should be valid 
-    in combination - so if you have a town you must have a country, but
-    otherwise either can be null.
+    * org.talframework.objexj.validation.FieldChangeGroup
     
-    [[c]] Inter Object Validation means that the object as a whole should
-    be valid when considered against other objects inside the container.
+    * org.talframework.objexj.validation.IntraObjectGroup
     
-    [[d]] Parent Object Validation applies to a parent object that itself
-    might not be changing, but is asked if it's children (at least one of
-    which has changed) are valid.
+    * org.talframework.objexj.validation.InterObjectGroup
     
-  Field validation occurs whenever you try and change a field, whereas
-  the other levels are applied when you save a container. You can also
-  request validation on the container or on the objects at any of the 
-  levels above.
+    * org.talframework.objexj.validation.ChildGroup
+    
+  With one exception these groups match the validation levels in Objex.
+  The exception is the field change group - this group allows you to
+  enforce rules when a field is actually changed, but not enforce it
+  otherwise. Perhaps the best case for this is when you have some kind
+  of endDate in your object - a user can only set this date in the 
+  future, but if you have an existing object you might not want to 
+  enforce that the date is always in the future. By marking your
+  constraint as belonging to the FieldChangeGroup it will not be 
+  validated when save the container, but it will if you actually try to
+  change the field.
+  
+  _Note_: Some care should be taken with the FieldChangeGroup as it is
+  possible to circumvent the application of this rule, particularly when
+  you express a remote interface to your Objex containers. 
+  
+* Field Level Validation
+
+  Field level validations should be applied to your state bean. The
+  simplest way is to annotate your state bean as follows:
+  
++--
+ObjexObjStateBean(name="MyObject")
+public class MyObjectStateBean {
+	@NotNull(groups={FieldGroup.class})
+	private String name;
+	@Max(value=100)
+	private int someValue;
+}
++--
+  
+  Notice that in the one case we mark the annotation with the field group
+  interface and in the other case we do not. It is good practice to mark
+  the group the annotation applies to, but it is not absolutely necessary
+  for field level validation as the default group is also applied by
+  Objex as part of IntraObject validation.
+  
+  Field level validations apply both when you change the field via the
+  real Objex Object, and they are also checked at the point of Intra Object
+  validation.
+  
+  Although not immediately supported, at least in the generators, right now,
+  if you define interfaces to your state bean you can easily apply the
+  annotations to the accessor/getter methods of your state bean instead of
+  to the fields directly.
+  
+* Intra Object Validation
+
+  So far this is pretty standard JSR 303 validation. This change somewhat
+  when you move to intra object validation. Here the rules typically do
+  not apply to any one field - if they do you can mark these against the
+  state beans field just as you do field level validations, just remember
+  to mark the group as IntraObjectGroup in the constraint.
+  
+  However, most of the time intra object validations will apply against
+  the object. Now there are two ways of applying this kind of validation.
+  The first is to define yourself a contraint annotation and corresponding
+  validator and apply it to your Objex object. For instance:
+  
++--
+@ObjexObj(MyObjectStateBean.class)
+@MyCustomConstraint(groups={IntraObjectGroup.class})
+public class MyObjectImpl {
+  ...
+}
++--
+  
+  The @MyCustomConstraint annotation, or rather it's corresponding 
+  validator, will then be applied automatically. (Note that creating
+  a customer validator and annotation is not very difficult, but not
+  the purpose of this page).
+  
+  However, you may say that this is very cumbersome to create an
+  annotation, a corresponding validator in order to then perform some
+  logic that arguably should be part of the business object itself, 
+  honouring good OO principles (notable Encapsulation). And I would
+  agree. 
+  
+  So Objex has an alternative approach when using the generators. 
+  Basically inside your implementation class you mark special methods
+  as being validators. Like so:
+  
++--
+@ObjexObj(MyObjectStateBean.class)
+public class MyObjectImpl {
+  ...
+  
+  @ObjexCheck(group=IntraObjectGroup.class, message="some.error.key")
+  private boolean someCheck() {
+    ...
+  }
+}
++--
+
+  The @ObjexCheck annotation marks this method as a validation method.
+  The method itself should take no arguments and should return a boolean.
+  Return true and the check has passed and all is well. Return false
+  and the check is failed and an error under the given message key will
+  be added to the list of violations.
+  
+  The beauty of this style is that you keep internal object level checks
+  private to your class - even the method is private in this case, 
+  although it could be public if you wanted to expose it.
+  
+  The @ObjexCheck is a source level annotation because it is read by
+  the Spring Roo based generator. Behind the scenes a generic JSR303
+  annotation has been applied to your object and then we call each of
+  the @ObjexCheck methods in turn. You can have any number of these.
+  
+  You should also note that you can mix and match the styles. So you
+  can have @ObjexCheck methods and custom validation annotations on
+  your Objex object classes and all will be applied.
+  
+* Inter Object Validation
+
+  In terms of mechanisms, inter object validation is applied in exactly
+  the same way as Intra Object Validation. You can apply this as 
+  annotations against your state bean fields, your Objex object at 
+  type level or you can use the same @ObjexCheck mechanism described
+  above.
+  
+  The only thing you need to do is mark your validation annotations or
+  the @ObjexCheck validation with the InterObjectGroup marker interface
+  instead of the IntraObjectGroup marker.
+  
+  For those in the UK, as the Meercat says ... Simples.
+  
+* Child Validation
+
+  No prizes for guessing how child validation is applied ... yep in 
+  exactly the same way, only you mark you annotations with the
+  ChildGroup marker interface.
+  
+  However, you need to bear in mind that when we apply this level of
+  validation it is not necessarily true that the object being 
+  validated has changed. It may have (in which case it has already
+  gone through the other levels of validation), but equally it may
+  not. As Objex validates through all objects back to the root object
+  it is also true that your direct children may not have changed.
+  
+  Child level validation is really there to allow you to apply rules
+  such as all my children must have different values in some field -
+  for example their name.
+  
+  As such you should bear in mind that it can be costly to perform
+  this validation - especially if some or all of your direct children
+  have not even changed. So you should always query from the container
+  whether an object really has changed and make sensible decisions 
+  over whether to validate.
   
 Enrichment
 
-  A quick word on Enrichment. Often validation and enrichment go hand in hand
-  together. Particularly when you enrich domain objects from other, external,
-  sources. 
+  So this article has been about validation, but very often enrichment
+  goes hand in hand with validation. For example one project I have
+  spent some time on involved taking an address and then calling a
+  service to establish if we could 'service' this address. If we could
+  we would get a special location ID back from the service.
   
-  For instance given an account number you might go off during
-  validation to check that account is valid by getting a unique internal
-  reference which you then hold on to. Although purists may argue these are
-  two different concerns it seems particularly silly to make two calls to
-  the same thing just to keep enrichment and validation separate. 
+  Now you could envisage calling this service each any every time we
+  were asked to validate. But, I am sure you may have realised this
+  was not the speediest operation. So the solution was instead of
+  validating the address fields each time, we would instead hold the
+  service location. Each time any of the address fields changed we
+  would reset this field, then validate that this field was not 0. If
+  it was 0 we would call the service, store the returned value and
+  then raise an error if it was still 0.
   
-  If that idea floats your boat then by all means keep them separate, but if
-  not then the recommended approach is to apply enrichment, when possible, 
-  directly when the field changes. However, you should not make external calls at 
-  this time otherwise performance will suffer. Therefore, we recommend clearing
-  enriched fields as soon as possible and then performing the full enrichment
-  as part of the intra/inter validation when that is called.
+  Obviously when you consider this scenario we are performing 
+  enrichment as well as validation. So it makes perfect sense to allow
+  enrichment as part of the validation process. And indeed we do this
+  using a couple of what should now be familar mechanisms.
   
-
-Manual Approach
-
-  You can implement validation with entirely custom code. Inside your 
-  ObjexObj object you simply implement validate. This following
-  demonstrates this...
+  The first is to use JSR 303 annotations. To do this we've created
+  two other group marker interfaces. There are:
+  
+    * org.talframework.objexj.validation.IntraObjectEnrichmentGroup
+    
+    * org.talframework.objexj.validation.InterObjectEnrichmentGroup
+    
+  The groups are applied before then validating the Intra and Inter
+  object group sets. Importantly though we do not consider any
+  errors from these groups as we go on to call the validation itself.
+  
+  You might be thinking that this is totally misusing the JSR 303 
+  mechanism. I am not sure misusing is the right word, but clearly
+  Objex is using the mechanism is outside the original scope of
+  JSR 303. But, I still stand by this mechanism when enrichment
+  goes in hand with validation so neatly.
+  
+  The other mechanism available when using the Objex generators is to
+  mark your Objex object with @ObjexEnrich annotations. For instance:
   
 +--
-
+@ObjexObj(MyObjectStateBean.class)
+public class MyObjectImpl {
+  ...
+  
+  @ObjexEnrich(group=IntraObjectEnrichmentGroup.class)
+  private void someEnrichment() {
+    ...
+  }
+}
 +--
 
-Generator Approach
-
-  The generators attempt to make your life slightly easier by generating
-  a lot of the validation code. It does this by generating a set of 
-  ValidationRule instances. Each validation rule applies to a particular
-  validation level and tests a particular condition.
+  Just like with @ObjexCheck the method should take no arguments and 
+  should return void (any errors from the enrichment group would be
+  ignored anyway). Simply mark the Intra or InterObjectEnrichmentGroup
+  marker interfaces as appropriate.
   
-  // TODO: Validation annotations and rules.  
-
+  Of course often enrichment should simply occur when you change the
+  fields in your object by invoking implicit behaviour. In which case
+  you have no need for enrichment as part of the validation process - 
+  so if you completely disagree with using JSR303 for enrichment you
+  don't have to - but, it is a tool you can use if your use case
+  requires it.  
+  
 Performance
 
-  A final note on performance. If nothing changes inside a container then
-  it should not take very long to perform a validate. In particular you should
-  not go off to external sources for validation when nothing has changed.
+  Don't make it rational for developers to skip validation and find
+  way's to circumvent it. Put simply make it fast! Too slow and
+  developers will find exotic ways to skip parts or all of your
+  validation. I've seen this time and time again and it leads to
+  difficult to maintain, non-determinstic systems.
+
+  There are a number of tips and tricks you should employ and think
+  about in terms of validation and making it fast:
   
-  To actually implement this will take quite a bit of design. For instance you
-  might need to hold checksum values that you set to indicate a field is valid
-  and then clear them when ever a real field the rule is dependent on changes.
+    * Check was has changed before apply validation. The container
+    gives you access to the old state of your object and it can 
+    tell you which of your child objects has changed.
+    
+    * Use the enrichment idea to add in hidden, externally read-only
+    fields that you reset when relevant public fields in your 
+    objects change - then validate on the presence or value of those
+    hidden fields.
+    
+  In some future version of Objex I am also going to add the concept
+  of allowing a parent to be informed of changes to child objects so
+  they can modify their own fields in preparation for future
+  validation and therefore use the enrichment concept.
+
+Do I have to use JSR 303 Validation?
+
+  As a final note you should be aware that validation on an Objex object
+  does not *have* to use JSR 303 validation. This is actually applied
+  in the BaseObjexObj class - you will be using this base class if you
+  use the Objex generators (although you will typically be unaware of
+  this). 
+  
+  If you implement the ObjexObj interface from scratch then you are free
+  to implement the objects validate method in any way you choose - 
+  although frankly I'd challenge you to not use JSR 303 based validation.
+  
+  Even if you do use the generator and the BaseObjexObj class you are
+  still free to override the validate method and make whatever calls 
+  you want.

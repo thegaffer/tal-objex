@@ -138,7 +138,9 @@ public class TestSimpleObjectStrategy {
 	    public TestObj(StateBean bean) {
 	    }
 	    
-	    public void validate(ValidationRequest request) {
+	    @Override
+	    protected ObjexObjStateBean getStateBean() {
+	        return null;
 	    }
 	}
 }

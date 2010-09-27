@@ -14,7 +14,25 @@
   <name>Objex Parent</name>
   <description>General parent for Java projects within Objex</description>
   
+  <properties>
+  	<version.slf4j>1.5.6</version.slf4j>
+  	<version.spring>3.0.3.RELEASE</version.spring>
+  	<version.tal-aspects>1.0-SNAPSHOT</version.tal-aspects>
+  	<version.tal-beans>0.9</version.tal-beans>
+  	<version.validation>1.0.0.GA</version.validation>
+  	<version.hibernate-validator>4.0.2.GA</version.hibernate-validator>
+  	<version.gae>1.3.2</version.gae>
+  </properties>
+  
   <dependencies>
+    <!-- This + Exclusions ensure no direct logging use -->
+    <dependency>
+    	<groupId>org.slf4j</groupId>
+    	<artifactId>jcl-over-slf4j</artifactId>
+    	<version>${version.slf4j}</version>
+    	<scope>runtime</scope>
+    </dependency>
+  	
   	<!-- Standard Test -->
   	<dependency>
   		<groupId>org.talframework.tal</groupId>
@@ -28,6 +46,12 @@
   		<version>2.5.1</version>
   		<scope>test</scope>
   	</dependency>
+  	<dependency>
+ 		<groupId>org.slf4j</groupId>
+ 		<artifactId>slf4j-log4j12</artifactId>
+ 		<version>${version.slf4j}</version>
+ 		<scope>test</scope>
+ 	</dependency>
   </dependencies>
   
   <dependencyManagement>
@@ -36,29 +60,59 @@
   		<dependency>
 	  		<groupId>org.springframework</groupId>
 	  		<artifactId>spring-beans</artifactId>
-	  		<version>3.0.3.RELEASE</version>
+	  		<version>${version.spring}</version>
+	  		<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+  					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 	  	</dependency>
 	  	
 	  	<!-- Wider Tal Framework -->
 	  	<dependency>
-			<groupId>org.tpspencer.tal</groupId>
+			<groupId>org.talframework.tal</groupId>
 			<artifactId>tal-aspects</artifactId>
-			<version>0.9</version>
+			<version>${version.tal-aspects}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+  					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.talframework.tal</groupId>
 			<artifactId>tal-util-beans</artifactId>
-			<version>0.9</version>
+			<version>${version.tal-beans}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+  					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		
+		<!-- Validation -->
+		<dependency>
+	        <groupId>javax.validation</groupId>
+	        <artifactId>validation-api</artifactId>
+	        <version>${version.validation}</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.hibernate</groupId>
+	        <artifactId>hibernate-validator</artifactId>
+	        <version>${version.hibernate-validator}</version>
+	    </dependency>
 		
 		<!-- Google -->
 		<dependency>
 	 		<groupId>org.tpspencer.tal</groupId>
 			<artifactId>tal-gae-runtime</artifactId>
-			<version>1.3.2</version>
+			<version>${version.gae}</version>
 			<type>pom</type>
 	 	</dependency>
-  	</dependencies>
+	</dependencies>
   </dependencyManagement>
   
   <build>

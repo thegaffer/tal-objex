@@ -22,12 +22,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.Null;
+
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
 
@@ -66,7 +67,7 @@ import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
 public final class SimpleObjexObj extends BaseObjexObj {
 
 	/** The strategy for this object */
-	private final ObjectStrategy strategy;
+    private final ObjectStrategy strategy;
 	
 	/** Member holds the detail or state object */
 	private ObjexObjStateBean state;
@@ -94,6 +95,11 @@ public final class SimpleObjexObj extends BaseObjexObj {
 	public boolean isUpdateable() {
 	    if( state.isEditable() ) return true;
 	    return super.isUpdateable();
+	}
+	
+	@Override
+	protected ObjexObjStateBean getStateBean() {
+	    return state;
 	}
 	
 	/**
@@ -239,10 +245,6 @@ public final class SimpleObjexObj extends BaseObjexObj {
         
         return newObj;
     }
-	
-	public void validate(ValidationRequest request) {
-	    // FUTURE: Can we support validation on the strategy object?
-	}
 	
 	/////////////////////////////////////////////
 	// Internal

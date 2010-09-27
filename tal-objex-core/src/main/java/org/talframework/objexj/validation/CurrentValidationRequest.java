@@ -16,8 +16,11 @@
 
 package org.talframework.objexj.validation;
 
+
 import java.util.List;
 import java.util.Map;
+
+import javax.validation.Validator;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ValidationError;
@@ -94,6 +97,15 @@ public class CurrentValidationRequest implements ValidationRequest {
         ValidationRequest req = CurrentValidationRequest.getCurrent();
         if( req != null ) return req.getValidationType();
         else return ValidationType.FIELD;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Validator getValidator() {
+        ValidationRequest req = CurrentValidationRequest.getCurrent();
+        if( req != null ) return req.getValidator();
+        else return null;
     }
     
     /**

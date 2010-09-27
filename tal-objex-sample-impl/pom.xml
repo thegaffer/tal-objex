@@ -25,6 +25,11 @@
   		<version>${project.version}</version>
   	</dependency>
   	
+  	<dependency>
+  		<groupId>org.talframework.tal</groupId>
+		<artifactId>tal-aspects</artifactId>
+  	</dependency>
+  	
   	<!-- JDO -->
   	<dependency>
  		<groupId>javax.jdo</groupId>

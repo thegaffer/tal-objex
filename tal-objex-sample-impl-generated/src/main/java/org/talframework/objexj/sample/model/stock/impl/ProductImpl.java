@@ -16,6 +16,7 @@
 
 package org.talframework.objexj.sample.model.stock.impl;
 
+import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.annotations.ObjexObj;
 import org.talframework.objexj.sample.api.stock.Product;
 import org.talframework.objexj.sample.beans.stock.ProductBean;
@@ -28,4 +29,11 @@ public class ProductImpl implements Product {
     public ProductImpl(ProductBean bean) {
         this.bean = bean;
     }
+    
+    @Override
+    protected ObjexObjStateBean getStateBean() {
+        return bean;
+    }
+
+    
 }

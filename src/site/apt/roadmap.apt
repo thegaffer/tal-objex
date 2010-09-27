@@ -17,7 +17,9 @@ Version 1.0
     * Complete eventing model that allows triggers on fields that have changed
     
     * Ideally a relational database runtime environment using JDO. This might get
-    dropped.
+    dropped into 1.1
+    
+    * Full JSR 303 based validation model
     
 Version 1.1
 
@@ -28,9 +30,14 @@ Version 1.1
     * Web Service access to Containers and Web Service client runtime environment to
     allow for better distribution of load.
     
-    * Testing around Major RDBMS, potentially by adding JPA to the generators, although
-    I am not that committed to this because I don't like JPA in terms of its history.
+    * Testing around Major RDBMS, potentially by adding JPA to the generators.
     
     * Support for aggregation relationships as 'compound' objects
     
-    * Support for foreign references
+    * In built support for foreign references
+    
+Future
+
+  The following features are noted for inclusion in the future
+    
+    * Parent handlers on changes in child objects

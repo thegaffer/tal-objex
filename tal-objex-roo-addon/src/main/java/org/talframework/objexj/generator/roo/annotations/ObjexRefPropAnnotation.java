@@ -14,22 +14,66 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.generator.roo;
+package org.talframework.objexj.generator.roo.annotations;
+
+import java.util.List;
 
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.model.JavaType;
+import org.talframework.objexj.annotations.ObjexRefProp;
+import org.talframework.objexj.generator.roo.utils.TypeConstants;
+import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 
-public class ObjexRefPropAnnotationValues {
+public class ObjexRefPropAnnotation {
 
+    @AutoPopulate private String externalName = null;
     @AutoPopulate private boolean owned = false;
     @AutoPopulate private JavaType type = null;
     @AutoPopulate private String newType = null;
+    @AutoPopulate private boolean gettable = true;
     @AutoPopulate private boolean settable = true;
     
-    public ObjexRefPropAnnotationValues(AnnotationMetadata annotationMetadata) {
+    /**
+     * Helper to get the {@link ObjexRefProp} annotation and its values if
+     * it exists.
+     * 
+     * @param annotations The annotations
+     * @return The {@link ObjexRefPropAnnotation} instance if it exists in the annotations
+     */
+    //@Trace
+    public static ObjexRefPropAnnotation get(List<? extends AnnotationMetadata> annotations) {
+        ObjexRefPropAnnotation ret = null;
+        
+        AnnotationMetadata am = TypeDetailsUtil.getAnnotation(annotations, ObjexRefProp.class.getName());
+        if( am != null ) ret = new ObjexRefPropAnnotation(am);
+        
+        return ret;
+    }
+    
+    private ObjexRefPropAnnotation(AnnotationMetadata annotationMetadata) {
         AutoPopulationUtils.populate(this, annotationMetadata);
+        
+        if( "".equals(externalName) ) externalName = null;
+        if( "".equals(newType) ) newType = null;
+        if( TypeConstants.OBJECT.equals(type) ) type = new JavaType(TypeConstants.OBJEXOBJ);
+    }
+
+    /**
+     * @return the externalName
+     */
+    public String getExternalName() {
+        return externalName;
+    }
+
+    /**
+     * Setter for the externalName field
+     *
+     * @param externalName the externalName to set
+     */
+    public void setExternalName(String externalName) {
+        this.externalName = externalName;
     }
 
     /**
@@ -40,6 +84,8 @@ public class ObjexRefPropAnnotationValues {
     }
 
     /**
+     * Setter for the owned field
+     *
      * @param owned the owned to set
      */
     public void setOwned(boolean owned) {
@@ -54,6 +100,8 @@ public class ObjexRefPropAnnotationValues {
     }
 
     /**
+     * Setter for the type field
+     *
      * @param type the type to set
      */
     public void setType(JavaType type) {
@@ -68,10 +116,28 @@ public class ObjexRefPropAnnotationValues {
     }
 
     /**
+     * Setter for the newType field
+     *
      * @param newType the newType to set
      */
     public void setNewType(String newType) {
         this.newType = newType;
+    }
+
+    /**
+     * @return the gettable
+     */
+    public boolean isGettable() {
+        return gettable;
+    }
+
+    /**
+     * Setter for the gettable field
+     *
+     * @param gettable the gettable to set
+     */
+    public void setGettable(boolean gettable) {
+        this.gettable = gettable;
     }
 
     /**
@@ -82,10 +148,11 @@ public class ObjexRefPropAnnotationValues {
     }
 
     /**
+     * Setter for the settable field
+     *
      * @param settable the settable to set
      */
     public void setSettable(boolean settable) {
         this.settable = settable;
     }
-    
 }
