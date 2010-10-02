@@ -17,13 +17,8 @@
 package org.talframework.objexj.sample.model.stock.impl;
 
 import org.talframework.objexj.Container;
-import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexIDStrategy;
-import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.ContainerMiddlewareFactory;
 import org.talframework.objexj.container.ContainerStrategy;
-import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.container.impl.SimpleContainerStrategy;
 import org.talframework.objexj.locator.ContainerFactory;
