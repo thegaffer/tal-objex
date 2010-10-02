@@ -113,13 +113,28 @@ public final class MapReferenceField extends ReferenceField {
         return baseProp;
     }
     
-    public String getRemoveAllName() {
-        return "removeAll" + getName().getSymbolNameCapitalisedFirstLetter();
+    public String getCreateMethodName() {
+        return "create" + getItemReference();
     }
     
-    @Override
-    public String getCreatorName() {
-        return "create" + getItemReference();
+    public String getAddMethodName() {
+        return "add" + getItemReference();
+    }
+    
+    public String getGetByKeyMethodName() {
+        return "get" + getItemReference() + "ByKey";
+    }
+    
+    public String getRemoveByKeyMethodName() {
+        return "remove" + getItemReference() + "ByKey";
+    }
+    
+    public String getRemoveByIdMethodName() {
+        return "remove" + getItemReference() + "ById";
+    }
+    
+    public String getRemoveAllMethodName() {
+        return "removeAll" + getName().getSymbolNameCapitalisedFirstLetter();
     }
     
     /**

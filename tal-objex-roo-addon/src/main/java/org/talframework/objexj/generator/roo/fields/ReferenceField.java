@@ -54,11 +54,4 @@ public abstract class ReferenceField extends ObjexField {
      * @return The reference property name
      */
     public abstract String getReferencePropName();
-    
-    /**
-     * Returns the name of the create method
-     * 
-     * @return
-     */
-    public abstract String getCreatorName();
 }

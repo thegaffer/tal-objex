@@ -112,13 +112,28 @@ public final class ListReferenceField extends ReferenceField {
         return singleProp;
     }
     
-    public String getRemoveAllName() {
-        return "removeAll" + getName().getSymbolNameCapitalisedFirstLetter();
+    public String getCreateMethodName() {
+        return "create" + getItemReference();
     }
     
-    @Override
-    public String getCreatorName() {
-        return "create" + getItemReference();
+    public String getAddMethodName() {
+        return "add" + getItemReference();
+    }
+    
+    public String getGetByIndexMethodName() {
+        return "get" + getItemReference() + "ByIndex";
+    }
+    
+    public String getRemoveByIndexMethodName() {
+        return "remove" + getItemReference() + "ByIndex";
+    }
+    
+    public String getRemoveByIdMethodName() {
+        return "remove" + getItemReference() + "ById";
+    }
+    
+    public String getRemoveAllMethodName() {
+        return "removeAll" + getName().getSymbolNameCapitalisedFirstLetter();
     }
 
     /**

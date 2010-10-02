@@ -5,8 +5,8 @@ package org.talframework.objexj.sample.model.order.impl;
 
 import java.lang.String;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.ObjectUtils;
-import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.objexj.object.ReferenceFieldUtils;
+import org.talframework.objexj.object.SimpleFieldUtils;
 import org.talframework.objexj.sample.api.stock.Product;
 import org.talframework.objexj.sample.beans.order.OrderItemBean;
 
@@ -19,111 +19,99 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     }
     
     public String OrderItemImpl.getRef() {
-        java.lang.String rawValue = bean.getRef();
-        return rawValue;
+        String rawValue = bean.getRef();
+        String val = rawValue;
+        return val;
     }
     
     public void OrderItemImpl.setRef(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getRef(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setRef(rawValue);
+        String rawValue = val;
+        bean.setRef(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getRef()));
     }
     
     public String OrderItemImpl.getName() {
-        java.lang.String rawValue = bean.getName();
-        return rawValue;
+        String rawValue = bean.getName();
+        String val = rawValue;
+        return val;
     }
     
     public void OrderItemImpl.setName(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getName(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setName(rawValue);
+        String rawValue = val;
+        bean.setName(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getName()));
     }
     
     public String OrderItemImpl.getDescription() {
-        java.lang.String rawValue = bean.getDescription();
-        return rawValue;
+        String rawValue = bean.getDescription();
+        String val = rawValue;
+        return val;
     }
     
     public void OrderItemImpl.setDescription(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getDescription(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setDescription(rawValue);
+        String rawValue = val;
+        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getDescription()));
     }
     
     public Product OrderItemImpl.getStockItem() {
-        java.lang.String rawValue = bean.getStockItem();
-        return ObjectUtils.getObject(this, rawValue, Product.class);
+        return ReferenceFieldUtils.getReference(this, Product.class, bean.getStockItem());
     }
     
     public void OrderItemImpl.setStockItem(Product val) {
-        java.lang.String rawValue = ObjectUtils.getObjectRef(val);
-        if( !StateBeanUtils.hasChanged(bean.getStockItem(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setStockItem(rawValue);
+        bean.setStockItem(ReferenceFieldUtils.setReference(this, bean, bean.getStockItem(), val, false, "null"));
     }
     
     public String OrderItemImpl.getStockItemRef() {
-        java.lang.String rawValue = bean.getStockItem();
-        return rawValue;
+        String rawValue = bean.getStockItem();
+        String val = rawValue;
+        return val;
     }
     
     public void OrderItemImpl.setStockItemRef(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getStockItem(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setStockItem(rawValue);
+        String rawValue = val;
+        bean.setStockItem(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getStockItem()));
     }
     
     public double OrderItemImpl.getQuantity() {
         double rawValue = bean.getQuantity();
-        return cloneValue(rawValue);
+        double val = cloneValue(rawValue);
+        return val;
     }
     
     public void OrderItemImpl.setQuantity(double val) {
         double rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getQuantity(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setQuantity(rawValue);
+        bean.setQuantity(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getQuantity()));
     }
     
     public String OrderItemImpl.getMeasure() {
-        java.lang.String rawValue = bean.getMeasure();
-        return rawValue;
+        String rawValue = bean.getMeasure();
+        String val = rawValue;
+        return val;
     }
     
     public void OrderItemImpl.setMeasure(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getMeasure(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setMeasure(rawValue);
+        String rawValue = val;
+        bean.setMeasure(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getMeasure()));
     }
     
     public double OrderItemImpl.getPrice() {
         double rawValue = bean.getPrice();
-        return cloneValue(rawValue);
+        double val = cloneValue(rawValue);
+        return val;
     }
     
     public void OrderItemImpl.setPrice(double val) {
         double rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getPrice(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setPrice(rawValue);
+        bean.setPrice(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getPrice()));
     }
     
     public String OrderItemImpl.getCurrency() {
-        java.lang.String rawValue = bean.getCurrency();
-        return rawValue;
+        String rawValue = bean.getCurrency();
+        String val = rawValue;
+        return val;
     }
     
     public void OrderItemImpl.setCurrency(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getCurrency(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setCurrency(rawValue);
+        String rawValue = val;
+        bean.setCurrency(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getCurrency()));
     }
     
 }

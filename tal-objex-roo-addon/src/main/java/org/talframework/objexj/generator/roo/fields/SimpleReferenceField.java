@@ -78,8 +78,11 @@ public final class SimpleReferenceField extends ReferenceField {
         return getName().getSymbolNameCapitalisedFirstLetter() + "Ref";
     }
     
-    @Override
-    public String getCreatorName() {
+    public String getCreateMethodName() {
         return "create" + getName().getSymbolNameCapitalisedFirstLetter();
+    }
+    
+    public String getRemoveMethodName() {
+        return "remove" + getName().getSymbolNameCapitalisedFirstLetter();
     }
 }

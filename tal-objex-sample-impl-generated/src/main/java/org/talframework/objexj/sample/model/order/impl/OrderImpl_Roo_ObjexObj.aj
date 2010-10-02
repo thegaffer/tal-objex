@@ -5,16 +5,14 @@ package org.talframework.objexj.sample.model.order.impl;
 
 import java.lang.Object;
 import java.lang.String;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder;
-import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.ObjectUtils;
-import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.objexj.object.ReferenceFieldUtils;
+import org.talframework.objexj.object.ReferenceListFieldUtils;
+import org.talframework.objexj.object.SimpleFieldUtils;
 import org.talframework.objexj.sample.api.order.OrderItem;
 import org.talframework.objexj.sample.beans.order.OrderBean;
 import org.talframework.objexj.validation.object.SelfChildValidator;
@@ -41,121 +39,80 @@ privileged aspect OrderImpl_Roo_ObjexObj {
     
     public long OrderImpl.getAccount() {
         long rawValue = bean.getAccount();
-        return cloneValue(rawValue);
+        long val = cloneValue(rawValue);
+        return val;
     }
     
     public void OrderImpl.setAccount(long val) {
         long rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getAccount(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setAccount(rawValue);
+        bean.setAccount(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getAccount()));
     }
     
     public java.util.List<OrderItem> OrderImpl.getItems() {
-        java.util.List<java.lang.String> rawValue = bean.getItems();
-        return ObjectUtils.getObjectList(this, rawValue, OrderItem.class);
+        return ReferenceListFieldUtils.getList(this, OrderItem.class, bean.getItems());
+    }
+    
+    public void OrderImpl.setItems(java.util.List<OrderItem> val) {
+        bean.setItems(ReferenceListFieldUtils.setList(this, bean, bean.getItems(), val, true));
     }
     
     public OrderItem OrderImpl.getItemByIndex(int index) {
-        List<String> refs = bean.getItems();
-        if( refs != null && index >= 0 && index < refs.size() ) return ObjectUtils.getObject(this, refs.get(index), OrderItem.class);
-        return null;
-    }
-    
-    public void OrderImpl.removeItemById(Object id) {
-        checkUpdateable();
-        String ref = ObjectUtils.getObjectRef(this, id);
-        List<String> refs = bean.getItems();
-        if( refs == null || refs.size() == 0 ) return;
-        int size = refs.size();
-        Iterator<String> it = refs.iterator();
-        while( it.hasNext() ) {
-        	if( ref.equals(it.next()) ) {
-        		ensureUpdateable(bean);
-        		it.remove();
-        	}
-        }
-        if( refs.size() == size ) return;
-        ObjectUtils.removeObject(this, bean, ref);
-    }
-    
-    public void OrderImpl.removeItemByIndex(int index) {
-        checkUpdateable();
-        List<String> refs = bean.getItems();
-        if( refs == null || index < 0 || index >= refs.size() ) return;
-        String ref = refs.get(index);
-        ensureUpdateable(bean);
-        refs.remove(index);
-        ObjectUtils.removeObject(this, bean, ref);
-    }
-    
-    public void OrderImpl.removeAllItems() {
-        List<String> refs = bean.getItems();
-        if( refs == null || refs.size() == 0 ) return;
-        checkUpdateable();
-        Iterator<String> it = refs.iterator();
-        while( it.hasNext() ) {
-        	String ref = it.next();
-        	ObjectUtils.removeObject(this, bean, ref);
-        	it.remove();
-        }
-        ensureUpdateable(bean);
-        bean.setItems(null);
+        return ReferenceListFieldUtils.getElementByIndex(this, OrderItem.class, bean.getItems(), index);
     }
     
     public OrderItem OrderImpl.createItem() {
-        checkUpdateable();
-        ObjexObj val = ObjectUtils.createObject(this, bean, "OrderItem");
-        ensureUpdateable(bean);
-        List<String> refs = bean.getItems();
-        if( refs == null ) {
-        	refs = new ArrayList<String>();
-        	bean.setItems(refs);
-        }
-        refs.add(val.getId().toString());
-        return val.getBehaviour(OrderItem.class);
+        String type = "OrderItem";
+        OrderItem val = ReferenceListFieldUtils.createElement(this, bean, OrderItem.class, type);
+        bean.setItems(ReferenceListFieldUtils.addElement(this, bean, bean.getItems(), val));
+        return val;
+    }
+    
+    public void OrderImpl.removeItemByIndex(int index) {
+        bean.setItems(ReferenceListFieldUtils.removeElementByIndex(this, bean, bean.getItems(), true, index));
+    }
+    
+    public void OrderImpl.removeItemById(Object id) {
+        bean.setItems(ReferenceListFieldUtils.removeElementById(this, bean, bean.getItems(), true, id));
+    }
+    
+    public void OrderImpl.removeAllItems() {
+        bean.setItems(ReferenceListFieldUtils.removeAll(this, bean, bean.getItems(), true));
     }
     
     public List<String> OrderImpl.getItemRefs() {
-        java.util.List<java.lang.String> rawValue = bean.getItems();
-        return rawValue;
+        List<String> rawValue = bean.getItems();
+        List<String> val = rawValue;
+        return val;
     }
     
     public void OrderImpl.setItemRefs(List<String> val) {
-        java.util.List<java.lang.String> rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getItems(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setItems(rawValue);
+        List<String> rawValue = val;
+        bean.setItems(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getItems()));
     }
     
     public OrderItem OrderImpl.getTest() {
-        java.lang.String rawValue = bean.getTest();
-        return ObjectUtils.getObject(this, rawValue, OrderItem.class);
+        return ReferenceFieldUtils.getReference(this, OrderItem.class, bean.getTest());
+    }
+    
+    public void OrderImpl.setTest(OrderItem val) {
+        bean.setTest(ReferenceFieldUtils.setReference(this, bean, bean.getTest(), val, true, "null"));
     }
     
     public OrderItem OrderImpl.createTest(String type) {
-        ensureUpdateable(bean);
-        if( bean.getTest() != null ) ObjectUtils.removeObject(this, bean, bean.getTest());
-        ObjexObj val = ObjectUtils.createObject(this, bean, type);
-        bean.setTest(val.getId().toString());
-        return val.getBehaviour(OrderItem.class);
-    }
-    
-    public void OrderImpl.removeTest() {
-        ensureUpdateable(bean);
-        if( bean.getTest() != null ) ObjectUtils.removeObject(this, bean, bean.getTest());
+        OrderItem val = ReferenceFieldUtils.createReference(this, bean, OrderItem.class, type);
+        bean.setTest(ReferenceFieldUtils.setReference(this, bean, bean.getTest(), val, true, "null"));
+        return val;
     }
     
     public String OrderImpl.getTestRef() {
-        java.lang.String rawValue = bean.getTest();
-        return rawValue;
+        String rawValue = bean.getTest();
+        String val = rawValue;
+        return val;
     }
     
     public void OrderImpl.setTestRef(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getTest(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setTest(rawValue);
+        String rawValue = val;
+        bean.setTest(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getTest()));
     }
     
     public boolean OrderImpl.validateObject(ConstraintValidatorContext context) {

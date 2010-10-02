@@ -6,7 +6,7 @@ package org.talframework.objexj.sample.model.stock.impl;
 import java.lang.String;
 import java.util.Date;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.objexj.object.SimpleFieldUtils;
 import org.talframework.objexj.sample.beans.stock.ProductBean;
 
 privileged aspect ProductImpl_Roo_ObjexObj {
@@ -18,75 +18,69 @@ privileged aspect ProductImpl_Roo_ObjexObj {
     }
     
     public String ProductImpl.getName() {
-        java.lang.String rawValue = bean.getName();
-        return rawValue;
+        String rawValue = bean.getName();
+        String val = rawValue;
+        return val;
     }
     
     public void ProductImpl.setName(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getName(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setName(rawValue);
+        String rawValue = val;
+        bean.setName(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getName()));
     }
     
     public String ProductImpl.getDescription() {
-        java.lang.String rawValue = bean.getDescription();
-        return rawValue;
+        String rawValue = bean.getDescription();
+        String val = rawValue;
+        return val;
     }
     
     public void ProductImpl.setDescription(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getDescription(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setDescription(rawValue);
+        String rawValue = val;
+        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getDescription()));
     }
     
     public Date ProductImpl.getEffectiveFrom() {
-        java.util.Date rawValue = bean.getEffectiveFrom();
-        return rawValue;
+        Date rawValue = bean.getEffectiveFrom();
+        Date val = rawValue;
+        return val;
     }
     
     public void ProductImpl.setEffectiveFrom(Date val) {
-        java.util.Date rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getEffectiveFrom(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setEffectiveFrom(rawValue);
+        Date rawValue = val;
+        bean.setEffectiveFrom(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getEffectiveFrom()));
     }
     
     public Date ProductImpl.getEffectiveTo() {
-        java.util.Date rawValue = bean.getEffectiveTo();
-        return rawValue;
+        Date rawValue = bean.getEffectiveTo();
+        Date val = rawValue;
+        return val;
     }
     
     public void ProductImpl.setEffectiveTo(Date val) {
-        java.util.Date rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getEffectiveTo(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setEffectiveTo(rawValue);
+        Date rawValue = val;
+        bean.setEffectiveTo(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getEffectiveTo()));
     }
     
     public double ProductImpl.getPrice() {
         double rawValue = bean.getPrice();
-        return cloneValue(rawValue);
+        double val = cloneValue(rawValue);
+        return val;
     }
     
     public void ProductImpl.setPrice(double val) {
         double rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getPrice(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setPrice(rawValue);
+        bean.setPrice(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getPrice()));
     }
     
     public String ProductImpl.getCurrency() {
-        java.lang.String rawValue = bean.getCurrency();
-        return rawValue;
+        String rawValue = bean.getCurrency();
+        String val = rawValue;
+        return val;
     }
     
     public void ProductImpl.setCurrency(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getCurrency(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setCurrency(rawValue);
+        String rawValue = val;
+        bean.setCurrency(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getCurrency()));
     }
     
 }

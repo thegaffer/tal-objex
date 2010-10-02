@@ -5,13 +5,10 @@ package org.talframework.objexj.sample.model.stock.impl;
 
 import java.lang.Object;
 import java.lang.String;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.ObjectUtils;
-import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.objexj.object.ReferenceListFieldUtils;
+import org.talframework.objexj.object.SimpleFieldUtils;
 import org.talframework.objexj.sample.api.stock.Category;
 import org.talframework.objexj.sample.api.stock.Product;
 import org.talframework.objexj.sample.beans.stock.CategoryBean;
@@ -25,181 +22,109 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     }
     
     public String CategoryImpl.getName() {
-        java.lang.String rawValue = bean.getName();
-        return rawValue;
+        String rawValue = bean.getName();
+        String val = rawValue;
+        return val;
     }
     
     public void CategoryImpl.setName(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getName(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setName(rawValue);
+        String rawValue = val;
+        bean.setName(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getName()));
     }
     
     public String CategoryImpl.getDescription() {
-        java.lang.String rawValue = bean.getDescription();
-        return rawValue;
+        String rawValue = bean.getDescription();
+        String val = rawValue;
+        return val;
     }
     
     public void CategoryImpl.setDescription(String val) {
-        java.lang.String rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getDescription(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setDescription(rawValue);
+        String rawValue = val;
+        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getDescription()));
     }
     
     public java.util.List<Product> CategoryImpl.getProducts() {
-        java.util.List<java.lang.String> rawValue = bean.getProducts();
-        return ObjectUtils.getObjectList(this, rawValue, Product.class);
+        return ReferenceListFieldUtils.getList(this, Product.class, bean.getProducts());
+    }
+    
+    public void CategoryImpl.setProducts(java.util.List<Product> val) {
+        bean.setProducts(ReferenceListFieldUtils.setList(this, bean, bean.getProducts(), val, true));
     }
     
     public Product CategoryImpl.getProductByIndex(int index) {
-        List<String> refs = bean.getProducts();
-        if( refs != null && index >= 0 && index < refs.size() ) return ObjectUtils.getObject(this, refs.get(index), Product.class);
-        return null;
-    }
-    
-    public void CategoryImpl.removeProductById(Object id) {
-        checkUpdateable();
-        String ref = ObjectUtils.getObjectRef(this, id);
-        List<String> refs = bean.getProducts();
-        if( refs == null || refs.size() == 0 ) return;
-        int size = refs.size();
-        Iterator<String> it = refs.iterator();
-        while( it.hasNext() ) {
-        	if( ref.equals(it.next()) ) {
-        		ensureUpdateable(bean);
-        		it.remove();
-        	}
-        }
-        if( refs.size() == size ) return;
-        ObjectUtils.removeObject(this, bean, ref);
-    }
-    
-    public void CategoryImpl.removeProductByIndex(int index) {
-        checkUpdateable();
-        List<String> refs = bean.getProducts();
-        if( refs == null || index < 0 || index >= refs.size() ) return;
-        String ref = refs.get(index);
-        ensureUpdateable(bean);
-        refs.remove(index);
-        ObjectUtils.removeObject(this, bean, ref);
-    }
-    
-    public void CategoryImpl.removeAllProducts() {
-        List<String> refs = bean.getProducts();
-        if( refs == null || refs.size() == 0 ) return;
-        checkUpdateable();
-        Iterator<String> it = refs.iterator();
-        while( it.hasNext() ) {
-        	String ref = it.next();
-        	ObjectUtils.removeObject(this, bean, ref);
-        	it.remove();
-        }
-        ensureUpdateable(bean);
-        bean.setProducts(null);
+        return ReferenceListFieldUtils.getElementByIndex(this, Product.class, bean.getProducts(), index);
     }
     
     public Product CategoryImpl.createProduct() {
-        checkUpdateable();
-        ObjexObj val = ObjectUtils.createObject(this, bean, "Product");
-        ensureUpdateable(bean);
-        List<String> refs = bean.getProducts();
-        if( refs == null ) {
-        	refs = new ArrayList<String>();
-        	bean.setProducts(refs);
-        }
-        refs.add(val.getId().toString());
-        return val.getBehaviour(Product.class);
+        String type = "Product";
+        Product val = ReferenceListFieldUtils.createElement(this, bean, Product.class, type);
+        bean.setProducts(ReferenceListFieldUtils.addElement(this, bean, bean.getProducts(), val));
+        return val;
+    }
+    
+    public void CategoryImpl.removeProductByIndex(int index) {
+        bean.setProducts(ReferenceListFieldUtils.removeElementByIndex(this, bean, bean.getProducts(), true, index));
+    }
+    
+    public void CategoryImpl.removeProductById(Object id) {
+        bean.setProducts(ReferenceListFieldUtils.removeElementById(this, bean, bean.getProducts(), true, id));
+    }
+    
+    public void CategoryImpl.removeAllProducts() {
+        bean.setProducts(ReferenceListFieldUtils.removeAll(this, bean, bean.getProducts(), true));
     }
     
     public List<String> CategoryImpl.getProductRefs() {
-        java.util.List<java.lang.String> rawValue = bean.getProducts();
-        return rawValue;
+        List<String> rawValue = bean.getProducts();
+        List<String> val = rawValue;
+        return val;
     }
     
     public void CategoryImpl.setProductRefs(List<String> val) {
-        java.util.List<java.lang.String> rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getProducts(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setProducts(rawValue);
+        List<String> rawValue = val;
+        bean.setProducts(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getProducts()));
     }
     
     public java.util.List<Category> CategoryImpl.getCategories() {
-        java.util.List<java.lang.String> rawValue = bean.getCategories();
-        return ObjectUtils.getObjectList(this, rawValue, Category.class);
+        return ReferenceListFieldUtils.getList(this, Category.class, bean.getCategories());
+    }
+    
+    public void CategoryImpl.setCategories(java.util.List<Category> val) {
+        bean.setCategories(ReferenceListFieldUtils.setList(this, bean, bean.getCategories(), val, true));
     }
     
     public Category CategoryImpl.getCategoryByIndex(int index) {
-        List<String> refs = bean.getCategories();
-        if( refs != null && index >= 0 && index < refs.size() ) return ObjectUtils.getObject(this, refs.get(index), Category.class);
-        return null;
-    }
-    
-    public void CategoryImpl.removeCategoryById(Object id) {
-        checkUpdateable();
-        String ref = ObjectUtils.getObjectRef(this, id);
-        List<String> refs = bean.getCategories();
-        if( refs == null || refs.size() == 0 ) return;
-        int size = refs.size();
-        Iterator<String> it = refs.iterator();
-        while( it.hasNext() ) {
-        	if( ref.equals(it.next()) ) {
-        		ensureUpdateable(bean);
-        		it.remove();
-        	}
-        }
-        if( refs.size() == size ) return;
-        ObjectUtils.removeObject(this, bean, ref);
-    }
-    
-    public void CategoryImpl.removeCategoryByIndex(int index) {
-        checkUpdateable();
-        List<String> refs = bean.getCategories();
-        if( refs == null || index < 0 || index >= refs.size() ) return;
-        String ref = refs.get(index);
-        ensureUpdateable(bean);
-        refs.remove(index);
-        ObjectUtils.removeObject(this, bean, ref);
-    }
-    
-    public void CategoryImpl.removeAllCategories() {
-        List<String> refs = bean.getCategories();
-        if( refs == null || refs.size() == 0 ) return;
-        checkUpdateable();
-        Iterator<String> it = refs.iterator();
-        while( it.hasNext() ) {
-        	String ref = it.next();
-        	ObjectUtils.removeObject(this, bean, ref);
-        	it.remove();
-        }
-        ensureUpdateable(bean);
-        bean.setCategories(null);
+        return ReferenceListFieldUtils.getElementByIndex(this, Category.class, bean.getCategories(), index);
     }
     
     public Category CategoryImpl.createCategory() {
-        checkUpdateable();
-        ObjexObj val = ObjectUtils.createObject(this, bean, "Category");
-        ensureUpdateable(bean);
-        List<String> refs = bean.getCategories();
-        if( refs == null ) {
-        	refs = new ArrayList<String>();
-        	bean.setCategories(refs);
-        }
-        refs.add(val.getId().toString());
-        return val.getBehaviour(Category.class);
+        String type = "Category";
+        Category val = ReferenceListFieldUtils.createElement(this, bean, Category.class, type);
+        bean.setCategories(ReferenceListFieldUtils.addElement(this, bean, bean.getCategories(), val));
+        return val;
+    }
+    
+    public void CategoryImpl.removeCategoryByIndex(int index) {
+        bean.setCategories(ReferenceListFieldUtils.removeElementByIndex(this, bean, bean.getCategories(), true, index));
+    }
+    
+    public void CategoryImpl.removeCategoryById(Object id) {
+        bean.setCategories(ReferenceListFieldUtils.removeElementById(this, bean, bean.getCategories(), true, id));
+    }
+    
+    public void CategoryImpl.removeAllCategories() {
+        bean.setCategories(ReferenceListFieldUtils.removeAll(this, bean, bean.getCategories(), true));
     }
     
     public List<String> CategoryImpl.getCategoryRefs() {
-        java.util.List<java.lang.String> rawValue = bean.getCategories();
-        return rawValue;
+        List<String> rawValue = bean.getCategories();
+        List<String> val = rawValue;
+        return val;
     }
     
     public void CategoryImpl.setCategoryRefs(List<String> val) {
-        java.util.List<java.lang.String> rawValue = val;
-        if( !StateBeanUtils.hasChanged(bean.getCategories(), rawValue) ) return;
-        ensureUpdateable(bean);
-        bean.setCategories(rawValue);
+        List<String> rawValue = val;
+        bean.setCategories(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getCategories()));
     }
     
 }

@@ -53,44 +53,44 @@ public class StateFieldAccessorGenerator extends BaseGenerator implements FieldV
     }
     
     public void visitSimple(SimpleField prop) {
-        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterName()), prop.getBeanType());
+        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterMethodName()), prop.getBeanType());
         getter.addBody("return " + prop.getBeanName().getSymbolName() + ";");
         methods.add(getter);
         
-        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterName()), JavaType.VOID_PRIMITIVE);
+        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterMethodName()), JavaType.VOID_PRIMITIVE);
         setter.addParameter(new JavaSymbolName("val"), prop.getBeanType(), null);
         setter.addBody(prop.getBeanName().getSymbolName() + " = val;");
         methods.add(setter);
     }
     
     public void visitReference(SimpleReferenceField prop) {
-        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterName()), prop.getBeanType());
+        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterMethodName()), prop.getBeanType());
         getter.addBody("return " + prop.getBeanName().getSymbolName() + ";");
         methods.add(getter);
         
-        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterName()), JavaType.VOID_PRIMITIVE);
+        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterMethodName()), JavaType.VOID_PRIMITIVE);
         setter.addParameter(new JavaSymbolName("val"), prop.getBeanType(), null);
         setter.addBody(prop.getBeanName().getSymbolName() + " = val;");
         methods.add(setter);
     }
     
     public void visitList(ListReferenceField prop) {
-        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterName()), prop.getBeanType());
+        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterMethodName()), prop.getBeanType());
         getter.addBody("return " + prop.getBeanName().getSymbolName() + ";");
         methods.add(getter);
         
-        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterName()), JavaType.VOID_PRIMITIVE);
+        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterMethodName()), JavaType.VOID_PRIMITIVE);
         setter.addParameter(new JavaSymbolName("val"), prop.getBeanType(), null);
         setter.addBody(prop.getBeanName().getSymbolName() + " = val;");
         methods.add(setter);
     }
     
     public void visitMap(MapReferenceField prop) {
-        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterName()), prop.getBeanType());
+        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterMethodName()), prop.getBeanType());
         getter.addBody("return " + prop.getBeanName().getSymbolName() + ";");
         methods.add(getter);
         
-        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterName()), JavaType.VOID_PRIMITIVE);
+        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterMethodName()), JavaType.VOID_PRIMITIVE);
         setter.addParameter(new JavaSymbolName("val"), prop.getBeanType(), null);
         setter.addBody(prop.getBeanName().getSymbolName() + " = val;");
         methods.add(setter);

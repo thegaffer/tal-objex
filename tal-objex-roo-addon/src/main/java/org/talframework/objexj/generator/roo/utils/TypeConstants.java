@@ -20,7 +20,10 @@ public class TypeConstants {
     // Object
     
     public static final String BASEOBJ = "org.talframework.objexj.object.BaseObjexObj";
-    public static final String OBJUTILS = "org.talframework.objexj.object.ObjectUtils";
+    public static final String SIMPLEUTILS = "org.talframework.objexj.object.SimpleFieldUtils";
+    public static final String REFUTILS = "org.talframework.objexj.object.ReferenceFieldUtils";
+    public static final String REFLISTUTILS = "org.talframework.objexj.object.ReferenceListFieldUtils";
+    public static final String REFMAPUTILS = "org.talframework.objexj.object.ReferenceMapFieldUtils";
     public static final String BEANUTILS = "org.talframework.objexj.object.StateBeanUtils";
     
     ///////////////////////////////

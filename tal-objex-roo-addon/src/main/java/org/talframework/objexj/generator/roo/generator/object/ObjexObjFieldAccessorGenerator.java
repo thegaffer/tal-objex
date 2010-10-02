@@ -29,12 +29,10 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
     /** Holds the methods generated as we visit the properties */
     private List<MethodMetadataWrapper> methods;
     
-    private boolean includeObjexObj = false;
-    private boolean includeStateUtils = true;
-    private boolean includeObjectUtils = false;
-    private boolean includeIterator = false;
-    private boolean includeList = false;
-    private boolean includeMap = false;
+    private boolean includeSimpleUtils = false;
+    private boolean includeReferenceUtils = false;
+    private boolean includeListUtils = false;
+    private boolean includeMapUtils = false;
 
     public ObjexObjFieldAccessorGenerator(DefaultItdTypeDetailsBuilder builder, ClassOrInterfaceTypeDetails typeDetails, String typeId) {
         super(builder, typeDetails, typeId);
@@ -48,26 +46,20 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
      */
     public void generate(List<ObjexField> fields) {
         methods = new ArrayList<MethodMetadataWrapper>();
-        includeObjexObj = false;
-        includeStateUtils = true;
-        includeObjectUtils = false;
-        includeIterator = false;
-        includeList = false;
-        includeMap = false;
+        includeSimpleUtils = false;
+        includeReferenceUtils = false;
+        includeListUtils = false;
+        includeMapUtils = false;
         
         Iterator<ObjexField> it = fields.iterator();
         while( it.hasNext() ) {
             it.next().accept(this);
         }
         
-        if( includeObjexObj ) builder.getImportRegistrationResolver().addImport(new JavaType(TypeConstants.OBJEXOBJ));
-        if( includeStateUtils ) builder.getImportRegistrationResolver().addImport(new JavaType(TypeConstants.BEANUTILS));
-        if( includeObjectUtils ) builder.getImportRegistrationResolver().addImport(new JavaType(TypeConstants.OBJUTILS));
-        if( includeIterator ) builder.getImportRegistrationResolver().addImport(new JavaType("java.util.Iterator"));
-        if( includeList ) builder.getImportRegistrationResolver().addImport(new JavaType("java.util.ArrayList"));
-        if( includeList ) builder.getImportRegistrationResolver().addImport(new JavaType("java.util.List"));
-        if( includeMap ) builder.getImportRegistrationResolver().addImport(new JavaType("java.util.HashMap"));
-        if( includeMap ) builder.getImportRegistrationResolver().addImport(new JavaType("java.util.Map"));
+        if( includeSimpleUtils ) builder.getImportRegistrationResolver().addImport(new JavaType(TypeConstants.SIMPLEUTILS));
+        if( includeReferenceUtils ) builder.getImportRegistrationResolver().addImport(new JavaType(TypeConstants.REFUTILS));
+        if( includeListUtils ) builder.getImportRegistrationResolver().addImport(new JavaType(TypeConstants.REFLISTUTILS));
+        if( includeMapUtils ) builder.getImportRegistrationResolver().addImport(new JavaType(TypeConstants.REFMAPUTILS));
         
         Iterator<MethodMetadataWrapper> it2 = methods.iterator();
         while( it2.hasNext() ) {
@@ -75,395 +67,230 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
         }
     }
 
+    /**
+     * Simply generates a get/set method pair
+     */
     public void visitSimple(SimpleField prop) {
-        generateSimpleAccessor(prop);
-        generateSimpleMutator(prop);
+        includeSimpleUtils = true;
+        
+        // a. Getter
+        MethodMetadataWrapper getter = startMethod(prop.getGetterMethodName(), prop.getType());
+        getter.addBody(getSimpleType(prop.getBeanType()) + " rawValue = bean." + prop.getBeanGetterMethodName() + "();");
+        getter.addBody(getValueFromRawValue(prop));
+        getter.addBody("return val;");
+        methods.add(getter);
+        
+        // b. Setter
+        MethodMetadataWrapper setter = startSetter(prop.getSetterMethodName(), prop.getType());
+        setter.addBody(getRawValueFromValue(prop));
+        setter.addBody("bean." + prop.getBeanSetterMethodName() + "(SimpleFieldUtils.setSimple(this, bean, rawValue, bean." + prop.getBeanGetterMethodName() + "()));");
+        methods.add(setter);
     }
     
     public void visitReference(SimpleReferenceField prop) {
-        includeObjectUtils = true;
+        includeReferenceUtils = true;
         
-        generateSimpleAccessor(prop);
+        // a. Getter
+        MethodMetadataWrapper getter = startMethod(prop.getGetterMethodName(), prop.getType());
+        getter.addBody("return ReferenceFieldUtils.getReference(this, " + getSimpleType(prop.getType()) + ".class, bean." + prop.getBeanGetterMethodName() + "());");
+        methods.add(getter);
+        
+        // b. Setter
+        MethodMetadataWrapper setter = startSetter(prop.getSetterMethodName(), prop.getType());
+        setter.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceFieldUtils.setReference(this, bean, bean." + prop.getBeanGetterMethodName() + "(), val, " + prop.isOwned() + ", \"" + prop.getNewType() + "\"));");
+        methods.add(setter);
         
         if( prop.isOwned() ) {
-            includeObjexObj = true;
-            generateRefCreate(prop);
-            generateRefRemove(prop);
-            generateRefSetter(prop);
-        }
-        else {
-            generateSimpleMutator(prop);
+            // c. Create
+            MethodMetadataWrapper creator = startMethod(prop.getCreateMethodName(), prop.getType());
+            if( prop.getNewType() == null ) creator.addParameter(new JavaSymbolName("type"), JavaType.STRING_OBJECT, null);
+            else creator.addBody("String type = \"" + prop.getNewType() + "\";");
+            creator.addBody(getSimpleType(prop.getType()) + " val = ReferenceFieldUtils.createReference(this, bean, " + getSimpleType(prop.getType()) + ".class, type);");
+            creator.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceFieldUtils.setReference(this, bean, bean." + prop.getBeanGetterMethodName() + "(), val, " + prop.isOwned() + ", \"" + prop.getNewType() + "\"));");
+            creator.addBody("return val;");
+            methods.add(creator);
         }
     }
     
     public void visitList(ListReferenceField prop) {
-        includeObjectUtils = true;
-        includeIterator = true;
-        includeList = true;
+        includeListUtils = true;
         
-        generateSimpleAccessor(prop);
+        // a. Getter
+        MethodMetadataWrapper method = startMethod(prop.getGetterMethodName(), prop.getType());
+        method.addBody("return ReferenceListFieldUtils.getList(this, " + getSimpleType(prop.getMemberType()) + ".class, bean." + prop.getBeanGetterMethodName() + "());");
+        methods.add(method);
         
-        generateListItemGet(prop);
-        generateListRemoveById(prop);
-        generateListRemoveByIndex(prop);
-        generateListRemoveAll(prop);
+        // b. Setter
+        method = startSetter(prop.getSetterMethodName(), prop.getType());
+        method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceListFieldUtils.setList(this, bean, bean." + prop.getBeanGetterMethodName() + "(), val, " + prop.isOwned() + "));");
+        methods.add(method);
         
+        // c. Item by Index
+        method = startMethod(prop.getGetByIndexMethodName(), prop.getMemberType());
+        method.addParameter(new JavaSymbolName("index"), JavaType.INT_PRIMITIVE, null);
+        method.addBody("return ReferenceListFieldUtils.getElementByIndex(this, " + getSimpleType(prop.getMemberType()) + ".class, bean." + prop.getBeanGetterMethodName() + "(), index);");
+        methods.add(method);
+        
+        // d. Create
         if( prop.isOwned() ) {
-            includeObjexObj = true;
-            generateListCreate(prop);
+            method = startMethod(prop.getCreateMethodName(), prop.getMemberType());
+            if( prop.getNewType() == null ) method.addParameter(new JavaSymbolName("type"), JavaType.STRING_OBJECT, null);
+            else method.addBody("String type = \"" + prop.getNewType() + "\";");
+            method.addBody(getSimpleType(prop.getMemberType()) + " val = ReferenceListFieldUtils.createElement(this, bean, " + getSimpleType(prop.getMemberType()) + ".class, type);");
+            method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceListFieldUtils.addElement(this, bean, bean." + prop.getBeanGetterMethodName() + "(), val));");
+            method.addBody("return val;");
+            methods.add(method);
         }
+
+        // e. Add
         else {
-            generateListAdd(prop);
-            generateSimpleMutator(prop);
+            method = startMethod(prop.getAddMethodName(), JavaType.VOID_PRIMITIVE);
+            method.addParameter(new JavaSymbolName("val"), prop.getMemberType(), null);
+            method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceListFieldUtils.addElement(this, bean, bean." + prop.getBeanGetterMethodName() + "(), val);");
+            methods.add(method);
         }
+        
+        // f. Remove Index
+        method = startMethod(prop.getRemoveByIndexMethodName(), JavaType.VOID_PRIMITIVE);
+        method.addParameter(new JavaSymbolName("index"), JavaType.INT_PRIMITIVE, null);
+        method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceListFieldUtils.removeElementByIndex(this, bean, bean." + prop.getBeanGetterMethodName() + "(), " + prop.isOwned() + ", index));");
+        methods.add(method);
+        
+        // g. Remove ID
+        method = startMethod(prop.getRemoveByIdMethodName(), JavaType.VOID_PRIMITIVE);
+        method.addParameter("id", "java.lang.Object", null);
+        method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceListFieldUtils.removeElementById(this, bean, bean." + prop.getBeanGetterMethodName() + "(), " + prop.isOwned() + ", id));");
+        methods.add(method);
+        
+        // h. Remove All
+        method = startMethod(prop.getRemoveAllMethodName(), JavaType.VOID_PRIMITIVE);
+        method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceListFieldUtils.removeAll(this, bean, bean." + prop.getBeanGetterMethodName() + "(), " + prop.isOwned() + "));");
+        methods.add(method);
     }
     
     public void visitMap(MapReferenceField prop) {
-        includeObjectUtils = true;
-        includeIterator = true;
-        includeMap = true;
+        includeListUtils = true;
         
-        generateSimpleAccessor(prop);
+        // a. Getter
+        MethodMetadataWrapper method = startMethod(prop.getGetterMethodName(), prop.getType());
+        method.addBody("return ReferenceMapFieldUtils.getMap(this, " + getSimpleType(prop.getMemberType()) + ".class, bean." + prop.getBeanGetterMethodName() + "());");
+        methods.add(method);
         
-        generateMapItemGet(prop);
-        generateMapRemoveById(prop);
-        generateMapRemoveByKey(prop);
-        generateMapRemoveAll(prop);
+        // b. Setter
+        method = startSetter(prop.getSetterMethodName(), prop.getType());
+        method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceMapFieldUtils.setMap(this, bean, " + prop.isOwned() + ", bean." + prop.getBeanGetterMethodName() + "(), val);");
+        methods.add(method);
         
+        // c. Item by Key
+        method = startMethod(prop.getGetByKeyMethodName(), prop.getMemberType());
+        method.addParameter(new JavaSymbolName("key"), JavaType.STRING_OBJECT, null);
+        method.addBody("return ReferenceMapFieldUtils.getElementByKey(this, " + getSimpleType(prop.getMemberType()) + ".class, bean." + prop.getBeanGetterMethodName() + "(), key);");
+        methods.add(method);
+        
+        // d. Create
         if( prop.isOwned() ) {
-            includeObjexObj = true;
-            generateMapCreate(prop);
+            method = startMethod(prop.getCreateMethodName(), prop.getMemberType());
+            method.addParameter(new JavaSymbolName("key"), JavaType.STRING_OBJECT, null);
+            if( prop.getNewType() == null ) method.addParameter(new JavaSymbolName("type"), JavaType.STRING_OBJECT, null);
+            else method.addBody("String type = \"" + prop.getNewType() + "\";");
+            method.addBody(getSimpleType(prop.getMemberType()) + " val = ReferenceMapFieldUtils.createElement(this, bean, " + getSimpleType(prop.getMemberType()) + ".class, type);");
+            method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceMapFieldUtils.addElement(this, bean, bean." + prop.getBeanGetterMethodName() + "(), key, val);");
+            method.addBody("return val;");
+            methods.add(method);
         }
+
+        // e. Add
         else {
-            // TODO: Add
-            generateSimpleMutator(prop);
+            method = startMethod(prop.getAddMethodName(), JavaType.VOID_PRIMITIVE);
+            method.addParameter(new JavaSymbolName("key"), JavaType.STRING_OBJECT, null);
+            method.addParameter(new JavaSymbolName("val"), prop.getMemberType(), null);
+            method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceMapFieldUtils.addElement(this, bean, bean." + prop.getBeanGetterMethodName() + "(), key, val);");
+            methods.add(method);
         }
+        
+        // f. Remove Index
+        method = startMethod(prop.getRemoveByKeyMethodName(), JavaType.VOID_PRIMITIVE);
+        method.addParameter(new JavaSymbolName("key"), JavaType.STRING_OBJECT, null);
+        method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceMapFieldUtils.removeElementByKey(this, bean, bean." + prop.getBeanGetterMethodName() + "(), " + prop.isOwned() + ", key));");
+        methods.add(method);
+        
+        // g. Remove ID
+        method = startMethod(prop.getRemoveByIdMethodName(), JavaType.VOID_PRIMITIVE);
+        method.addParameter("id", "java.lang.Object", null);
+        method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceMapFieldUtils.removeElementById(this, bean, bean." + prop.getBeanGetterMethodName() + "(), " + prop.isOwned() + ", id));");
+        methods.add(method);
+        
+        // h. Remove All
+        method = startMethod(prop.getRemoveAllMethodName(), JavaType.VOID_PRIMITIVE);
+        method.addBody("bean." + prop.getBeanSetterMethodName() + "(ReferenceMapFieldUtils.removeAll(this, bean, bean." + prop.getBeanGetterMethodName() + "(), " + prop.isOwned() + "));");
+        methods.add(method);
     }
     
     //////////////////////////////////
     // Helpers
     
     /**
-     * Helper to generate a basic getter method
+     * Helper to start and return a method that is called name
+     * and returns the given type.
      */
-    private void generateSimpleAccessor(ObjexField prop) {
-        MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getGetterName()), prop.getType());
+    private MethodMetadataWrapper startMethod(String name, JavaType type) {
+        JavaSymbolName javaName = new JavaSymbolName(name);
+        return new MethodMetadataWrapper(javaName, type);
+    }
+    
+    /**
+     * Helper to start and return a setter method
+     */
+    private MethodMetadataWrapper startSetter(String name, JavaType type) {
+        JavaSymbolName javaName = new JavaSymbolName(name);
+        MethodMetadataWrapper method = new MethodMetadataWrapper(javaName, JavaType.VOID_PRIMITIVE);
+        method.addParameter(new JavaSymbolName("val"), type, null);
+        return method;
+    }
+    
+    /**
+     * Helper to return the line that converts a raw value into the return
+     */
+    private String getValueFromRawValue(ObjexField prop) {
+        String ret = null;
         
-        getter.addBody(prop.getBeanTypeName() + " rawValue = bean." + prop.getBeanGetterName() + "();");
-        
-        // Convert to bean's type
         // a. Not transformed & primitive
-        if( !prop.isTransformed() && !prop.getType().isPrimitive() ) getter.addBody("return rawValue;");
+        if( !prop.isTransformed() && !prop.getType().isPrimitive() ) ret = getSimpleType(prop.getType()) + " val = rawValue;";
+        
         // b. Not transformed and not primitive
-        else if( !prop.isTransformed() ) getter.addBody("return cloneValue(rawValue);");
-        // b. Exposed type natively handles
-        else if( prop.getTransformer() == null ) getter.addBody("return new " + prop.getTypeName() + "(rawValue);");
-        // c. Function
-        else getter.addBody("return " + prop.getTransformer() + "." + prop.getGetTransformer() + ";");
+        else if( !prop.isTransformed() ) ret = getSimpleType(prop.getType()) + " val = cloneValue(rawValue);";
         
-        methods.add(getter);
+        // b. Exposed type natively handles
+        else if( prop.getTransformer() == null ) ret = getSimpleType(prop.getType()) + " val = new " + prop.getTypeName() + "(rawValue);";
+        
+        // c. Function
+        else ret = getSimpleType(prop.getType()) + " val = " + prop.getTransformer() + "." + prop.getGetTransformer() + ";";
+        
+        return ret;
     }
     
     /**
-     * Helper to generate a basic setter method
+     * Helper to return the line that converts to value from raw value
      */
-    private void generateSimpleMutator(ObjexField prop) {
-        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getSetterName()), JavaType.VOID_PRIMITIVE);
-        setter.addParameter(new JavaSymbolName("val"), prop.getType(), null);
-
-        // Convert to bean's type
+    private String getRawValueFromValue(ObjexField prop) {
+        String ret = getSimpleType(prop.getBeanType()) + " rawValue = ";
+        
         // a. Not transformed
-        if( !prop.isTransformed() ) setter.addBody(prop.getBeanTypeName() + " rawValue = val;");
+        if( !prop.isTransformed() ) ret += "val;";
+        
         // b. Exposed type natively handles
-        else if( prop.getTransformer() == null ) setter.addBody(prop.getBeanTypeName() + " rawValue = val." + prop.getSetTransformer() + ";");
+        else if( prop.getTransformer() == null ) ret += "val." + prop.getSetTransformer() + ";";
+        
         // c. Function
-        else setter.addBody(prop.getBeanTypeName() + " rawValue = " + prop.getTransformer() + "." + prop.getSetTransformer() + ";");
+        else ret += prop.getTransformer() + "." + prop.getSetTransformer() + ";";
         
-        setter.addBody("if( !StateBeanUtils.hasChanged(bean." + prop.getBeanGetterName() + "(), rawValue) ) return;");
-        setter.addBody("ensureUpdateable(bean);");
-        setter.addBody("bean." + prop.getBeanSetterName() + "(rawValue);");
-        
-        // TODO: Triggers
-        
-        methods.add(setter);
+        return ret;
     }
-    
-    /**
-     * Generates a method to create a new child
-     */
-    private void generateRefCreate(SimpleReferenceField prop) {
-        MethodMetadataWrapper method = new MethodMetadataWrapper(new JavaSymbolName(prop.getCreatorName()), prop.getType());
-        if( prop.getNewType() == null ) method.addParameter("type", String.class.getName(), null);
-        
-        method.addBody("ensureUpdateable(bean);");
-        
-        // Remove if already present
-        method.addBody("if( bean." + prop.getBeanGetterName() + "() != null ) ObjectUtils.removeObject(this, bean, bean." + prop.getBeanGetterName() + "());");
-        
-        if( prop.getNewType() == null ) method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, type);");
-        else method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, \"" + prop.getNewType() + "\");");
-        method.addBody("bean." + prop.getBeanSetterName() + "(val.getId().toString());");
-        method.addBody("return val.getBehaviour(" + prop.getType().getSimpleTypeName() + ".class);");
-        
-        methods.add(method);
-    }
-    
-    /**
-     * Generates a create member method on a list ref field
-     */
-    private void generateListCreate(ListReferenceField prop) {
-        String newType = prop.getNewType();
-        
-        MethodMetadataWrapper method = new MethodMetadataWrapper(prop.getCreatorName(), prop.getMemberTypeName());
-        if( newType == null ) method.addParameter("type", String.class.getName(), null);
 
-        method.addBody("checkUpdateable();");
-        
-        if( newType == null ) method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, type);");
-        else method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, \"" + newType + "\");");
-        
-        method.addBody("ensureUpdateable(bean);");
-        method.addBody("List<String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null ) {");
-        method.addBody("\trefs = new ArrayList<String>();");
-        method.addBody("\tbean." + prop.getBeanSetterName() + "(refs);");
-        method.addBody("}");
-        method.addBody("refs.add(val.getId().toString());");
-        
-        method.addBody("return val.getBehaviour(" + prop.getMemberType().getSimpleTypeName() + ".class);");
-        methods.add(method);
-    }
-    
     /**
-     * Generates a create member method on a list ref field
+     * @return The simple type name
      */
-    private void generateMapCreate(MapReferenceField prop) {
-        String newType = prop.getNewType();
-        
-        MethodMetadataWrapper method = new MethodMetadataWrapper(prop.getCreatorName(), prop.getMemberTypeName());
-        method.addParameter("key", String.class.getName(), null);
-        if( newType == null ) method.addParameter("type", String.class.getName(), null);
-
-        method.addBody("checkUpdateable();");
-        
-        if( newType == null ) method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, type);");
-        else method.addBody("ObjexObj val = ObjectUtils.createObject(this, bean, \"" + newType + "\");");
-        
-        method.addBody("ensureUpdateable(bean);");
-        method.addBody("Map<String, String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null ) {");
-        method.addBody("\trefs = new HashMap<String, String>();");
-        method.addBody("\tbean." + prop.getBeanSetterName() + "(refs);");
-        method.addBody("}");
-        method.addBody("refs.put(key, val.getId().toString());");
-        
-        method.addBody("return val.getBehaviour(" + prop.getMemberType().getSimpleTypeName() + ".class);");
-        methods.add(method);
-    }
-    
-    /**
-     * Generates the set method on an owned reference property.
-     * This creates the reference if required and copies all
-     * fields from input into the object.
-     */
-    private void generateRefSetter(SimpleReferenceField prop) {
-        // TODO: Generate the reference setter
-    }
-    
-    /**
-     * Generates a getter by ID on a ref or map property
-     */
-    private void generateListItemGet(ListReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName("get" + prop.getItemReference() + "ByIndex");
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, prop.getMemberType());
-        method.addParameter(new JavaSymbolName("index"), JavaType.INT_PRIMITIVE, null);
-        
-        method.addBody("List<String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs != null && index >= 0 && index < refs.size() ) return ObjectUtils.getObject(this, refs.get(index), " + prop.getMemberTypeName() + ".class);");
-        method.addBody("return null;");
-        
-        methods.add(method);
-    }
-    
-    /**
-     * Generates a getter by key on a map property
-     */
-    private void generateMapItemGet(MapReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName("get" + prop.getItemReference() + "ByIndex");
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, prop.getMemberType());
-        method.addParameter(new JavaSymbolName("key"), JavaType.STRING_OBJECT, null);
-        
-        method.addBody("Map<String, String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null || !refs.containsKey(key) ) return null;");
-        method.addBody("else return ObjectUtils.getObject(this, refs.get(key), " + prop.getMemberTypeName() + ".class");
-        
-        methods.add(method);
-    }
-    
-    /**
-     * Generates a getter by ID on a ref or map property
-     */
-    private void generateListAdd(ListReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName("add" + prop.getItemReference());
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        method.addParameter(new JavaSymbolName("val"), prop.getMemberType(), null);
-        method.addBody("checkUpdateable();");
-        method.addBody("String ref = ObjectUtils.getObjexId(val);");
-        
-        method.addBody("ensureUpdateable(bean);");
-        method.addBody("List<String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null ) {");
-        method.addBody("\trefs = new ArrayList<String>();");
-        method.addBody("\tbean." + prop.getBeanSetterName() + "(refs);");
-        method.addBody("}");
-        method.addBody("refs.add(ref);");
-        
-        methods.add(method);
-    }
-    
-    /**
-     * Generates a method to remove a owned reference property
-     */
-    private void generateRefRemove(SimpleReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName("remove" + prop.getName().getSymbolNameCapitalisedFirstLetter());
-        
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        
-        method.addBody("ensureUpdateable(bean);");
-        method.addBody("if( bean." + prop.getBeanGetterName() + "() != null ) ObjectUtils.removeObject(this, bean, bean." + prop.getBeanGetterName() + "());");
-        
-        methods.add(method);
-    }
-    
-    private void generateListRemoveById(ListReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName("remove" + prop.getItemReference() + "ById");
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        method.addParameter("id", "java.lang.Object", null);
-        method.addBody("checkUpdateable();");
-        
-        method.addBody("String ref = ObjectUtils.getObjectRef(this, id);");
-        method.addBody("List<String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null || refs.size() == 0 ) return;");
-        if( prop.isOwned() ) method.addBody("int size = refs.size();");
-        
-        method.addBody("Iterator<String> it = refs.iterator();");
-        method.addBody("while( it.hasNext() ) {");
-        method.addBody("\tif( ref.equals(it.next()) ) {");
-        method.addBody("\t\tensureUpdateable(bean);");
-        method.addBody("\t\tit.remove();");
-        method.addBody("\t}");
-        method.addBody("}");
-        
-        if( prop.isOwned() ) {
-            method.addBody("if( refs.size() == size ) return;");
-            method.addBody("ObjectUtils.removeObject(this, bean, ref);");
-        }
-        
-        methods.add(method);
-    }
-    
-    private void generateMapRemoveById(MapReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName("remove" + prop.getItemReference() + "ById");
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        method.addParameter("id", "java.lang.Object", null);
-        method.addBody("checkUpdateable();");
-        
-        method.addBody("String ref = ObjectUtils.getObjectRef(this, id);");
-        method.addBody("Map<String, String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null || refs.size() == 0 ) return;");
-        if( prop.isOwned() ) method.addBody("int size = refs.size();");
-        
-        method.addBody("Iterator<String> it = refs.keySet().iterator();");
-        method.addBody("while( it.hasNext() ) {");
-        method.addBody("\tif( ref.equals(it.next()) ) {");
-        method.addBody("\t\tensureUpdateable(bean);");
-        method.addBody("\t\tit.remove();");
-        method.addBody("\t}");
-        method.addBody("}");
-        
-        if( prop.isOwned() ) {
-            method.addBody("if( refs.size() == size ) return;");
-            method.addBody("ObjectUtils.removeObject(this, bean, ref);");
-        }
-        
-        methods.add(method);
-    }
-    
-    private void generateListRemoveByIndex(ListReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName("remove" + prop.getItemReference() + "ByIndex");
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        method.addParameter(new JavaSymbolName("index"), JavaType.INT_PRIMITIVE, null);
-        method.addBody("checkUpdateable();");
-        
-        method.addBody("List<String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null || index < 0 || index >= refs.size() ) return;");
-        
-        if( prop.isOwned() ) method.addBody("String ref = refs.get(index);");
-        method.addBody("ensureUpdateable(bean);");
-        method.addBody("refs.remove(index);");
-        if( prop.isOwned() ) method.addBody("ObjectUtils.removeObject(this, bean, ref);");
-        
-        methods.add(method);
-    }
-    
-    private void generateMapRemoveByKey(MapReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName("remove" + prop.getItemReference() + "ByIndex");
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        method.addParameter(new JavaSymbolName("ref"), JavaType.INT_PRIMITIVE, null);
-        method.addBody("checkUpdateable();");
-        
-        method.addBody("Map<String, String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null || !refs.containsKey(ref) ) ) return;");
-        
-        method.addBody("ensureUpdateable(bean);");
-        method.addBody("refs.remove(ref);");
-        if( prop.isOwned() ) method.addBody("ObjectUtils.removeObject(this, bean, ref);");
-        
-        methods.add(method);
-    }
-    
-    private void generateListRemoveAll(ListReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName(prop.getRemoveAllName());
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        
-        method.addBody("List<String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null || refs.size() == 0 ) return;");
-        method.addBody("checkUpdateable();");
-        
-        // Remove all refs from container if owned
-        if( prop.isOwned() ) {
-            method.addBody("Iterator<String> it = refs.iterator();");
-            method.addBody("while( it.hasNext() ) {");
-            method.addBody("\tString ref = it.next();");
-            method.addBody("\tObjectUtils.removeObject(this, bean, ref);");
-            method.addBody("\tit.remove();");
-            method.addBody("}");
-        }
-        method.addBody("ensureUpdateable(bean);");
-        method.addBody("bean." + prop.getBeanSetterName() + "(null);");
-        
-        methods.add(method);
-    }
-    
-    private void generateMapRemoveAll(MapReferenceField prop) {
-        JavaSymbolName name = new JavaSymbolName(prop.getRemoveAllName());
-        MethodMetadataWrapper method = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        
-        method.addBody("Map<String, String> refs = bean." + prop.getBeanGetterName() + "();");
-        method.addBody("if( refs == null || refs.size() == 0 ) return;");
-        method.addBody("checkUpdateable();");
-        
-        // Remove all refs from container if owned
-        if( prop.isOwned() ) {
-            method.addBody("Iterator<String> it = refs.keySet.iterator();");
-            method.addBody("while( it.hasNext() ) {");
-            method.addBody("\tString ref = it.next();");
-            method.addBody("\tObjectUtils.removeObject(this, bean, ref);");
-            method.addBody("}");
-        }
-        method.addBody("ensureUpdateable(bean);");
-        method.addBody("bean." + prop.getBeanSetterName() + "(null);");
-        
-        methods.add(method);
+    private String getSimpleType(JavaType type) {
+        return type.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
     }
 }

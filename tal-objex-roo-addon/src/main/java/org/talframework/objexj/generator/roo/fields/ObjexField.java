@@ -228,7 +228,7 @@ public abstract class ObjexField {
     /**
      * @return The main getter method name
      */
-    public String getGetterName() {
+    public String getGetterMethodName() {
         String prefix = "get";
         if( JavaType.BOOLEAN_PRIMITIVE.equals(type) ) prefix = "is";
         else if( JavaType.BOOLEAN_OBJECT.equals(type) ) prefix = "is";
@@ -238,14 +238,14 @@ public abstract class ObjexField {
     /**
      * @return The main setter method name
      */
-    public String getSetterName() {
+    public String getSetterMethodName() {
         return "set" + name.getSymbolNameCapitalisedFirstLetter();
     }
     
     /**
      * @return The beans getter method name
      */
-    public String getBeanGetterName() {
+    public String getBeanGetterMethodName() {
         String prefix = "get";
         if( JavaType.BOOLEAN_PRIMITIVE.equals(beanType) ) prefix = "is";
         else if( JavaType.BOOLEAN_OBJECT.equals(beanType) ) prefix = "is";
@@ -255,7 +255,7 @@ public abstract class ObjexField {
     /**
      * @return The beans setter method name
      */
-    public String getBeanSetterName() {
+    public String getBeanSetterMethodName() {
         return "set" + beanName.getSymbolNameCapitalisedFirstLetter();
     }
     
