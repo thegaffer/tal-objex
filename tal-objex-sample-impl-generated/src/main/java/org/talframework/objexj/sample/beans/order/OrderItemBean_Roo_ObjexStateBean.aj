@@ -14,7 +14,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.ObjectUtils;
+import org.talframework.objexj.object.StateBeanUtils;
 
 privileged aspect OrderItemBean_Roo_ObjexStateBean {
     
@@ -146,8 +146,8 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
     }
     
     public void OrderItemBean.updateTemporaryReferences(java.util.Map<ObjexID, ObjexID> refs) {
-        parentId = ObjectUtils.updateTempReferences(parentId, refs);
-        stockItem = ObjectUtils.updateTempReferences(stockItem, refs);
+        parentId = StateBeanUtils.updateTempReferences(parentId, refs);
+        stockItem = StateBeanUtils.updateTempReferences(stockItem, refs);
     }
     
     public void OrderItemBean.writeBean(Writer writer, ObjexID id, String prefix) {

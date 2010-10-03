@@ -187,8 +187,7 @@ public final class SimpleObjexObj extends BaseObjexObj {
         Object current = wrapper.getPropertyValue(name);
         if( (current != null && current.equals(val)) || current == val ) return;
         
-        // FUTURE: Wrap in a canSet/onSet provided by Strategy 
-        if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
+        val = SimpleFieldUtils.setSimple(this, state, name, val, current);
         wrapper.setPropertyValue(name, val);
     }
     

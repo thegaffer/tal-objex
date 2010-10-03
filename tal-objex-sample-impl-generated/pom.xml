@@ -49,6 +49,13 @@
  			</exclusion>
  		</exclusions>
  	</dependency>
+ 	
+ 	<!-- Test -->
+ 	<dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>

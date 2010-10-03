@@ -16,7 +16,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.ObjectUtils;
+import org.talframework.objexj.object.StateBeanUtils;
 
 privileged aspect CategoryBean_Roo_ObjexStateBean {
     
@@ -112,9 +112,9 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     }
     
     public void CategoryBean.updateTemporaryReferences(java.util.Map<ObjexID, ObjexID> refs) {
-        parentId = ObjectUtils.updateTempReferences(parentId, refs);
-        products = ObjectUtils.updateTempReferences(products, refs);
-        categories = ObjectUtils.updateTempReferences(categories, refs);
+        parentId = StateBeanUtils.updateTempReferences(parentId, refs);
+        products = StateBeanUtils.updateTempReferences(products, refs);
+        categories = StateBeanUtils.updateTempReferences(categories, refs);
     }
     
     public void CategoryBean.writeBean(Writer writer, ObjexID id, String prefix) {

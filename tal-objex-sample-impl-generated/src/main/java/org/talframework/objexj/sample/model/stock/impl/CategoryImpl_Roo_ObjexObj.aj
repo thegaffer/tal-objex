@@ -29,7 +29,7 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     
     public void CategoryImpl.setName(String val) {
         String rawValue = val;
-        bean.setName(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getName()));
+        bean.setName(SimpleFieldUtils.setSimple(this, bean, "name", rawValue, bean.getName()));
     }
     
     public String CategoryImpl.getDescription() {
@@ -40,7 +40,7 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     
     public void CategoryImpl.setDescription(String val) {
         String rawValue = val;
-        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getDescription()));
+        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, "description", rawValue, bean.getDescription()));
     }
     
     public java.util.List<Product> CategoryImpl.getProducts() {
@@ -82,7 +82,7 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     
     public void CategoryImpl.setProductRefs(List<String> val) {
         List<String> rawValue = val;
-        bean.setProducts(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getProducts()));
+        bean.setProducts(SimpleFieldUtils.setSimple(this, bean, "ProductRefs", rawValue, bean.getProducts()));
     }
     
     public java.util.List<Category> CategoryImpl.getCategories() {
@@ -124,7 +124,7 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     
     public void CategoryImpl.setCategoryRefs(List<String> val) {
         List<String> rawValue = val;
-        bean.setCategories(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getCategories()));
+        bean.setCategories(SimpleFieldUtils.setSimple(this, bean, "CategoryRefs", rawValue, bean.getCategories()));
     }
     
 }

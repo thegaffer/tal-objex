@@ -27,7 +27,8 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         
         // If owned
         if( owned ) {
-            // TODO: Complex!!
+         // FUTURE: Allow setting to non-ObjexObj and copying in
+            throw new IllegalArgumentException("Cannot set an owned map currently");
         }
         
         // If not owned, each val must be an ObjexObj instances
@@ -55,7 +56,7 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         Map<String, String> ret = null;
         
         if( current != null ) {
-            if( owned && current.containsKey(key) ) removeObject(current.get(key)); 
+            if( owned && current.containsKey(key) ) removeObject(obj, current.get(key)); 
             ret = new HashMap<String, String>(current);
         }
         else {
@@ -127,7 +128,7 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         }
         
         if( removed ) {
-            removeObject(realId);
+            removeObject(obj, realId);
         }
         
         return ret;

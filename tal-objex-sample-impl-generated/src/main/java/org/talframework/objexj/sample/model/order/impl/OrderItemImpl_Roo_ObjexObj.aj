@@ -26,7 +26,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     public void OrderItemImpl.setRef(String val) {
         String rawValue = val;
-        bean.setRef(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getRef()));
+        bean.setRef(SimpleFieldUtils.setSimple(this, bean, "ref", rawValue, bean.getRef()));
     }
     
     public String OrderItemImpl.getName() {
@@ -37,7 +37,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     public void OrderItemImpl.setName(String val) {
         String rawValue = val;
-        bean.setName(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getName()));
+        bean.setName(SimpleFieldUtils.setSimple(this, bean, "name", rawValue, bean.getName()));
     }
     
     public String OrderItemImpl.getDescription() {
@@ -48,7 +48,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     public void OrderItemImpl.setDescription(String val) {
         String rawValue = val;
-        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getDescription()));
+        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, "description", rawValue, bean.getDescription()));
     }
     
     public Product OrderItemImpl.getStockItem() {
@@ -67,7 +67,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     public void OrderItemImpl.setStockItemRef(String val) {
         String rawValue = val;
-        bean.setStockItem(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getStockItem()));
+        bean.setStockItem(SimpleFieldUtils.setSimple(this, bean, "StockItemRef", rawValue, bean.getStockItem()));
     }
     
     public double OrderItemImpl.getQuantity() {
@@ -78,7 +78,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     public void OrderItemImpl.setQuantity(double val) {
         double rawValue = val;
-        bean.setQuantity(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getQuantity()));
+        bean.setQuantity(SimpleFieldUtils.setSimple(this, bean, "quantity", rawValue, bean.getQuantity()));
     }
     
     public String OrderItemImpl.getMeasure() {
@@ -89,7 +89,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     public void OrderItemImpl.setMeasure(String val) {
         String rawValue = val;
-        bean.setMeasure(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getMeasure()));
+        bean.setMeasure(SimpleFieldUtils.setSimple(this, bean, "measure", rawValue, bean.getMeasure()));
     }
     
     public double OrderItemImpl.getPrice() {
@@ -100,7 +100,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     public void OrderItemImpl.setPrice(double val) {
         double rawValue = val;
-        bean.setPrice(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getPrice()));
+        bean.setPrice(SimpleFieldUtils.setSimple(this, bean, "price", rawValue, bean.getPrice()));
     }
     
     public String OrderItemImpl.getCurrency() {
@@ -111,7 +111,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     public void OrderItemImpl.setCurrency(String val) {
         String rawValue = val;
-        bean.setCurrency(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getCurrency()));
+        bean.setCurrency(SimpleFieldUtils.setSimple(this, bean, "currency", rawValue, bean.getCurrency()));
     }
     
 }

@@ -53,7 +53,8 @@ public final class ReferenceListFieldUtils extends FieldUtils {
         
         // If owned
         if( owned ) {
-            // TODO: Complex!!
+            // FUTURE: Allow setting to non-ObjexObj and copying in
+            throw new IllegalArgumentException("Cannot set an owned list currently");
         }
         
         // If not owned, each val must be an ObjexObj instances
@@ -145,7 +146,7 @@ public final class ReferenceListFieldUtils extends FieldUtils {
         }
         
         if( removed ) {
-            removeObject(realId);
+            removeObject(obj, realId);
         }
         
         return ret;

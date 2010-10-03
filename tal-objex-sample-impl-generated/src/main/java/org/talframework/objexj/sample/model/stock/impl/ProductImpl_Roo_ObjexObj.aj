@@ -25,7 +25,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
     
     public void ProductImpl.setName(String val) {
         String rawValue = val;
-        bean.setName(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getName()));
+        bean.setName(SimpleFieldUtils.setSimple(this, bean, "name", rawValue, bean.getName()));
     }
     
     public String ProductImpl.getDescription() {
@@ -36,7 +36,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
     
     public void ProductImpl.setDescription(String val) {
         String rawValue = val;
-        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getDescription()));
+        bean.setDescription(SimpleFieldUtils.setSimple(this, bean, "description", rawValue, bean.getDescription()));
     }
     
     public Date ProductImpl.getEffectiveFrom() {
@@ -47,7 +47,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
     
     public void ProductImpl.setEffectiveFrom(Date val) {
         Date rawValue = val;
-        bean.setEffectiveFrom(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getEffectiveFrom()));
+        bean.setEffectiveFrom(SimpleFieldUtils.setSimple(this, bean, "effectiveFrom", rawValue, bean.getEffectiveFrom()));
     }
     
     public Date ProductImpl.getEffectiveTo() {
@@ -58,7 +58,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
     
     public void ProductImpl.setEffectiveTo(Date val) {
         Date rawValue = val;
-        bean.setEffectiveTo(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getEffectiveTo()));
+        bean.setEffectiveTo(SimpleFieldUtils.setSimple(this, bean, "effectiveTo", rawValue, bean.getEffectiveTo()));
     }
     
     public double ProductImpl.getPrice() {
@@ -69,7 +69,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
     
     public void ProductImpl.setPrice(double val) {
         double rawValue = val;
-        bean.setPrice(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getPrice()));
+        bean.setPrice(SimpleFieldUtils.setSimple(this, bean, "price", rawValue, bean.getPrice()));
     }
     
     public String ProductImpl.getCurrency() {
@@ -80,7 +80,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
     
     public void ProductImpl.setCurrency(String val) {
         String rawValue = val;
-        bean.setCurrency(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getCurrency()));
+        bean.setCurrency(SimpleFieldUtils.setSimple(this, bean, "currency", rawValue, bean.getCurrency()));
     }
     
 }

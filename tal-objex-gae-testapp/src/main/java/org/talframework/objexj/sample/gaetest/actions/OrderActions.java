@@ -115,7 +115,7 @@ public class OrderActions {
             
             OrderItem item = null;
             if( itemId == null ) item = order.createItem();
-            else item = order.getItemById(itemId);
+            else item = repository.getOrderItem(itemId);
             
             // Bind
             item.setName(RequestUtil.getParameter(request, "name"));

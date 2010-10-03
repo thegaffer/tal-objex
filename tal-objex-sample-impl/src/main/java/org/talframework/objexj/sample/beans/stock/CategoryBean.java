@@ -23,7 +23,7 @@ import javax.jdo.annotations.PersistenceCapable;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.ObjectUtils;
+import org.talframework.objexj.object.StateBeanUtils;
 import org.talframework.objexj.sample.beans.BaseBean;
 
 /**
@@ -76,8 +76,8 @@ public class CategoryBean extends BaseBean {
     @Override
     public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
         super.updateTemporaryReferences(refs);
-        products = ObjectUtils.updateTempReferences(products, refs);
-        categories = ObjectUtils.updateTempReferences(categories, refs);
+        products = StateBeanUtils.updateTempReferences(products, refs);
+        categories = StateBeanUtils.updateTempReferences(categories, refs);
     }
     
     public String getName() {

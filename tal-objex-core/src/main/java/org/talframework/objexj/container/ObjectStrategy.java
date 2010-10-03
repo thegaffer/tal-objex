@@ -31,8 +31,6 @@ import org.talframework.objexj.object.SimpleObjexObj;
  * state of the object and can create ObjexObj instances
  * as appropriate.
  * 
- * TODO: Remove the ID/ParentID Prop Name
- * 
  * @author Tom Spencer
  */
 public interface ObjectStrategy {

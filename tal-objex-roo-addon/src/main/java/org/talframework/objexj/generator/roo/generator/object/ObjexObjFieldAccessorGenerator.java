@@ -83,7 +83,7 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
         // b. Setter
         MethodMetadataWrapper setter = startSetter(prop.getSetterMethodName(), prop.getType());
         setter.addBody(getRawValueFromValue(prop));
-        setter.addBody("bean." + prop.getBeanSetterMethodName() + "(SimpleFieldUtils.setSimple(this, bean, rawValue, bean." + prop.getBeanGetterMethodName() + "()));");
+        setter.addBody("bean." + prop.getBeanSetterMethodName() + "(SimpleFieldUtils.setSimple(this, bean, \"" + prop.getName().getSymbolName() + "\", rawValue, bean." + prop.getBeanGetterMethodName() + "()));");
         methods.add(setter);
     }
     

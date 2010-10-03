@@ -18,6 +18,7 @@ package org.talframework.objexj.sample.model.order.impl;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.sample.api.order.Order;
+import org.talframework.objexj.sample.api.order.OrderItem;
 import org.talframework.objexj.sample.api.repository.OrderRepository;
 
 public class OrderRepositoryImpl implements OrderRepository {
@@ -36,7 +37,11 @@ public class OrderRepositoryImpl implements OrderRepository {
 		return container.getRootObject().getBehaviour(Order.class);
 	}
 	
-	public void open() {
+	public OrderItem getOrderItem(String id) {
+        return container.getObject(id).getBehaviour(OrderItem.class);
+    }
+    
+    public void open() {
 		container = container.openContainer();
 	}
 	

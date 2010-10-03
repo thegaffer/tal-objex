@@ -16,7 +16,6 @@
   		<groupId>org.talframework.tal</groupId>
 		<artifactId>tal-util-beans</artifactId>
   	</dependency>
-  	
   	<dependency>
   		<groupId>org.talframework.tal</groupId>
 		<artifactId>tal-aspects</artifactId>
@@ -27,6 +26,7 @@
         <artifactId>validation-api</artifactId>
     </dependency>
     
+    <!-- Test -->
     <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>

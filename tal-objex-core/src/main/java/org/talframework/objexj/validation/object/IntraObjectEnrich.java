@@ -9,8 +9,6 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import org.talframework.objexj.validation.groups.IntraObjectEnrichmentGroup;
-
 /**
  * This annotation invokes the generic internal intra
  * object enricher, which in turns calls the appropriate

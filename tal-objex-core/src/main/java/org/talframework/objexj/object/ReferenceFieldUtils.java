@@ -63,7 +63,7 @@ public final class ReferenceFieldUtils extends FieldUtils {
         
         // Test if it has changed, if so make editable
         if( current == null || !current.equals(ret) ) {
-            if( owned && current != null ) removeObject(current);
+            if( owned && current != null ) removeObject(obj, current);
             setEditable(obj, state);
         }
         

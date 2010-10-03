@@ -45,7 +45,7 @@ privileged aspect OrderImpl_Roo_ObjexObj {
     
     public void OrderImpl.setAccount(long val) {
         long rawValue = val;
-        bean.setAccount(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getAccount()));
+        bean.setAccount(SimpleFieldUtils.setSimple(this, bean, "account", rawValue, bean.getAccount()));
     }
     
     public java.util.List<OrderItem> OrderImpl.getItems() {
@@ -87,7 +87,7 @@ privileged aspect OrderImpl_Roo_ObjexObj {
     
     public void OrderImpl.setItemRefs(List<String> val) {
         List<String> rawValue = val;
-        bean.setItems(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getItems()));
+        bean.setItems(SimpleFieldUtils.setSimple(this, bean, "ItemRefs", rawValue, bean.getItems()));
     }
     
     public OrderItem OrderImpl.getTest() {
@@ -112,7 +112,7 @@ privileged aspect OrderImpl_Roo_ObjexObj {
     
     public void OrderImpl.setTestRef(String val) {
         String rawValue = val;
-        bean.setTest(SimpleFieldUtils.setSimple(this, bean, rawValue, bean.getTest()));
+        bean.setTest(SimpleFieldUtils.setSimple(this, bean, "TestRef", rawValue, bean.getTest()));
     }
     
     public boolean OrderImpl.validateObject(ConstraintValidatorContext context) {

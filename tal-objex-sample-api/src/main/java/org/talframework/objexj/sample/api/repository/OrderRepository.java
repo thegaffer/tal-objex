@@ -17,6 +17,7 @@
 package org.talframework.objexj.sample.api.repository;
 
 import org.talframework.objexj.sample.api.order.Order;
+import org.talframework.objexj.sample.api.order.OrderItem;
 
 /**
  * This interface represents the repository of orders.
@@ -40,6 +41,13 @@ public interface OrderRepository {
 	 * @return The order object
 	 */
 	public Order getOrder();
+	
+	/**
+	 * 
+	 * @param id The ID of the item we want
+	 * @return The requested order item
+	 */
+	public OrderItem getOrderItem(String id);
 	
 	/**
 	 * Call to open up the repository for changes. Any

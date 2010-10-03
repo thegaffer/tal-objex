@@ -23,7 +23,7 @@ import javax.jdo.annotations.PersistenceCapable;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.ObjectUtils;
+import org.talframework.objexj.object.StateBeanUtils;
 import org.talframework.objexj.sample.beans.BaseBean;
 
 /**
@@ -60,7 +60,7 @@ public class OrderBean extends BaseBean {
 	@Override
 	public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
 	    super.updateTemporaryReferences(refs);
-	    items = ObjectUtils.updateTempReferences(items, refs);
+	    items = StateBeanUtils.updateTempReferences(items, refs);
 	}
 	
 	public long getAccount() {

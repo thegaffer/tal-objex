@@ -48,9 +48,9 @@ public class StateTempRefsGenerator extends BaseGenerator implements FieldVisito
         method.addParameter(new JavaSymbolName("refs"), refMap, null);
         
         // Update all reference properties
-        builder.getImportRegistrationResolver().addImport(new JavaType("org.talframework.objexj.object.ObjectUtils"));
+        builder.getImportRegistrationResolver().addImport(new JavaType("org.talframework.objexj.object.StateBeanUtils"));
         
-        method.addBody("parentId = ObjectUtils.updateTempReferences(parentId, refs);");
+        method.addBody("parentId = StateBeanUtils.updateTempReferences(parentId, refs);");
         Iterator<ObjexField> it = fields.iterator();
         while( it.hasNext() ) {
             it.next().accept(this);
@@ -64,14 +64,14 @@ public class StateTempRefsGenerator extends BaseGenerator implements FieldVisito
     }
     
     public void visitReference(SimpleReferenceField prop) {
-        method.addBody(prop.getName() + " = ObjectUtils.updateTempReferences(" + prop.getName() + ", refs);");
+        method.addBody(prop.getName() + " = StateBeanUtils.updateTempReferences(" + prop.getName() + ", refs);");
     }
     
     public void visitList(ListReferenceField prop) {
-        method.addBody(prop.getName() + " = ObjectUtils.updateTempReferences(" + prop.getName() + ", refs);");
+        method.addBody(prop.getName() + " = StateBeanUtils.updateTempReferences(" + prop.getName() + ", refs);");
     }
     
     public void visitMap(MapReferenceField prop) {
-        method.addBody(prop.getName() + " = ObjectUtils.updateTempReferences(" + prop.getName() + ", refs);");
+        method.addBody(prop.getName() + " = StateBeanUtils.updateTempReferences(" + prop.getName() + ", refs);");
     }
 }

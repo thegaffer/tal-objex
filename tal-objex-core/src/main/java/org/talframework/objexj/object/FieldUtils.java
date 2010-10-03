@@ -4,7 +4,10 @@ import java.beans.PropertyDescriptor;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.container.InternalContainer;
 
 /**
  * This base class contains a number of helper methods that
@@ -28,8 +31,16 @@ public abstract class FieldUtils {
     /**
      * Helper to remove a specific object from the container
      */
-    protected static void removeObject(Object id) {
-       // TODO: Remove the object 
+    protected static void removeObject(BaseObjexObj parentObj, Object id) {
+        Container container = parentObj.getContainer();
+        
+        ObjexObj objToRemove = container.getObject(id);
+        if( objToRemove != null && container instanceof InternalContainer ) {
+            ((InternalContainer)container).removeObject(objToRemove);
+        }
+        else if( objToRemove != null ){
+            throw new IllegalArgumentException("Cannot remove object, invalid container: " + objToRemove);
+        }
     }
     
     /**

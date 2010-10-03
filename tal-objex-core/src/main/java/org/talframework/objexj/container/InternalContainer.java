@@ -66,5 +66,5 @@ public interface InternalContainer extends Container {
      * 
      * @param obj The object to be removed
      */
-    public void removeObject(ObjexObj obj, ObjexObjStateBean state);
+    public void removeObject(ObjexObj obj);
 }

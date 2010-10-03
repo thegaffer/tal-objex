@@ -29,7 +29,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.ObjectUtils;
+import org.talframework.objexj.object.StateBeanUtils;
 
 /**
  * Base class for any bean class. Holds the objects
@@ -67,7 +67,7 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	}
 	
 	public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
-	    parentId = ObjectUtils.updateTempReferences(parentId, refs);
+	    parentId = StateBeanUtils.updateTempReferences(parentId, refs);
 	}
 	
 	/**

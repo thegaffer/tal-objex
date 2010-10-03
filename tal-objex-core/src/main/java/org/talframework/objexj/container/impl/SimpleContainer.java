@@ -41,6 +41,7 @@ import org.talframework.objexj.events.EventHandler;
 import org.talframework.objexj.exceptions.ContainerInvalidException;
 import org.talframework.objexj.exceptions.EventHandlerNotFoundException;
 import org.talframework.objexj.exceptions.ObjectNotFoundException;
+import org.talframework.objexj.exceptions.ObjectRemovedException;
 import org.talframework.objexj.query.Query;
 import org.talframework.objexj.query.QueryRequest;
 import org.talframework.objexj.query.QueryResult;
@@ -301,8 +302,8 @@ public final class SimpleContainer implements InternalContainer {
      * @return The editable container interface to this container
      */
     public Container openContainer() {
+        if( isOpen() ) throw new IllegalArgumentException("The container is already open");
         if( transactionCache == null ) transactionCache = middleware.open();
-        // TODO: Should we throw error if already open!?!
         return this;
     }
     
@@ -422,8 +423,7 @@ public final class SimpleContainer implements InternalContainer {
             break;
             
         case REMOVED:
-            // TODO: Throw an exception - cannot edit removed!?!
-            break;
+            throw new ObjectRemovedException(id, obj.getId().toString());
         }
     }
     
@@ -455,8 +455,11 @@ public final class SimpleContainer implements InternalContainer {
         return ret;
     }
     
-    public void removeObject(ObjexObj obj, ObjexObjStateBean state) {
+    public void removeObject(ObjexObj obj) {
         checkInTransaction();
+        
+        ObjexObjStateBean state = transactionCache.findObject(obj.getId(), null);
+        if( state == null ) state = middleware.loadObject(strategy.getObjectStrategy(obj.getType()).getStateClass(), obj.getId());
         
         transactionCache.addObject(ObjectRole.REMOVED, obj.getId(), state);
     }

@@ -4,8 +4,10 @@ import java.util.Map;
 
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Validation;
+import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -16,8 +18,15 @@ import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.ValidationRequest.ValidationType;
+import org.talframework.objexj.exceptions.ObjectErrorException;
 import org.talframework.objexj.object.BaseObjexObj;
+import org.talframework.objexj.object.SimpleFieldUtils;
+import org.talframework.objexj.validation.groups.ChildGroup;
 import org.talframework.objexj.validation.groups.FieldGroup;
+import org.talframework.objexj.validation.groups.InterObjectEnrichmentGroup;
+import org.talframework.objexj.validation.groups.InterObjectGroup;
+import org.talframework.objexj.validation.groups.IntraObjectEnrichmentGroup;
+import org.talframework.objexj.validation.groups.IntraObjectGroup;
 import org.talframework.objexj.validation.object.SelfIntraObjectValidator;
 
 /**
@@ -34,8 +43,47 @@ public class TestValidation {
      * This test mocks out the validator to ensure the basic
      * method works
      */
+    @Test
     public void basic() {
-        // TODO: Can't do until validation request holds validator
+        final ValidationRequest request = context.mock(ValidationRequest.class);
+        final Validator validator = context.mock(Validator.class);
+        final DummyObjexObj obj = new DummyObjexObj(null);
+        
+        context.checking(new Expectations() {{
+            allowing(request).getValidator(); will(returnValue(validator));
+            
+            // Intra Object Level
+            oneOf(request).getValidationType(); will(returnValue(ValidationType.INTRA_OBJECT));
+            oneOf(validator).validate(obj, IntraObjectEnrichmentGroup.class); will(returnValue(null));
+            oneOf(validator).validate(obj, IntraObjectGroup.class, FieldGroup.class, Default.class); will(returnValue(null));
+            
+            // Inter Object Level
+            oneOf(request).getValidationType(); will(returnValue(ValidationType.INTER_OBJECT));
+            oneOf(validator).validate(obj, InterObjectEnrichmentGroup.class); will(returnValue(null));
+            oneOf(validator).validate(obj, InterObjectGroup.class); will(returnValue(null));
+            
+            // Child Level
+            oneOf(request).getValidationType(); will(returnValue(ValidationType.CHILDREN));
+            oneOf(validator).validate(obj, ChildGroup.class); will(returnValue(null));
+        }});
+        
+        obj.validate(request); // Intra
+        obj.validate(request); // Inter
+        obj.validate(request); // Child
+        
+        context.assertIsSatisfied();
+    }
+    
+    /**
+     * This tests that we validate correctly when setting a method
+     */
+    @Test(expected=ObjectErrorException.class)
+    public void onSet() {
+        DummyObjexBean bean = new DummyObjexBean();
+        bean.name = "Something"; // So this is valid
+        DummyObjexObj obj = new DummyObjexObj(bean);
+        
+        obj.setName(null);
     }
     
     /**
@@ -77,6 +125,11 @@ public class TestValidation {
         public boolean validateObject(ConstraintValidatorContext context) {
             return false;
         }
+        
+        public void setName(String val) {
+            String rawValue = val;
+            bean.setName(SimpleFieldUtils.setSimple(this, bean, "name", rawValue, bean.getName()));
+        }
     }
     
     public class DummyObjexBean implements ObjexObjStateBean {
@@ -115,6 +168,22 @@ public class TestValidation {
         }
         
         public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
+        }
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Setter for the name field
+         *
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
         }
     }
 }

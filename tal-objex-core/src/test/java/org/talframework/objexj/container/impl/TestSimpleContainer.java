@@ -40,6 +40,7 @@ import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.events.EventHandler;
 import org.talframework.objexj.exceptions.ContainerInvalidException;
+import org.talframework.objexj.exceptions.ObjectRemovedException;
 import org.talframework.objexj.query.Query;
 import org.talframework.objexj.query.QueryRequest;
 import org.talframework.objexj.query.QueryResult;
@@ -352,10 +353,8 @@ private Mockery context = new JUnit4Mockery();
     /**
      * Tests that if we try to update an object that is 
      * already removed it fails.
-     * 
-     * FUTURE: Probably should fail with an exception, but currently does not
      */
-    @Test //(expected=IllegalArgumentException.class)
+    @Test(expected=ObjectRemovedException.class)
     public void updateRemovedObject() {
         final TransactionCache cache = context.mock(TransactionCache.class);
         final CategoryBean state = new CategoryBean();
@@ -410,11 +409,12 @@ private Mockery context = new JUnit4Mockery();
         
         context.checking(new Expectations() {{
             oneOf(middleware).getCache(); will(returnValue(cache));
+            oneOf(cache).findObject(obj.getId(), null); will(returnValue(state));
             oneOf(cache).addObject(ObjectRole.REMOVED, obj.getId(), state);
         }});
         
         SimpleContainer container = new SimpleContainer("test", strategy, middleware, true);
-        container.removeObject(obj, state);
+        container.removeObject(obj);
         context.assertIsSatisfied();
     }
     

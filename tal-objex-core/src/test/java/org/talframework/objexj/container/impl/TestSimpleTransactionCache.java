@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.transaction;
+package org.talframework.objexj.container.impl;
 
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ import org.junit.Test;
  * 
  * @author Tom Spencer
  */
-public class TestSimpleTransaction {
+public class TestSimpleTransactionCache {
 
 	@Test
 	public void basic() {
