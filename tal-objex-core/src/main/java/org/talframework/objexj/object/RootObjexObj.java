@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj;
+package org.talframework.objexj.object;
 
 import java.util.List;
 import java.util.Map;
 
+import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.events.EventListener;
 
 /**

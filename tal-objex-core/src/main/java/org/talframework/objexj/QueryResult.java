@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.query;
+package org.talframework.objexj;
 
 import java.util.List;
 
-import org.talframework.objexj.ObjexObj;
 
 /**
  * This interface represents the output to a query

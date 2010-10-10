@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexIDStrategy;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.events.EventListener;
 

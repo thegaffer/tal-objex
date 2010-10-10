@@ -33,7 +33,7 @@ import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
-import org.talframework.objexj.service.beans.CategoryBean;
+import org.talframework.objexj.object.testbeans.CategoryBean;
 
 /**
  * This class tests the behaviour of the {@link SimpleObjexObj}
@@ -80,7 +80,7 @@ public class TestSimpleObjexObj {
         categories.put("open", "Category/5");
         categories.put("closed", "Category/6");
         
-        category = new CategoryBean("Cat1");
+        category = new CategoryBean("Cat1", "Cat1");
         category.setMainProduct("Product/1");
         category.setProducts(products);
         category.setCategories(categories);

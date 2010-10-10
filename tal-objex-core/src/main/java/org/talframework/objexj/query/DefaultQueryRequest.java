@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.talframework.objexj.QueryRequest;
+
 
 /**
  * Default implementation of the query request object

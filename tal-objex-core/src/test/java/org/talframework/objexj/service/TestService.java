@@ -33,8 +33,8 @@ import org.talframework.objexj.container.middleware.SingletonContainerStore;
 import org.talframework.objexj.locator.ContainerFactory;
 import org.talframework.objexj.locator.SimpleContainerFactory;
 import org.talframework.objexj.object.SimpleObjectStrategy;
-import org.talframework.objexj.service.beans.CategoryBean;
-import org.talframework.objexj.service.beans.ProductBean;
+import org.talframework.objexj.object.testbeans.CategoryBean;
+import org.talframework.objexj.object.testbeans.ProductBean;
 
 /**
  * This class represents a service that would be written
@@ -73,18 +73,18 @@ public class TestService {
 	    
 	    // Now setup a couple of containers
 	    List<ObjexObjStateBean> test1Objs = new ArrayList<ObjexObjStateBean>(3);
-	    test1Objs.add(new CategoryBean("RootCategory"));
-	    test1Objs.add(new ProductBean("Product1"));
-	    test1Objs.add(new CategoryBean("Cat1"));
+	    test1Objs.add(new CategoryBean("RootCategory", "Root"));
+	    test1Objs.add(new ProductBean("Product1", "Product1", 0, 100.0));
+	    test1Objs.add(new CategoryBean("Cat1", "Cat1"));
 	    SingletonContainerStore.getInstance().setObjects("Test/123", test1Objs);
 	    
 	    List<ObjexObjStateBean> test2Objs = new ArrayList<ObjexObjStateBean>(6);
-        test2Objs.add(new CategoryBean("RootCategory"));
-        test2Objs.add(new CategoryBean("Cat1"));
-        test2Objs.add(new CategoryBean("Cat2"));
-        test2Objs.add(new CategoryBean("Cat3"));
-        test2Objs.add(new CategoryBean("Cat4"));
-        test2Objs.add(new CategoryBean("Cat5"));
+        test2Objs.add(new CategoryBean("RootCategory", "Root"));
+        test2Objs.add(new CategoryBean("Cat1", "Cat1"));
+        test2Objs.add(new CategoryBean("Cat2", "Cat2"));
+        test2Objs.add(new CategoryBean("Cat3", "Cat3"));
+        test2Objs.add(new CategoryBean("Cat4", "Cat4"));
+        test2Objs.add(new CategoryBean("Cat5", "Cat5"));
         SingletonContainerStore.getInstance().setObjects("Test/456", test2Objs);
 	}
 	

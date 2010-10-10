@@ -31,6 +31,8 @@ import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.InternalContainer;
@@ -172,6 +174,18 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	    checkInitialised();
 		if( behaviour.isInstance(this) ) return behaviour.cast(this);
 		else throw new ClassCastException("The behaviour is not supported by this object");
+	}
+	
+	public void acceptReader(ObjexStateReader reader) {
+	    getStateBean().acceptReader(reader);
+	}
+	
+	/**
+	 * Passes the writer to the state bean. The derived class should
+	 * override if it has non-persistent fields.
+	 */
+	public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+	    getStateBean().acceptWriter(writer, includeNonPersistent);
 	}
 	
 	/**

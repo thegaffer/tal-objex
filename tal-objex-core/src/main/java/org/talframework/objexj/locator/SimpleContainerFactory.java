@@ -35,7 +35,7 @@ import org.talframework.objexj.exceptions.ContainerNotFoundException;
  * 
  * @author Tom Spencer
  */
-public final class SimpleContainerFactory implements ContainerFactory {
+public final class SimpleContainerFactory implements ContainerFactory, InterceptingContainerFactory {
     
 	/** Describes the overall strategy for the container */
 	private ContainerStrategy strategy;
@@ -108,6 +108,18 @@ public final class SimpleContainerFactory implements ContainerFactory {
         
         return new SimpleContainer(null, strategy, middleware, true);
     }
+    
+    public Container create(InterceptingMiddleware interceptor) {
+        ContainerMiddleware middleware = middlewareFactory.createContainer(strategy);
+        interceptor.setRealMiddleware(middleware);
+        
+        // Add in the root object
+        ObjexID rootId = strategy.getRootObjectID();
+        ObjexObjStateBean rootBean = createRootBean();
+        middleware.getCache().addObject(ObjectRole.NEW, rootId, rootBean);
+        
+        return new SimpleContainer(null, strategy, interceptor, true);
+    }
 
     /**
      * Helper to create the state bean for the root object.
@@ -139,12 +151,32 @@ public final class SimpleContainerFactory implements ContainerFactory {
 	}
 	
 	/**
+     * Simply constructs an instance of the standard container
+     * with plugins configured.
+     */
+    public Container get(InterceptingMiddleware interceptor, String id) {
+	    ContainerMiddleware middleware = middlewareFactory.getMiddleware(strategy, id);
+	    interceptor.setRealMiddleware(middleware);
+        return new SimpleContainer(middleware.getContainerId(), strategy, interceptor, false);
+	}
+	
+	/**
 	 * Simply constructs an instance of the basic editable 
 	 * container.
 	 */
 	public Container open(String id) {
 	    ContainerMiddleware middleware = middlewareFactory.getTransaction(strategy, id);
 	    return new SimpleContainer(middleware.getContainerId(), strategy, middleware, true);
+	}
+	
+	/**
+     * Simply constructs an instance of the basic editable 
+     * container.
+     */
+    public Container open(InterceptingMiddleware interceptor, String id) {
+	    ContainerMiddleware middleware = middlewareFactory.getTransaction(strategy, id);
+        interceptor.setRealMiddleware(middleware);
+        return new SimpleContainer(middleware.getContainerId(), strategy, interceptor, true);
 	}
 	
 	/**

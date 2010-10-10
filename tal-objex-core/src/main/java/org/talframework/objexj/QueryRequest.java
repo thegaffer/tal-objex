@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.query;
+package org.talframework.objexj;
 
 import java.util.List;
 import java.util.Map;

@@ -103,4 +103,58 @@ public interface ObjexObjStateBean extends Serializable {
      * @param refs A map holding the original temp ID and its new real ID
      */
     public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs);
+    
+    /**
+     * Call to have the object accept the writer and then store
+     * all of its state on the writer. ID, ParentID and Type 
+     * are not written.
+     * 
+     * @param writer The writer to write into
+     * @param includeNonPersistent Indicates if non-persisted fields should be written
+     */
+    public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent);
+    
+    /**
+     * Call to have the object accept the reader and then read
+     * all of its state from the reader. ID, ParentID and Type
+     * are not read.
+     * 
+     * @param reader The reader to write into
+     */
+    public void acceptReader(ObjexStateReader reader);
+    
+    /**
+     * This enum represents the possible types of each field. It
+     * is used to remove ambiguity that can arise from simply 
+     * looking at the objects type - for instance a String and
+     * a Memo are both represented as strings.
+     * 
+     * SUGGEST: This is not extensible, if it needs to be (and I'm not sure it does) consider a field type annotation?
+     *
+     * @author Tom Spencer
+     */
+    public static enum ObjexFieldType {
+        /** Indicates the field is a text field */
+        STRING,
+        /** Indicates the field is a potentially large field */
+        MEMO,
+        /** Indicates the field is a number */
+        NUMBER,
+        /** Indicates the field is a date field */
+        DATE,
+        /** Indicates the field is a short binary (byte) field */
+        SHORT_BLOB,
+        /** Indicates the field is a blob (byte) field */
+        BLOB,
+        /** Indicates the field references an external blob field */
+        BLOB_REFERENCE,
+        /** Indicates the field represents a user */
+        USER,
+        /** Indicates the field references another object */
+        REFERENCE,
+        /** Indicates the field references an owned object */
+        OWNED_REFERENCE,
+        /** Indicates the field holds an arbitrary object */
+        OBJECT;
+    }
 }

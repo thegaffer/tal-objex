@@ -31,7 +31,7 @@ import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.container.impl.SimpleTransactionCache;
-import org.talframework.objexj.service.beans.CategoryBean;
+import org.talframework.objexj.object.testbeans.CategoryBean;
 
 /**
  * Tests the in memory middleware works
@@ -51,18 +51,18 @@ public class TestInMemoryMiddleware {
     @BeforeClass
     public static void containerSetup() {
         List<ObjexObjStateBean> objs = new ArrayList<ObjexObjStateBean>();
-        objs.add(new CategoryBean("Cat1"));
-        objs.add(new CategoryBean("Cat2"));
+        objs.add(new CategoryBean("Cat1", "Cat1"));
+        objs.add(new CategoryBean("Cat2", "Cat2"));
         SingletonContainerStore.getInstance().setObjects("123", objs);
         
         objs = new ArrayList<ObjexObjStateBean>();
-        objs.add(new CategoryBean("Cat1"));
-        objs.add(new CategoryBean("Cat2"));
+        objs.add(new CategoryBean("Cat1", "Cat1"));
+        objs.add(new CategoryBean("Cat2", "Cat2"));
         SingletonContainerStore.getInstance().setObjects("456", objs);
         
         objs = new ArrayList<ObjexObjStateBean>();
-        objs.add(new CategoryBean("Cat1"));
-        objs.add(new CategoryBean("Cat2"));
+        objs.add(new CategoryBean("Cat1", "Cat1"));
+        objs.add(new CategoryBean("Cat2", "Cat2"));
         SingletonContainerStore.getInstance().setObjects("789", objs);
         
         SingletonContainerCache.getInstance().setCache("123/trans", new SimpleTransactionCache());
@@ -124,7 +124,7 @@ public class TestInMemoryMiddleware {
         
         // Make sure we get the edited object, not the original
         TransactionCache cache = underTest.getCache();
-        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Any", 2), new CategoryBean("Cat2_edited"));
+        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Any", 2), new CategoryBean("Cat2_edited", "Cat2"));
         ObjexObjStateBean cat2 = underTest.loadObject(CategoryBean.class, new DefaultObjexID("Any", 2));
         Assert.assertEquals("Cat2_edited", ((CategoryBean)cat2).getName());
     }
@@ -146,9 +146,9 @@ public class TestInMemoryMiddleware {
         
         // Make some changes (as if container)
         TransactionCache cache = underTest.getCache();
-        cache.addObject(ObjectRole.NEW, new DefaultObjexID("Category", 3), new CategoryBean("NewCat"));
-        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Category", 1), new CategoryBean("Cat1_edited"));
-        cache.addObject(ObjectRole.REMOVED, new DefaultObjexID("Category", 2), new CategoryBean("Cat2_removed"));
+        cache.addObject(ObjectRole.NEW, new DefaultObjexID("Category", 3), new CategoryBean("NewCat", "NewCat"));
+        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Category", 1), new CategoryBean("Cat1_edited", "Cat1"));
+        cache.addObject(ObjectRole.REMOVED, new DefaultObjexID("Category", 2), new CategoryBean("Cat2_removed", "Cat2"));
         
         Assert.assertEquals("456", underTest.save(null, null));
         Assert.assertEquals(3, SingletonContainerStore.getInstance().getObjects("456").size());
@@ -163,9 +163,9 @@ public class TestInMemoryMiddleware {
         
         // Make some changes (as if container)
         TransactionCache cache = underTest.getCache();
-        cache.addObject(ObjectRole.NEW, new DefaultObjexID("Category", 3), new CategoryBean("NewCat"));
-        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Category", 1), new CategoryBean("Cat1_edited"));
-        cache.addObject(ObjectRole.REMOVED, new DefaultObjexID("Category", 2), new CategoryBean("Cat2_removed"));
+        cache.addObject(ObjectRole.NEW, new DefaultObjexID("Category", 3), new CategoryBean("NewCat", "NewCat"));
+        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Category", 1), new CategoryBean("Cat1_edited", "Cat1"));
+        cache.addObject(ObjectRole.REMOVED, new DefaultObjexID("Category", 2), new CategoryBean("Cat2_removed", "Cat2"));
         
         Assert.assertEquals("789/trans", underTest.suspend());
         Assert.assertNotNull(SingletonContainerCache.getInstance().getCache("789/trans"));

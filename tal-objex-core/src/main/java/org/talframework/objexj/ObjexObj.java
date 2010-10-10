@@ -68,6 +68,23 @@ public interface ObjexObj {
 	public <T> T getBehaviour(Class<T> behaviour);
 	
 	/**
+	 * Call to have the object accept the writer and then store
+	 * all of its state on the writer.
+	 * 
+	 * @param writer The writer to write into
+	 * @param includeNonPersistent Indicates if non-persisted fields should be written
+	 */
+	public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent);
+	
+	/**
+	 * Call to have the object accept the reader and then read
+	 * all of its state from the reader.
+	 * 
+	 * @param reader The reader to write into
+	 */
+	public void acceptReader(ObjexStateReader reader);
+	
+	/**
 	 * Helper to get a property given its name. This is
 	 * a convienience to save the client having to do
 	 * reflection if it does not know the concrete type.

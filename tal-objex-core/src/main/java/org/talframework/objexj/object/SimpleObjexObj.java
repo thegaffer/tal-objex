@@ -152,7 +152,7 @@ public final class SimpleObjexObj extends BaseObjexObj {
         
         // See if it is a reference prop and convert
         if( name.equals(realName) && isReferenceProperty(realName) ) {
-            if( ret instanceof Map<?, ?> ) ret = getContainer().getObjectMap((Map<Object, Object>)ret);
+            if( ret instanceof Map<?, ?> ) ret = getContainer().getObjectMap((Map<String, Object>)ret);
             else if( ret instanceof List<?> ) ret = getContainer().getObjectList((List<Object>)ret);
             else ret = getContainer().getObject(ret);
         }

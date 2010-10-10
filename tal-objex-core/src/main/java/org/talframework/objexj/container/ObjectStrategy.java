@@ -19,7 +19,6 @@ package org.talframework.objexj.container;
 import java.util.Map;
 
 import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexIDStrategy;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.object.SimpleObjexObj;

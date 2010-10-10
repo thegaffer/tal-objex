@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.QueryRequest;
+import org.talframework.objexj.QueryResult;
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.container.InternalContainer;
-import org.talframework.objexj.query.QueryRequest;
-import org.talframework.objexj.query.QueryResult;
 
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;

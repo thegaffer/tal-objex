@@ -16,8 +16,6 @@
 
 package org.talframework.objexj.object;
 
-import java.util.Map;
-
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
@@ -25,11 +23,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexIDStrategy;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.container.ObjexIDStrategy;
+import org.talframework.objexj.object.testbeans.StockBean;
+import org.talframework.objexj.object.testmodel.StockImpl;
 
 /**
  * Tests the {@link SimpleObjectStrategy} class.
@@ -61,9 +59,12 @@ public class TestSimpleObjectStrategy {
 	    SimpleObjectStrategy strategy = new SimpleObjectStrategy();
 	    strategy.setTypeName("Test");
 	    strategy.setIdStrategy(idStrategy);
-	    strategy.setStateClass(StateBean.class);
-	    strategy.setObjexClass(TestObj.class);
+	    strategy.setStateClass(StockBean.class);
+	    strategy.setObjexClass(StockImpl.class);
 	    strategy.init();
+	    
+	    StockBean bean = new StockBean();
+        bean.setParentId(parentId.toString());
 	    
 	    // Simple Tests
 	    Assert.assertEquals("Test", strategy.getTypeName());
@@ -72,17 +73,20 @@ public class TestSimpleObjectStrategy {
         Assert.assertNotNull(strategy.getObjexClass());
 	    
         // Construction
-	    StateBean bean = new StateBean(parentId);
 	    ObjexObj obj = strategy.getObjexObjInstance(container, parentId, id, bean);
 	    Assert.assertNotNull(obj);
+	    Assert.assertTrue(obj instanceof StockImpl);
     }
 	
 	@Test
     public void withoutObjexObj() {
         SimpleObjectStrategy strategy = new SimpleObjectStrategy();
         strategy.setTypeName("Test");
-        strategy.setStateClass(StateBean.class);
+        strategy.setStateClass(StockBean.class);
         strategy.init();
+        
+        StockBean bean = new StockBean();
+        bean.setParentId(parentId.toString());
         
         // Simple Tests
         Assert.assertEquals("Test", strategy.getTypeName());
@@ -90,57 +94,8 @@ public class TestSimpleObjectStrategy {
         Assert.assertNull(strategy.getObjexClass());
         
         // Construction
-        StateBean bean = new StateBean(parentId);
         ObjexObj obj = strategy.getObjexObjInstance(container, parentId, id, bean);
         Assert.assertNotNull(obj);
+        Assert.assertTrue(obj instanceof SimpleObjexObj);
     }
-	
-	public static class StateBean implements ObjexObjStateBean {
-	    private static final long serialVersionUID = 1L;
-	    
-	    public StateBean() {}
-	    
-	    public StateBean(ObjexID parent) {}
-	    public StateBean(StateBean bean) {}
-	    
-	    public void create(ObjexID parentId) {}
-	    public void preSave(Object id) {}
-	    
-	    public void setEditable() {
-	    }
-	    
-	    public boolean isEditable() {
-	        return true;
-	    }
-	    
-	    public ObjexObjStateBean cloneState() {
-	        return new StateBean();
-	    }
-	    
-	    public String getObjexObjType() {
-	        return null;
-	    }
-	    
-	    public Object getId() {
-	        return null;
-	    }
-	    
-	    public String getParentId() {
-	        return null;
-	    }
-	    
-	    public void updateTemporaryReferences(Map<ObjexID, ObjexID> refs) {
-	    }
-	}
-	
-	public static class TestObj extends BaseObjexObj {
-	    
-	    public TestObj(StateBean bean) {
-	    }
-	    
-	    @Override
-	    protected ObjexObjStateBean getStateBean() {
-	        return null;
-	    }
-	}
 }

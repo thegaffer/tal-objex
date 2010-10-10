@@ -25,16 +25,17 @@ import java.util.Map;
 import org.talframework.objexj.Container;
 import org.talframework.objexj.Event;
 import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexIDStrategy;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.RootObjexObj;
+import org.talframework.objexj.QueryRequest;
+import org.talframework.objexj.QueryResult;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ContainerMiddleware;
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.container.ObjectStrategy;
+import org.talframework.objexj.container.ObjexIDStrategy;
 import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.events.EventHandler;
@@ -42,9 +43,8 @@ import org.talframework.objexj.exceptions.ContainerInvalidException;
 import org.talframework.objexj.exceptions.EventHandlerNotFoundException;
 import org.talframework.objexj.exceptions.ObjectNotFoundException;
 import org.talframework.objexj.exceptions.ObjectRemovedException;
+import org.talframework.objexj.object.RootObjexObj;
 import org.talframework.objexj.query.Query;
-import org.talframework.objexj.query.QueryRequest;
-import org.talframework.objexj.query.QueryResult;
 
 /**
  * This class is the default form of container and handles
@@ -238,13 +238,13 @@ public final class SimpleContainer implements InternalContainer {
      * 
      * FUTURE: Work out objects not held locally and get in one op
      */
-    public Map<? extends Object, ObjexObj> getObjectMap(Map<? extends Object, ? extends Object> ids) {
+    public Map<String, ObjexObj> getObjectMap(Map<String, ? extends Object> ids) {
         if( ids == null ) return null;
         
-        Map<Object, ObjexObj> ret = new HashMap<Object, ObjexObj>();
-        Iterator<? extends Object> it = ids.keySet().iterator();
+        Map<String, ObjexObj> ret = new HashMap<String, ObjexObj>();
+        Iterator<String> it = ids.keySet().iterator();
         while( it.hasNext() ) {
-            Object k = it.next();
+            String k = it.next();
             Object ref = ids.get(k);
             ret.put(k, getObject(ref));
         }
@@ -259,14 +259,14 @@ public final class SimpleContainer implements InternalContainer {
      * 
      * @throws ClassCastException If any object is not of the expected type
      */
-    public <T> Map<? extends Object, T> getObjectMap(Map<? extends Object, ? extends Object> ids, Class<T> expectedElement) {
-        Map<? extends Object, ObjexObj> objs = getObjectMap(ids);
-        Map<Object, T> ret = objs != null ? new HashMap<Object, T>(objs.size()) : null;
+    public <T> Map<String, T> getObjectMap(Map<String, ? extends Object> ids, Class<T> expectedElement) {
+        Map<String, ObjexObj> objs = getObjectMap(ids);
+        Map<String, T> ret = objs != null ? new HashMap<String, T>(objs.size()) : null;
         
         if( objs != null ) {
-            Iterator<? extends Object> it = objs.keySet().iterator();
+            Iterator<String> it = objs.keySet().iterator();
             while( it.hasNext() ) {
-                Object key = it.next();
+                String key = it.next();
                 ObjexObj obj = objs.get(key);
                 ret.put(key, obj != null ? obj.getBehaviour(expectedElement) : null);
             }

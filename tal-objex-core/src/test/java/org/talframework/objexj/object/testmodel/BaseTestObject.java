@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Thomas Spencer
+ * Copyright 2010 Thomas Spencer
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.talframework.objexj.object.testmodel;
 
-package org.talframework.objexj;
+import org.talframework.objexj.object.BaseObjexObj;
 
 /**
- * This interface extends {@link Container} to represent
- * a Store. A store is a fixed or named collection of 
- * objects. It is very often used to hold index records
- * of documents - although it can exist in its own right.
- * In a business sense if your quotes, tenders and sales
- * are documents, then your stock list is your store.
- * 
+ *
+ *
  * @author Tom Spencer
  */
-public interface Store extends Container {
+public abstract class BaseTestObject extends BaseObjexObj {
 
+    @Override
+    public String getType() {
+        String ret = this.getClass().getSimpleName();
+        if( ret.endsWith("Impl") ) ret = ret.substring(0, ret.length() - 4);
+        return ret;
+    }
 }

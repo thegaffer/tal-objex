@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj;
+package org.talframework.objexj.container;
+
+import org.talframework.objexj.Container;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObjStateBean;
 
 /**
  * This interface represents a class that can create objex IDs.

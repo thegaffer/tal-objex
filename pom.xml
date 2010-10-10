@@ -26,6 +26,7 @@
   	<module>tal-objex-gae</module>
   	<module>tal-objex-gae-testapp</module>
   	<module>tal-objex-archetype-domain</module>
+  	<module>tal-objex-runtime-webservice</module>
   </modules>
   
   <licenses>

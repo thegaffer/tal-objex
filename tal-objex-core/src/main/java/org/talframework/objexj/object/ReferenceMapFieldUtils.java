@@ -18,11 +18,18 @@ import org.talframework.objexj.container.DefaultObjexID;
  * @author Tom Spencer
  */
 public final class ReferenceMapFieldUtils extends FieldUtils {
+    
+    /**
+     * Call to get a reference property
+     */
+    public static <T> Map<String, T> getMap(BaseObjexObj obj, Class<T> expected, Map<String, String> refs) {
+        return obj.getContainer().getObjectMap(refs, expected);
+    }
 
     /**
      * Helper to set a reference list against a set of incoming objects 
      */
-    public static <T> Map<String, String> setMap(BaseObjexObj obj, ObjexObjStateBean state, boolean owned, Map<String, T> val, Map<String, String> current) {
+    public static <T> Map<String, String> setMap(BaseObjexObj obj, ObjexObjStateBean state, Map<String, String> current, Map<String, T> val, boolean owned) {
         Map<String, String> ret = current;
         
         // If owned

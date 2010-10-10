@@ -16,6 +16,8 @@
 
 package org.talframework.objexj.query;
 
+import org.talframework.objexj.QueryRequest;
+import org.talframework.objexj.QueryResult;
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.container.InternalContainer;
 

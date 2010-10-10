@@ -19,6 +19,7 @@ package org.talframework.objexj.query;
 import java.util.List;
 
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.QueryResult;
 
 public final class DefaultQueryResult implements QueryResult {
 

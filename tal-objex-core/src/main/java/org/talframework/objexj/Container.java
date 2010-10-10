@@ -19,8 +19,6 @@ package org.talframework.objexj;
 import java.util.List;
 import java.util.Map;
 
-import org.talframework.objexj.query.QueryRequest;
-import org.talframework.objexj.query.QueryResult;
 
 /**
  * This interface represents wrapper (or container) or related
@@ -99,7 +97,7 @@ public interface Container {
 	 * @param ids The IDs in to get
 	 * @return A map containing the references to get
 	 */
-	public Map<? extends Object, ObjexObj> getObjectMap(Map<? extends Object, ? extends Object> ids);
+	public Map<String, ObjexObj> getObjectMap(Map<String, ? extends Object> ids);
 	
 	/**
 	 * As standard getObjectMap, but ensures each element
@@ -110,7 +108,7 @@ public interface Container {
 	 * @param expectedElement The expected behaviour for each element
 	 * @return The map containing the objects
 	 */
-	public <T> Map<? extends Object, T> getObjectMap(Map<? extends Object, ? extends Object> ids, Class<T> expectedElement);
+	public <T> Map<String, T> getObjectMap(Map<String, ? extends Object> ids, Class<T> expectedElement);
 	
 	/**
 	 * Call to execute a named query against the container.

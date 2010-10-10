@@ -3,7 +3,7 @@ package org.talframework.objexj.service.beans.rules;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.talframework.objexj.service.beans.CategoryBean;
+import org.talframework.objexj.object.testbeans.CategoryBean;
 
 public class CategoryValidator implements ConstraintValidator<CategoryValid, CategoryBean> {
 

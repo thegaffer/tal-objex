@@ -26,25 +26,25 @@ import org.junit.Test;
 import org.talframework.objexj.Container;
 import org.talframework.objexj.Event;
 import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexIDStrategy;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.RootObjexObj;
+import org.talframework.objexj.QueryRequest;
+import org.talframework.objexj.QueryResult;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ContainerMiddleware;
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.container.ObjectStrategy;
+import org.talframework.objexj.container.ObjexIDStrategy;
 import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.events.EventHandler;
 import org.talframework.objexj.exceptions.ContainerInvalidException;
 import org.talframework.objexj.exceptions.ObjectRemovedException;
+import org.talframework.objexj.object.RootObjexObj;
+import org.talframework.objexj.object.testbeans.CategoryBean;
 import org.talframework.objexj.query.Query;
-import org.talframework.objexj.query.QueryRequest;
-import org.talframework.objexj.query.QueryResult;
-import org.talframework.objexj.service.beans.CategoryBean;
 
 /**
  * This class tests our simple container

@@ -23,11 +23,11 @@ import java.util.Map;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexIDStrategy;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.ContainerMiddleware;
 import org.talframework.objexj.container.DefaultObjexID;
+import org.talframework.objexj.container.ObjexIDStrategy;
 import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.container.impl.SimpleTransactionCache;
