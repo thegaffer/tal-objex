@@ -18,6 +18,7 @@
 		<artifactId>tal-objex-core</artifactId>
 		<version>${project.version}</version>
   	</dependency>
+  	
   	<dependency>
   		<groupId>org.talframework.tal</groupId>
 		<artifactId>tal-aspects</artifactId>
@@ -29,13 +30,51 @@
  		<version>2.4-rc4</version>
  		<scope>provided</scope>
  	</dependency>
+ 	
+ 	<dependency>
+ 		<groupId>javax.ws.rs</groupId>
+ 		<artifactId>jsr311-api</artifactId>
+ 	</dependency>
   	
   	<!-- Test -->
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+		<artifactId>tal-objex-sample-impl</artifactId>
+		<version>${project.version}</version>
+		<scope>test</scope>
+  	</dependency>
     <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>
         <scope>test</scope>
+        <exclusions>
+        	<exclusion>
+        		<groupId>com.sun.xml.bind</groupId>
+        		<artifactId>jaxb-impl</artifactId>
+        	</exclusion>
+        </exclusions>
     </dependency>
+    <dependency>
+ 		<groupId>com.sun.jersey</groupId>
+ 		<artifactId>jersey-server</artifactId>
+ 		<scope>test</scope>
+ 	</dependency>
+ 	<dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-json</artifactId>
+        <scope>test</scope>
+    </dependency>
+	<dependency>
+ 		<groupId>com.sun.jersey</groupId>
+ 		<artifactId>jersey-client</artifactId>
+ 		<scope>test</scope>
+ 	</dependency>
+    <dependency>
+		<groupId>com.sun.jersey.jersey-test-framework</groupId>
+        <artifactId>jersey-test-framework-grizzly</artifactId>
+        <scope>test</scope>
+    </dependency>
+    
   </dependencies>
   
   <build>
