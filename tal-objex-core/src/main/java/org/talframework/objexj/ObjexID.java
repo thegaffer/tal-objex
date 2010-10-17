@@ -18,6 +18,9 @@ package org.talframework.objexj;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+
 /**
  * This interface represents an ID of a object inside
  * the current container. All IDs must be stringifiable
@@ -27,6 +30,7 @@ import java.io.Serializable;
  * 
  * @author Tom Spencer
  */
+@XmlJavaTypeAdapter(DefaultObjexID.XmlObjexIDAdaptor.class)
 public interface ObjexID extends Serializable {
 
 	/**

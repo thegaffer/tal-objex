@@ -29,9 +29,9 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
 import org.talframework.objexj.Container;
+import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.object.testbeans.CategoryBean;
 import org.talframework.objexj.object.testbeans.ProductBean;
@@ -142,7 +142,7 @@ public class TestRecursiveObjectCompiler {
     @Test
     public void basic() {
         RecursiveObjectCompiler compiler = new RecursiveObjectCompiler(container);
-        Map<ObjexID, ObjexObj> objs = compiler.writeObject(cat1);
+        Map<ObjexID, ObjexObj> objs = compiler.getObjects(cat1);
         
         Assert.assertNotNull(objs);
         Assert.assertEquals(6, objs.size());
@@ -155,7 +155,7 @@ public class TestRecursiveObjectCompiler {
     public void findAll() {
         RecursiveObjectCompiler compiler = new RecursiveObjectCompiler(container);
         compiler.setRecurseDepth(-1);
-        Map<ObjexID, ObjexObj> objs = compiler.writeObject(cat1);
+        Map<ObjexID, ObjexObj> objs = compiler.getObjects(cat1);
         
         Assert.assertNotNull(objs);
         Assert.assertEquals(12, objs.size());
@@ -168,7 +168,7 @@ public class TestRecursiveObjectCompiler {
     public void referencesOnly() {
         RecursiveObjectCompiler compiler = new RecursiveObjectCompiler(container);
         compiler.setIgnoreOwned();
-        Map<ObjexID, ObjexObj> objs = compiler.writeObject(cat1);
+        Map<ObjexID, ObjexObj> objs = compiler.getObjects(cat1);
         
         Assert.assertNotNull(objs);
         Assert.assertEquals(2, objs.size());
@@ -181,7 +181,7 @@ public class TestRecursiveObjectCompiler {
     public void childrenOnly() {
         RecursiveObjectCompiler compiler = new RecursiveObjectCompiler(container);
         compiler.setIgnoreReferenced();
-        Map<ObjexID, ObjexObj> objs = compiler.writeObject(cat1);
+        Map<ObjexID, ObjexObj> objs = compiler.getObjects(cat1);
         
         Assert.assertNotNull(objs);
         Assert.assertEquals(5, objs.size());

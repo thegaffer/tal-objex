@@ -13,6 +13,7 @@ public abstract class ReferenceField extends ObjexField {
     
     public ReferenceField(boolean naturalBeanField) {
         super(naturalBeanField);
+        setObjexType("ObjexFieldType.OWNED_REFERENCE");
     }
     
     /**
@@ -30,6 +31,11 @@ public abstract class ReferenceField extends ObjexField {
     public void setNewType(String newType) {
         this.newType = newType;
     }
+    
+    /**
+     * @return Returns of the field is a collection (list or map) of references
+     */
+    public abstract boolean isCollection();
 
     /**
      * @return the owned
@@ -45,6 +51,9 @@ public abstract class ReferenceField extends ObjexField {
      */
     public void setOwned(boolean owned) {
         this.owned = owned;
+        
+        if( owned ) setObjexType("ObjexFieldType.OWNED_REFERENCE");
+        else setObjexType("ObjexFieldType.REFERENCE");
     }
     
     /**

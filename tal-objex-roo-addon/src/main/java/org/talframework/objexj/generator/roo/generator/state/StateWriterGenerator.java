@@ -25,8 +25,8 @@ import org.talframework.objexj.generator.roo.utils.TypeConstants;
  */
 public class StateWriterGenerator extends BaseGenerator implements FieldVisitor {
     
-    private MethodMetadataWrapper method = null;
-    private boolean includeIterator = false;
+    private MethodMetadataWrapper writerMethod = null;
+    private MethodMetadataWrapper readerMethod = null;
     
     public StateWriterGenerator(DefaultItdTypeDetailsBuilder builder, ClassOrInterfaceTypeDetails typeDetails, String typeId) {
         super(builder, typeDetails, typeId);
@@ -39,16 +39,12 @@ public class StateWriterGenerator extends BaseGenerator implements FieldVisitor 
      * @param fields The fields
      */
     public void generate(List<ObjexField> fields) {
-        includeIterator = false;
+        readerMethod = new MethodMetadataWrapper(new JavaSymbolName("acceptReader"), JavaType.VOID_PRIMITIVE);
+        readerMethod.addParameter("reader", TypeConstants.OBJEXSTATEREADER, null);
         
-        method = new MethodMetadataWrapper(new JavaSymbolName("writeBean"), JavaType.VOID_PRIMITIVE);
-        method.addParameter("writer", "java.io.Writer", null);
-        method.addParameter("id", TypeConstants.OBJEXID, null);
-        method.addParameter(new JavaSymbolName("prefix"), JavaType.STRING_OBJECT, null);
-        
-        method.addBody("StringBuilder builder = new StringBuilder();");
-        method.addBody("builder.append(prefix).append(\".id=\").append(id.toString()).append('\\n');");
-        method.addBody("if( parentId != null ) builder.append(prefix).append(\".parentId=\").append(parentId).append('\\n');");
+        writerMethod = new MethodMetadataWrapper(new JavaSymbolName("acceptWriter"), JavaType.VOID_PRIMITIVE);
+        writerMethod.addParameter("writer", TypeConstants.OBJEXSTATEWRITER, null);
+        writerMethod.addParameter(new JavaSymbolName("includeNonPersistent"), JavaType.BOOLEAN_PRIMITIVE, null);
         
         Iterator<ObjexField> it = fields.iterator();
         while( it.hasNext() ) {
@@ -58,49 +54,29 @@ public class StateWriterGenerator extends BaseGenerator implements FieldVisitor 
             }
         }
         
-        if( includeIterator ) builder.getImportRegistrationResolver().addImport(new JavaType("java.util.Iterator"));
+        builder.getImportRegistrationResolver().addImport(new JavaType("org.talframework.objexj.ObjexObjStateBean.ObjexFieldType"));
         
-        method.addMetadata(builder, typeDetails, typeId);
+        readerMethod.addMetadata(builder, typeDetails, typeId);
+        writerMethod.addMetadata(builder, typeDetails, typeId);
     }
 
     public void visitSimple(SimpleField prop) {
-        String name = prop.getBeanName().getSymbolName();
-        boolean primitive = prop.getBeanType().isPrimitive();
-        if( primitive ) method.addBody("builder.append(prefix).append(\"." + name + "=\").append(" + name + ").append('\\n');");
-        else method.addBody("if( " + name + " != null ) builder.append(prefix).append(\"." + name + "=\").append(" + name + ").append('\\n');");
+        writerMethod.addBody("writer.write(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
+        readerMethod.addBody(prop.getBeanName() + " = reader.read(\"" + prop.getBeanName() + "\", " + prop.getBeanTypeName() + ".class, " + prop.getObjexType() + ", true);");
     }
     
     public void visitReference(SimpleReferenceField prop) {
-        String name = prop.getBeanName().getSymbolName();
-        method.addBody("if( " + name + " != null ) builder.append(prefix).append(\"." + name + "=\").append(" + name + ").append('\\n');");
+        writerMethod.addBody("writer.writeReference(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
+        readerMethod.addBody(prop.getBeanName() + " = reader.readReference(\"" + prop.getBeanName() + "\", " + prop.getObjexType() + ", true);");
     }
     
     public void visitList(ListReferenceField prop) {
-        includeIterator = true;
-        
-        String name = prop.getBeanName().getSymbolName();
-        method.addBody("if( " + name + " != null ) {");
-        method.addBody("\tIterator<String> it = " + name + ".iterator();");
-        method.addBody("\tint index = 0;");
-        method.addBody("\twhile( it.hasNext() ) {");
-        method.addBody("\t\tbuilder.append(prefix).append(\"." + name + "[index]=\").append(it.next()).append('\\n');");
-        method.addBody("\t\tindex++;");
-        method.addBody("\t}");
-        method.addBody("}");
+        writerMethod.addBody("writer.writeReferenceList(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
+        readerMethod.addBody(prop.getBeanName() + " = reader.readReferenceList(\"" + prop.getBeanName() + "\", " + prop.getObjexType() + ", true);");
     }
     
     public void visitMap(MapReferenceField prop) {
-        includeIterator = true;
-        
-        String name = prop.getBeanName().getSymbolName();
-        method.addBody("if( " + name + " != null ) {");
-        method.addBody("\tIterator<String> it = " + name + ".iterator();");
-        method.addBody("\tint index = 0;");
-        method.addBody("\twhile( it.hasNext() ) {");
-        method.addBody("\t\tString key = it.next();");
-        method.addBody("\t\tbuilder.append(prefix).append(\"." + name + "[key]=\").append(" + name + ".get(key)).append('\\n');");
-        method.addBody("\t\tindex++;");
-        method.addBody("\t}");
-        method.addBody("}");
+        writerMethod.addBody("writer.writeReferenceMap(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
+        readerMethod.addBody(prop.getBeanName() + " = reader.readReferenceMap(\"" + prop.getBeanName() + "\", " + prop.getObjexType() + ", true);");
     }
 }

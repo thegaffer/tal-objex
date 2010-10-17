@@ -1,17 +1,20 @@
 package org.talframework.objexj.generator.roo.generator.state;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.DefaultItdTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.DefaultAnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.talframework.objexj.generator.roo.annotations.ObjexObjStateBeanAnnotation;
-import org.talframework.objexj.generator.roo.fields.ObjexObjProperty;
 import org.talframework.objexj.generator.roo.generator.BaseGenerator;
 import org.talframework.objexj.generator.roo.utils.ConstructorMetadataWrapper;
 import org.talframework.objexj.generator.roo.utils.MethodMetadataWrapper;
@@ -36,6 +39,13 @@ public class StateGenerator extends BaseGenerator {
     public void generate(ObjexObjStateBeanAnnotation annotationValues) {
         this.annotationValues = annotationValues;
         
+        // Make the object a JAXB one
+        if( TypeDetailsUtil.getAnnotation(typeDetails, TypeConstants.XML_ROOT) == null ) {
+            List<AnnotationAttributeValue<?>> values = new ArrayList<AnnotationAttributeValue<?>>();
+            values.add(new StringAttributeValue(new JavaSymbolName("name"), annotationValues.getName()));
+            builder.addTypeAnnotation(new DefaultAnnotationMetadata(TypeConstants.XML_ROOT_TYPE, (List<AnnotationAttributeValue<?>>)new ArrayList<AnnotationAttributeValue<?>>()));
+        }
+        
         addIdField();
         addParentIdField();
         addEditable();
@@ -53,24 +63,6 @@ public class StateGenerator extends BaseGenerator {
         con.addMetadata(builder, typeDetails, typeId);
     }
     
-    /**
-     * Adds a getter/setter to the property
-     * 
-     * @param prop
-     */
-    public void addGetterSetter(ObjexObjProperty prop) {
-        JavaSymbolName name = new JavaSymbolName("get" + prop.getName().getSymbolNameCapitalisedFirstLetter());
-        MethodMetadataWrapper getter = new MethodMetadataWrapper(name, prop.getType());
-        getter.addBody("return this." + prop.getName().getSymbolName() + ";");
-        getter.addMetadata(builder, typeDetails, typeId);
-        
-        name = new JavaSymbolName("set" + prop.getName().getSymbolNameCapitalisedFirstLetter());
-        MethodMetadataWrapper setter = new MethodMetadataWrapper(name, JavaType.VOID_PRIMITIVE);
-        setter.addParameter(new JavaSymbolName("val"), prop.getType(), null);
-        setter.addBody("this." + prop.getName().getSymbolName() + " = val;");
-        setter.addMetadata(builder, typeDetails, typeId);
-    }
-    
     private void addIdField() {
         PropertyMetadataWrapper prop = new PropertyMetadataWrapper(new JavaSymbolName("id"), JavaType.STRING_OBJECT);
         prop.addAnnotation("javax.jdo.annotations.PrimaryKey");
@@ -83,8 +75,16 @@ public class StateGenerator extends BaseGenerator {
         prop.addMetadata(builder, typeDetails, typeId);
         
         MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName("getId"), prop.getType());
+        getter.addAnnotation(TypeConstants.XML_ATTRIBUTE);
+        getter.addAnnotation(TypeConstants.XML_ID);
         getter.addBody("return this.id;");
         getter.addMetadata(builder, typeDetails, typeId);
+        
+        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName("setId"), JavaType.VOID_PRIMITIVE);
+        setter.addParameter(new JavaSymbolName("val"), prop.getType(), null);
+        setter.addBody("if( this.id != null ) throw new IllegalArgumentException(\"You cannot set a parent ID on an object once it is set\");");
+        setter.addBody("this.id = val;");
+        setter.addMetadata(builder, typeDetails, typeId);
     }
     
     private void addParentIdField() {
@@ -94,8 +94,15 @@ public class StateGenerator extends BaseGenerator {
         prop.addMetadata(builder, typeDetails, typeId);
         
         MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName("getParentId"), prop.getType());
+        getter.addAnnotation(TypeConstants.XML_ATTRIBUTE);
         getter.addBody("return this.parentId;");
         getter.addMetadata(builder, typeDetails, typeId);
+        
+        MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName("setParentId"), JavaType.VOID_PRIMITIVE);
+        setter.addParameter(new JavaSymbolName("val"), prop.getType(), null);
+        setter.addBody("if( this.parentId != null ) throw new IllegalArgumentException(\"You cannot set a parent ID on an object once it is set\");");
+        setter.addBody("this.parentId = val;");
+        setter.addMetadata(builder, typeDetails, typeId);
     }
     
     private void addEditable() {
@@ -108,6 +115,7 @@ public class StateGenerator extends BaseGenerator {
         
         // isEditable method
         MethodMetadataWrapper isMethod = new MethodMetadataWrapper(new JavaSymbolName("isEditable"), JavaType.BOOLEAN_PRIMITIVE);
+        isMethod.addAnnotation(TypeConstants.XML_TRANSIENT);
         isMethod.addBody("return _editable;");
         isMethod.addMetadata(builder, typeDetails, typeId);
         
@@ -131,6 +139,7 @@ public class StateGenerator extends BaseGenerator {
         }
         
         MethodMetadataWrapper typeMethod = new MethodMetadataWrapper(new JavaSymbolName("getObjexObjType"), JavaType.STRING_OBJECT);
+        typeMethod.addAnnotation(TypeConstants.XML_TRANSIENT);
         typeMethod.addBody("return \"" + type + "\";");
         typeMethod.addMetadata(builder, typeDetails, typeId);
     }

@@ -20,9 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.container.ContainerStrategy;
-import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.events.EventHandler;
 import org.talframework.objexj.events.EventListener;

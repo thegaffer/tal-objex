@@ -22,6 +22,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.talframework.objexj.ObjexID;
@@ -62,6 +67,7 @@ import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
  * 
  * @author Tom Spencer
  */
+@XmlRootElement
 public final class SimpleObjexObj extends BaseObjexObj {
 
 	/** The strategy for this object */
@@ -69,6 +75,10 @@ public final class SimpleObjexObj extends BaseObjexObj {
 	
 	/** Member holds the detail or state object */
 	private ObjexObjStateBean state;
+	
+	public SimpleObjexObj() {
+	    throw new IllegalArgumentException("Cannot create a SimpleObjexObj directly");
+	}
 	
 	public SimpleObjexObj(ObjectStrategy strategy, ObjexObjStateBean state) {
 	    if( strategy == null ) throw new IllegalArgumentException("Cannot create object without a strategy");
@@ -89,12 +99,14 @@ public final class SimpleObjexObj extends BaseObjexObj {
 	 * Overridden based on whether state object is
 	 * updateable or not.
 	 */
+	@XmlTransient
 	@Override
 	public boolean isUpdateable() {
 	    if( state.isEditable() ) return true;
 	    return super.isUpdateable();
 	}
 	
+	@XmlAnyElement
 	@Override
 	protected ObjexObjStateBean getStateBean() {
 	    return state;
@@ -105,7 +117,8 @@ public final class SimpleObjexObj extends BaseObjexObj {
 	 * 
 	 * @deprecated
 	 */
-	public Object getStateObject() {
+	@XmlTransient
+    public Object getStateObject() {
 		return state.cloneState();
 	}
 	
@@ -130,7 +143,8 @@ public final class SimpleObjexObj extends BaseObjexObj {
 	 * 
 	 * @return The state object in editable form
 	 */
-	public ObjexObjStateBean getEditableLocalState() {
+	@XmlTransient
+    public ObjexObjStateBean getEditableLocalState() {
 	    if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
 	    return state;
 	}

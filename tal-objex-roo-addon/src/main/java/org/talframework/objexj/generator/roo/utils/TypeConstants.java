@@ -14,6 +14,8 @@ public class TypeConstants {
 
     public static final String OBJEXOBJ = "org.talframework.objexj.ObjexObj";
     public static final String OBJEXSTATEBEAN = "org.talframework.objexj.ObjexObjStateBean";
+    public static final String OBJEXSTATEWRITER = "org.talframework.objexj.ObjexStateWriter";
+    public static final String OBJEXSTATEREADER = "org.talframework.objexj.ObjexStateReader";
     public static final String OBJEXID = "org.talframework.objexj.ObjexID";
     
     ///////////////////////////////
@@ -43,4 +45,25 @@ public class TypeConstants {
     
     public static final String CONSTARINT_CONTEXT = "javax.validation.ConstraintValidatorContext";
     public static final String CONSTRAINT_BUILDER = "javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder";
+    
+    ///////////////////////////////
+    // XML - JAXB
+    
+    public static final String XML_OBJEXOBJ = "org.talframework.objexj.object.xml.XmlObjexObj";
+    public static final JavaType XML_OBJEXOBJ_TYPE = new JavaType(XML_OBJEXOBJ);
+    public static final String XML_ROOT = "javax.xml.bind.annotation.XmlRootElement";
+    public static final JavaType XML_ROOT_TYPE = new JavaType(XML_ROOT);
+    public static final String XML_TYPE = "javax.xml.bind.annotation.XmlType";
+    public static final JavaType XML_TYPE_TYPE = new JavaType(XML_TYPE);
+    public static final String XML_ACCESSOR = "javax.xml.bind.annotation.XmlAccessorType";
+    public static final JavaType XML_ACCESSOR_TYPE = new JavaType(XML_ACCESSOR); 
+    public static final JavaType XML_ACCESS_TYPE = new JavaType("javax.xml.bind.annotation.XmlAccessType");
+    public static final String XML_TRANSIENT = "javax.xml.bind.annotation.XmlTransient";
+    public static final String XML_ATTRIBUTE = "javax.xml.bind.annotation.XmlAttribute";
+    public static final String XML_ELEMENT = "javax.xml.bind.annotation.XmlElement";
+    public static final String XML_ANY_ELEMENT = "javax.xml.bind.annotation.XmlAnyElement";
+    public static final String XML_ELEMENT_WRAPPER = "javax.xml.bind.annotation.XmlElementWrapper";
+    public static final String XML_ID = "javax.xml.bind.annotation.XmlID";
+    public static final String XML_IDREF = "javax.xml.bind.annotation.XmlIDREF";
+    public static final String XML_LIST = "javax.xml.bind.annotation.XmlList";
 }

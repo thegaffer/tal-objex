@@ -28,7 +28,7 @@ import junit.framework.Assert;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Test;
-import org.talframework.objexj.container.DefaultObjexID;
+import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.object.testbeans.CategoryBean;
 import org.talframework.objexj.object.testbeans.ProductBean;
@@ -53,7 +53,7 @@ public class TestPropertyWriter {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printer = new PrintWriter(stringWriter);
         PropertyWriter writer = new PropertyWriter(printer);
-        writer.writeState("test[product]", new DefaultObjexID("Product", 1), product);
+        writer.writeState("test[product]", new DefaultObjexID("Product", 1).toString(), product);
         
         StringBuilder buf = new StringBuilder();
         buf.append("test[product].id=Product/1").append('\n');
@@ -100,7 +100,7 @@ public class TestPropertyWriter {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printer = new PrintWriter(stringWriter);
         PropertyWriter writer = new PropertyWriter(printer);
-        writer.writeState("test[cat]", new DefaultObjexID("Category", 1), category);
+        writer.writeState("test[cat]", new DefaultObjexID("Category", 1).toString(), category);
      
         StringBuilder buf = new StringBuilder();
         buf.append("test[cat].id=Category/1").append('\n');
@@ -128,7 +128,7 @@ public class TestPropertyWriter {
         PrintWriter printer = new PrintWriter(stringWriter);
         PropertyWriter writer = new PropertyWriter(printer);
         writer.setIgnoreReferenced();
-        writer.writeState("test[cat]", new DefaultObjexID("Category", 1), category);
+        writer.writeState("test[cat]", new DefaultObjexID("Category", 1).toString(), category);
      
         StringBuilder buf = new StringBuilder();
         buf.append("test[cat].id=Category/1").append('\n');
@@ -155,7 +155,7 @@ public class TestPropertyWriter {
         PrintWriter printer = new PrintWriter(stringWriter);
         PropertyWriter writer = new PropertyWriter(printer);
         writer.setIgnoreOwned();
-        writer.writeState("test[cat]", new DefaultObjexID("Category", 1), category);
+        writer.writeState("test[cat]", new DefaultObjexID("Category", 1).toString(), category);
      
         StringBuilder buf = new StringBuilder();
         buf.append("test[cat].id=Category/1").append('\n');

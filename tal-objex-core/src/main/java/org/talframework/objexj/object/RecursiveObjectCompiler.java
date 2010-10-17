@@ -114,7 +114,7 @@ public final class RecursiveObjectCompiler implements ObjexStateWriter {
      * @param obj The object to start at
      * @return The map of objects
      */
-    public Map<ObjexID, ObjexObj> writeObject(ObjexObj obj) {
+    public Map<ObjexID, ObjexObj> getObjects(ObjexObj obj) {
         referencedObjects.put(obj.getId(), obj);
         
         // Find its children if we are recursing
@@ -127,7 +127,7 @@ public final class RecursiveObjectCompiler implements ObjexStateWriter {
         if( recurseDepth == 0 ) return; // Shouldn't happen, but just in case
         
         --recurseDepth;
-        writeObject(obj);
+        getObjects(obj);
         ++recurseDepth;
     }
     

@@ -26,8 +26,12 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.talframework.objexj.Container;
+import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
@@ -100,6 +104,9 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	/**
 	 * Simply returns the ID
 	 */
+	@XmlAttribute
+    @XmlJavaTypeAdapter(value=DefaultObjexID.XmlObjexIDAdaptor.class)
+	@XmlID
 	public ObjexID getId() {
 	    checkInitialised();
 		return id;

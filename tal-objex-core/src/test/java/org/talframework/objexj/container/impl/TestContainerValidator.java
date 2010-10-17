@@ -27,12 +27,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.talframework.objexj.Container;
+import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
-import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.TransactionCache;
 import org.talframework.objexj.container.TransactionCache.ObjectRole;
 

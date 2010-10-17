@@ -70,6 +70,11 @@ public final class SimpleReferenceField extends ReferenceField {
         visitor.visitReference(this);
     }
     
+    @Override
+    public boolean isCollection() {
+        return false;
+    }
+    
     /**
      * {@inheritDoc}
      */

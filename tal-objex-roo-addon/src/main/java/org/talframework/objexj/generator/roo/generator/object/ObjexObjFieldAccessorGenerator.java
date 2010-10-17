@@ -6,12 +6,14 @@ import java.util.List;
 
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.DefaultItdTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.annotations.ClassAttributeValue;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.talframework.objexj.generator.roo.fields.FieldVisitor;
 import org.talframework.objexj.generator.roo.fields.ListReferenceField;
 import org.talframework.objexj.generator.roo.fields.MapReferenceField;
 import org.talframework.objexj.generator.roo.fields.ObjexField;
+import org.talframework.objexj.generator.roo.fields.ReferenceField;
 import org.talframework.objexj.generator.roo.fields.SimpleField;
 import org.talframework.objexj.generator.roo.fields.SimpleReferenceField;
 import org.talframework.objexj.generator.roo.generator.BaseGenerator;
@@ -75,6 +77,7 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
         
         // a. Getter
         MethodMetadataWrapper getter = startMethod(prop.getGetterMethodName(), prop.getType());
+        addSimpleXmlAnnotations(getter, prop);
         getter.addBody(getSimpleType(prop.getBeanType()) + " rawValue = bean." + prop.getBeanGetterMethodName() + "();");
         getter.addBody(getValueFromRawValue(prop));
         getter.addBody("return val;");
@@ -92,6 +95,7 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
         
         // a. Getter
         MethodMetadataWrapper getter = startMethod(prop.getGetterMethodName(), prop.getType());
+        addReferenceXmlAnnotations(getter, prop);
         getter.addBody("return ReferenceFieldUtils.getReference(this, " + getSimpleType(prop.getType()) + ".class, bean." + prop.getBeanGetterMethodName() + "());");
         methods.add(getter);
         
@@ -117,6 +121,7 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
         
         // a. Getter
         MethodMetadataWrapper method = startMethod(prop.getGetterMethodName(), prop.getType());
+        addReferenceXmlAnnotations(method, prop);
         method.addBody("return ReferenceListFieldUtils.getList(this, " + getSimpleType(prop.getMemberType()) + ".class, bean." + prop.getBeanGetterMethodName() + "());");
         methods.add(method);
         
@@ -173,6 +178,7 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
         
         // a. Getter
         MethodMetadataWrapper method = startMethod(prop.getGetterMethodName(), prop.getType());
+        addReferenceXmlAnnotations(method, prop);
         method.addBody("return ReferenceMapFieldUtils.getMap(this, " + getSimpleType(prop.getMemberType()) + ".class, bean." + prop.getBeanGetterMethodName() + "());");
         methods.add(method);
         
@@ -292,5 +298,24 @@ public final class ObjexObjFieldAccessorGenerator extends BaseGenerator implemen
      */
     private String getSimpleType(JavaType type) {
         return type.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
+    }
+    
+    private void addSimpleXmlAnnotations(MethodMetadataWrapper method, SimpleField field) {
+        if( field.isNaturalBeanField() ) {
+            if( !field.isLarge() ) method.addAnnotation(TypeConstants.XML_ATTRIBUTE);
+            else method.addAnnotation(TypeConstants.XML_ELEMENT);
+        }
+        // TODO: If simple prop for a reference, add on a
+    }
+    
+    private void addReferenceXmlAnnotations(MethodMetadataWrapper method, ReferenceField field) {
+        if( field.isNaturalBeanField() && field.isOwned() ) {
+            JavaType type = TypeConstants.XML_OBJEXOBJ_TYPE;
+            if( field.getNewType() != null ) {
+                // TODO: Set this to the correct type based on newType
+            }
+            
+            method.addAnnotation(TypeConstants.XML_ELEMENT, new ClassAttributeValue(new JavaSymbolName("type"), type));
+        }
     }
 }

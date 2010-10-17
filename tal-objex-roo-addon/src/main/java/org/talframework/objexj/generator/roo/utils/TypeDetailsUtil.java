@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ConstructorMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
@@ -161,6 +162,43 @@ public class TypeDetailsUtil {
             
             // If we get here we have a match
             ret = mm;
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Call to find a particular constructor on the given type.
+     * 
+     * @param details The type to check
+     * @param paramTypes The parameter types for constructor
+     * @return The constructor metadata if found
+     */
+    public static ConstructorMetadata getConstructor(ClassOrInterfaceTypeDetails details, List<AnnotatedJavaType> paramTypes) {
+        ConstructorMetadata ret = null;
+        
+        List<? extends ConstructorMetadata> cons = details.getDeclaredConstructors();
+        Iterator<? extends ConstructorMetadata> it = cons.iterator();
+        while( it.hasNext() && ret == null ) {
+            ConstructorMetadata con = it.next();
+            
+            List<AnnotatedJavaType> pt = con.getParameterTypes();
+            if( paramTypes == null ) {
+                if( pt != null && pt.size() != 0 ) continue;
+            }
+            else {
+                if( pt.size() != paramTypes.size() ) continue;
+
+                boolean match = true;
+                for( int i = 0 ; i < paramTypes.size() && match ; i++ ) {
+                    if( !paramTypes.get(i).equals(pt.get(i)) ) match = false;
+                }
+                
+                if( !match ) continue;
+            }
+            
+            // If we get here we have a match
+            ret = con;
         }
         
         return ret;

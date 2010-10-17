@@ -140,6 +140,8 @@ public interface ObjexObjStateBean extends Serializable {
         MEMO,
         /** Indicates the field is a number */
         NUMBER,
+        /** Indicates the field is a boolean */
+        BOOL,
         /** Indicates the field is a date field */
         DATE,
         /** Indicates the field is a short binary (byte) field */

@@ -29,15 +29,12 @@ import org.talframework.objexj.generator.roo.compiler.ValidationMethodsCompiler;
 import org.talframework.objexj.generator.roo.fields.ObjexField;
 import org.talframework.objexj.generator.roo.generator.object.ObjexObjFieldAccessorGenerator;
 import org.talframework.objexj.generator.roo.generator.object.ObjexObjGenerator;
-import org.talframework.objexj.generator.roo.generator.object.ObjexXmlWriterGenerator;
 import org.talframework.objexj.generator.roo.generator.object.ValidationGenerator;
 import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 
 /**
  * Metadata Item for an Objex Object. This object in the code contains
  * the real business behaviour.
- * 
- * TODO: Set methods on owned members that copy fields into existing (creating first as necc)
  * 
  * @author Tom Spencer
  */
@@ -49,7 +46,6 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
     private ObjexObjGenerator objGenerator;
     private ObjexObjFieldAccessorGenerator fieldGenerator;
     private ValidationGenerator validationGenerator;
-    private ObjexXmlWriterGenerator xmlGenerator;
     
     public ObjexObjMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjAnnotation values, List<ObjexField> properties) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
@@ -71,7 +67,6 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
         if( objGenerator == null ) objGenerator = new ObjexObjGenerator(builder, governorTypeDetails, getId());
         if( fieldGenerator == null ) fieldGenerator = new ObjexObjFieldAccessorGenerator(builder, governorTypeDetails, getId());
         if( validationGenerator == null ) validationGenerator = new ValidationGenerator(builder, governorTypeDetails, getId());
-        if( xmlGenerator == null ) xmlGenerator = new ObjexXmlWriterGenerator(builder, governorTypeDetails, getId());
     }
     
     private ValidationMethodsCompiler getValidationMethods() {

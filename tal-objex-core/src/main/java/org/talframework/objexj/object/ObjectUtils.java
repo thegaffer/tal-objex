@@ -16,9 +16,9 @@
 
 package org.talframework.objexj.object;
 
+import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.container.DefaultObjexID;
 
 /**
  * This class contains various helper methods that can be

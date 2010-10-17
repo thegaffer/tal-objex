@@ -26,7 +26,9 @@ import org.springframework.roo.classpath.details.DefaultItdTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.DefaultMethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.DefaultAnnotationMetadata;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -106,6 +108,23 @@ public class MethodMetadataWrapper {
     public void addAnnotation(AnnotationMetadata am) {
         if( this.annotations == null ) this.annotations = new ArrayList<AnnotationMetadata>();
         this.annotations.add(am);
+    }
+    
+    public void addAnnotation(String annotation) {
+        List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
+        AnnotationMetadata am = new DefaultAnnotationMetadata(new JavaType(annotation), attributes);
+        addAnnotation(am);
+    }
+    
+    public void addAnnotation(String annotation, AnnotationAttributeValue<?>... attrs) {
+        List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
+        if( attrs != null ) {
+            for( int i = 0 ; i < attrs.length ; i++ ) {
+                attributes.add(attrs[i]);
+            }
+        }
+        AnnotationMetadata am = new DefaultAnnotationMetadata(new JavaType(annotation), attributes);
+        addAnnotation(am);
     }
 
     /**

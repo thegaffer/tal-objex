@@ -26,6 +26,7 @@ import org.talframework.objexj.annotations.ObjexObj;
 public class ObjexObjAnnotation extends AbstractAnnotationValues {
     
     @AutoPopulate private JavaType value = null;
+    private String objexType = null;
     
     /**
      * Helper to get the {@link ObjexObj} annotation and its values if
@@ -57,5 +58,21 @@ public class ObjexObjAnnotation extends AbstractAnnotationValues {
      */
     public void setValue(JavaType value) {
         this.value = value;
+    }
+
+    /**
+     * @return the objexType
+     */
+    public String getObjexType() {
+        return objexType;
+    }
+
+    /**
+     * Setter for the objexType field
+     *
+     * @param objexType the objexType to set
+     */
+    public void setObjexType(String objexType) {
+        this.objexType = objexType;
     }
 }

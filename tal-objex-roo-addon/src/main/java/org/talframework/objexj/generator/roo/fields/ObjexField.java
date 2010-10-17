@@ -35,6 +35,8 @@ public abstract class ObjexField {
     private JavaSymbolName name = null;
     /** Holds the exposed type of the field */
     private JavaType type = null;
+    /** Holds the ObjexType of the field */
+    private String objexType = null;
     /** Holds the name of the field on the state bean */
     private JavaSymbolName beanName = null;
     /** Holds the type of the property on the state bean */
@@ -92,6 +94,22 @@ public abstract class ObjexField {
      */
     public void setType(JavaType type) {
         this.type = type;
+    }
+    
+    /**
+     * @return the objexType
+     */
+    public String getObjexType() {
+        return objexType;
+    }
+
+    /**
+     * Setter for the objexType field
+     *
+     * @param objexType the objexType to set
+     */
+    public void setObjexType(String objexType) {
+        this.objexType = objexType;
     }
 
     /**

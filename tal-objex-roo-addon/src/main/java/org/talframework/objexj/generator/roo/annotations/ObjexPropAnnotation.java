@@ -13,6 +13,7 @@ import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 public class ObjexPropAnnotation {
     
     @AutoPopulate private String externalName = null;
+    @AutoPopulate private String objexType = null;
     @AutoPopulate private JavaType exposeAs = null;
     @AutoPopulate private JavaType transformerClass = null;
     @AutoPopulate private String transformerGetFunction = null;
@@ -41,6 +42,7 @@ public class ObjexPropAnnotation {
         AutoPopulationUtils.populate(this, annotationMetadata);
         
         if( "".equals(externalName) ) externalName = null;
+        if( "".equals(objexType) ) objexType = null;
         if( "".equals(transformerGetFunction) ) transformerSetFunction = null;
         if( "".equals(transformerSetFunction) ) transformerSetFunction = null;
         if( TypeConstants.OBJECT.equals(exposeAs) ) exposeAs = null;
@@ -157,5 +159,21 @@ public class ObjexPropAnnotation {
      */
     public void setSettable(boolean settable) {
         this.settable = settable;
+    }
+
+    /**
+     * @return the objexType
+     */
+    public String getObjexType() {
+        return objexType;
+    }
+
+    /**
+     * Setter for the objexType field
+     *
+     * @param objexType the objexType to set
+     */
+    public void setObjexType(String objexType) {
+        this.objexType = objexType;
     }
 }

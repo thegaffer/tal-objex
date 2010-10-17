@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.container;
+package org.talframework.objexj;
 
-import org.talframework.objexj.ObjexID;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+
 import org.talframework.objexj.exceptions.ObjectIDInvalidException;
 
 /**
@@ -156,5 +157,21 @@ public class DefaultObjexID implements ObjexID {
         }
         else if( !type.equals(other.getType()) ) return false;
         return true;
+    }
+    
+    /**
+     * This JAXB adapter class takes care of adapting an ObjexID
+     * into a String and vice versa
+     *
+     * @author Tom Spencer
+     */
+    public static class XmlObjexIDAdaptor extends XmlAdapter<String, ObjexID> {
+        public ObjexID unmarshal(String val) throws Exception {
+            return DefaultObjexID.getId(val);
+        }
+        
+        public String marshal(ObjexID val) throws Exception {
+            return val.toString();
+        }
     }
 }

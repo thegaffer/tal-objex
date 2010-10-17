@@ -24,13 +24,13 @@ import java.util.List;
 
 import javax.jdo.PersistenceManager;
 
+import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.QueryRequest;
 import org.talframework.objexj.QueryResult;
 import org.talframework.objexj.container.ContainerStrategy;
-import org.talframework.objexj.container.DefaultObjexID;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.query.DefaultQueryResult;

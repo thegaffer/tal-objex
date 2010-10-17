@@ -42,7 +42,6 @@ import org.talframework.objexj.generator.roo.generator.state.StateGAEGenerator;
 import org.talframework.objexj.generator.roo.generator.state.StateGenerator;
 import org.talframework.objexj.generator.roo.generator.state.StateTempRefsGenerator;
 import org.talframework.objexj.generator.roo.generator.state.StateWriterGenerator;
-import org.talframework.objexj.generator.roo.generator.state.StateXmlWriterGenerator;
 import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 
 /**
@@ -62,15 +61,17 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     private StateTempRefsGenerator tempRefsGenerator;
     private StateFieldAccessorGenerator fieldGenerator;
     private StateWriterGenerator writerGenerator;
-    private StateXmlWriterGenerator xmlWriterGenerator;
     private StateGAEGenerator gaeGenerator;
     
+    private String type = null;
     private List<ObjexField> properties = null;
     
     public ObjexStateBeanMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjStateBeanAnnotation annotationValues) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         
         initialiseGenerators();
+        
+        type = annotationValues.getName();
         
         // Annotation, UID and ObjexObj interface
         builder.addTypeAnnotation(getJDOAnnotation());
@@ -85,7 +86,6 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         tempRefsGenerator.generate(getProperties());
         gaeGenerator.generate(getProperties());
         writerGenerator.generate(getProperties());
-        xmlWriterGenerator.generate(getProperties());
         
         // Create the ITD Type
         itdTypeDetails = builder.build();
@@ -97,7 +97,6 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         if( tempRefsGenerator == null ) tempRefsGenerator = new StateTempRefsGenerator(builder, governorTypeDetails, getId());
         if( fieldGenerator == null ) fieldGenerator = new StateFieldAccessorGenerator(builder, governorTypeDetails, getId());
         if( writerGenerator == null ) writerGenerator = new StateWriterGenerator(builder, governorTypeDetails, getId());
-        if( xmlWriterGenerator == null ) xmlWriterGenerator = new StateXmlWriterGenerator(builder, governorTypeDetails, getId());
         if( gaeGenerator == null ) gaeGenerator = new StateGAEGenerator(builder, governorTypeDetails, getId());
     }
     
@@ -111,6 +110,10 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         }
         
         return properties;
+    }
+    
+    public String getType() {
+        return type;
     }
     
     /**

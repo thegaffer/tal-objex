@@ -16,6 +16,7 @@ import org.talframework.objexj.generator.roo.fields.SimpleField;
 import org.talframework.objexj.generator.roo.fields.SimpleReferenceField;
 import org.talframework.objexj.generator.roo.generator.BaseGenerator;
 import org.talframework.objexj.generator.roo.utils.MethodMetadataWrapper;
+import org.talframework.objexj.generator.roo.utils.TypeConstants;
 
 /**
  * Generates out the getter/setters for the state bean
@@ -54,6 +55,7 @@ public class StateFieldAccessorGenerator extends BaseGenerator implements FieldV
     
     public void visitSimple(SimpleField prop) {
         MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterMethodName()), prop.getBeanType());
+        if( !prop.isLarge() ) getter.addAnnotation(TypeConstants.XML_ATTRIBUTE);
         getter.addBody("return " + prop.getBeanName().getSymbolName() + ";");
         methods.add(getter);
         
@@ -65,6 +67,7 @@ public class StateFieldAccessorGenerator extends BaseGenerator implements FieldV
     
     public void visitReference(SimpleReferenceField prop) {
         MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterMethodName()), prop.getBeanType());
+        getter.addAnnotation(TypeConstants.XML_ATTRIBUTE);
         getter.addBody("return " + prop.getBeanName().getSymbolName() + ";");
         methods.add(getter);
         
@@ -76,6 +79,7 @@ public class StateFieldAccessorGenerator extends BaseGenerator implements FieldV
     
     public void visitList(ListReferenceField prop) {
         MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterMethodName()), prop.getBeanType());
+        getter.addAnnotation(TypeConstants.XML_LIST);
         getter.addBody("return " + prop.getBeanName().getSymbolName() + ";");
         methods.add(getter);
         

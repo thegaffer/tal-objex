@@ -82,6 +82,11 @@ public final class ListReferenceField extends ReferenceField {
         visitor.visitList(this);
     }
     
+    @Override
+    public boolean isCollection() {
+        return true;
+    }
+    
     /**
      * @return the memberType
      */

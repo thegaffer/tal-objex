@@ -20,7 +20,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ObjexStateWriter;
@@ -101,20 +100,22 @@ public final class PropertyWriter implements ObjexStateWriter {
         write("objType", obj.getType());
         
         obj.acceptWriter(this, includeNonPersisted);
+        writer.flush();
         
         currentPrefix = oldPrefix;
     }
     
-    public void writeState(String prefix, ObjexID id, ObjexObjStateBean bean) {
+    public void writeState(String prefix, String id, ObjexObjStateBean bean) {
         String oldPrefix = currentPrefix;
         currentPrefix = prefix;
         
         // Write out the id, parent and objType
-        write("id", id.toString());
+        write("id", id);
         if( bean.getParentId() != null ) write("parentId", bean.getParentId().toString());
         write("objType", bean.getObjexObjType());
         
         bean.acceptWriter(this, includeNonPersisted);
+        writer.flush();
         
         currentPrefix = oldPrefix;
     }

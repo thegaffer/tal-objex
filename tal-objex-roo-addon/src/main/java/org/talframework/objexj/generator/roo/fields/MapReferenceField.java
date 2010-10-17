@@ -83,6 +83,11 @@ public final class MapReferenceField extends ReferenceField {
         visitor.visitMap(this);
     }
     
+    @Override
+    public boolean isCollection() {
+        return true;
+    }
+    
     /**
      * @return the memberType
      */
