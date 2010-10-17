@@ -27,6 +27,10 @@ public class CategoryImpl implements Category {
     
     private CategoryBean bean;
     
+    public CategoryImpl() {
+        throw new IllegalAccessError("Cannot construct ObjexObj directly, must use the container");
+    }
+    
     public CategoryImpl(CategoryBean bean) {
         this.bean = bean;
     }

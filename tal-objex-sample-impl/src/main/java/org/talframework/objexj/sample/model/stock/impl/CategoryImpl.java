@@ -19,6 +19,12 @@ package org.talframework.objexj.sample.model.stock.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
@@ -26,6 +32,7 @@ import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.SimpleObjectStrategy;
+import org.talframework.objexj.object.xml.XmlObjexObj;
 import org.talframework.objexj.sample.api.stock.Category;
 import org.talframework.objexj.sample.api.stock.Product;
 import org.talframework.objexj.sample.beans.stock.CategoryBean;
@@ -38,10 +45,16 @@ import org.talframework.objexj.sample.beans.stock.CategoryBean;
  *
  * @author Tom Spencer
  */
+@XmlType(name="Category")
+@XmlAccessorType(XmlAccessType.NONE)
 public class CategoryImpl extends BaseObjexObj implements Category {
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Category", CategoryImpl.class, CategoryBean.class);
     
     private final CategoryBean bean;
+    
+    public CategoryImpl() {
+        throw new IllegalAccessError("Cannot create an ObjexObj instance except through the container");
+    }
 
     public CategoryImpl(CategoryBean state) {
         this.bean = state;
@@ -57,6 +70,7 @@ public class CategoryImpl extends BaseObjexObj implements Category {
         return parentId != null ? parentId.toString() : null;
     }
 
+    @XmlAttribute
     public String getName() {
         return bean.getName();
     }
@@ -69,6 +83,7 @@ public class CategoryImpl extends BaseObjexObj implements Category {
         bean.setName(name);
     }
     
+    @XmlAttribute
     public String getDescription() {
         return bean.getDescription();
     }
@@ -85,6 +100,7 @@ public class CategoryImpl extends BaseObjexObj implements Category {
         return bean.getCategories();
     }
     
+    @XmlElement(type=XmlObjexObj.class)
     public List<Category> getCategories() {
         return getContainer().getObjectList(bean.getCategories(), Category.class);
     }
@@ -98,6 +114,7 @@ public class CategoryImpl extends BaseObjexObj implements Category {
         return bean.getProducts();
     }
     
+    @XmlElement(type=ProductImpl.class)
     public List<Product> getProducts() {
         return getContainer().getObjectList(bean.getProducts(), Product.class);
     }

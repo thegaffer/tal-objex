@@ -29,9 +29,6 @@ import org.talframework.objexj.sample.api.order.Order;
 import org.talframework.objexj.sample.api.order.OrderItem;
 import org.talframework.objexj.sample.api.repository.OrderRepository;
 import org.talframework.objexj.sample.api.repository.OrderService;
-import org.talframework.objexj.sample.model.order.impl.OrderImpl;
-import org.talframework.objexj.sample.model.order.impl.OrderItemImpl;
-import org.talframework.objexj.sample.model.order.impl.OrderServiceImpl;
 
 /**
  * This is the full Integration test for the order service.

@@ -17,8 +17,13 @@
 package org.talframework.objexj.sample.beans.order;
 
 import javax.jdo.annotations.PersistenceCapable;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.sample.beans.BaseBean;
 
 /**
@@ -29,6 +34,7 @@ import org.talframework.objexj.sample.beans.BaseBean;
  * @author Tom Spencer
  */
 @PersistenceCapable
+@XmlRootElement(name="OrderItem")
 public class OrderItemBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 
@@ -67,10 +73,12 @@ public class OrderItemBean extends BaseBean {
         return ret;
     }
 	
+	@XmlTransient
 	public String getObjexObjType() {
         return "OrderItem";
     }
     
+	@XmlAttribute
     public String getRef() {
 		return ref;
 	}
@@ -81,7 +89,8 @@ public class OrderItemBean extends BaseBean {
 		this.ref = ref;
 	}
 
-	public String getName() {
+	@XmlAttribute
+    public String getName() {
 		return name;
 	}
 	
@@ -89,7 +98,8 @@ public class OrderItemBean extends BaseBean {
 		this.name = name;
 	}
 	
-	public String getDescription() {
+	@XmlAttribute
+    public String getDescription() {
 		return description;
 	}
 	
@@ -99,9 +109,11 @@ public class OrderItemBean extends BaseBean {
 	/**
 	 * @return the stockItem
 	 */
-	public String getStockItem() {
+	@XmlAttribute
+    public String getStockItem() {
 		return stockItem;
 	}
+	@XmlTransient
 	public String getStockItemRef() {
 		return stockItem;
 	}
@@ -112,7 +124,8 @@ public class OrderItemBean extends BaseBean {
 		this.stockItem = stockItem;
 	}
 	
-	public double getQuantity() {
+	@XmlAttribute
+    public double getQuantity() {
 		return quantity;
 	}
 	
@@ -120,7 +133,8 @@ public class OrderItemBean extends BaseBean {
 		this.quantity = quantity;
 	}
 	
-	public String getMeasure() {
+	@XmlAttribute
+    public String getMeasure() {
 		return measure;
 	}
 	
@@ -128,7 +142,8 @@ public class OrderItemBean extends BaseBean {
 		this.measure = measure;
 	}
 	
-	public double getPrice() {
+	@XmlAttribute
+    public double getPrice() {
 		return price;
 	}
 	
@@ -136,11 +151,34 @@ public class OrderItemBean extends BaseBean {
 		this.price = price;
 	}
 	
-	public String getCurrency() {
+	@XmlAttribute
+    public String getCurrency() {
 		return currency;
 	}
 	
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
+	
+	public void acceptReader(ObjexStateReader reader) {
+        ref = reader.read("ref", java.lang.String.class, ObjexFieldType.OBJECT, true);
+        name = reader.read("name", java.lang.String.class, ObjexFieldType.OBJECT, true);
+        description = reader.read("description", java.lang.String.class, ObjexFieldType.OBJECT, true);
+        stockItem = reader.readReference("stockItem", ObjexFieldType.REFERENCE, true);
+        quantity = reader.read("quantity", double.class, ObjexFieldType.OBJECT, true);
+        measure = reader.read("measure", java.lang.String.class, ObjexFieldType.OBJECT, true);
+        price = reader.read("price", double.class, ObjexFieldType.OBJECT, true);
+        currency = reader.read("currency", java.lang.String.class, ObjexFieldType.OBJECT, true);
+    }
+    
+    public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+        writer.write("ref", ref, ObjexFieldType.OBJECT, true);
+        writer.write("name", name, ObjexFieldType.OBJECT, true);
+        writer.write("description", description, ObjexFieldType.OBJECT, true);
+        writer.writeReference("stockItem", stockItem, ObjexFieldType.REFERENCE, true);
+        writer.write("quantity", quantity, ObjexFieldType.OBJECT, true);
+        writer.write("measure", measure, ObjexFieldType.OBJECT, true);
+        writer.write("price", price, ObjexFieldType.OBJECT, true);
+        writer.write("currency", currency, ObjexFieldType.OBJECT, true);
+    }
 }

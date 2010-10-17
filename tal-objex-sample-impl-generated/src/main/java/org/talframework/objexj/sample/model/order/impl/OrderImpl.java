@@ -26,6 +26,10 @@ public class OrderImpl implements Order {
     
     private final OrderBean bean;
     
+    public OrderImpl() {
+        throw new IllegalAccessError("Cannot construct ObjexObj directly, must use the container");
+    }
+    
     public OrderImpl(OrderBean bean) {
         this.bean = bean;
     }

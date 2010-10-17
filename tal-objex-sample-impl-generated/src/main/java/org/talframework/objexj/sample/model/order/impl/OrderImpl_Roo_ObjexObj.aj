@@ -8,13 +8,18 @@ import java.lang.String;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.ReferenceFieldUtils;
 import org.talframework.objexj.object.ReferenceListFieldUtils;
 import org.talframework.objexj.object.SimpleFieldUtils;
+import org.talframework.objexj.object.xml.XmlObjexObj;
 import org.talframework.objexj.sample.api.order.OrderItem;
-import org.talframework.objexj.sample.beans.order.OrderBean;
 import org.talframework.objexj.validation.object.SelfChildValidator;
 import org.talframework.objexj.validation.object.SelfInterObjectValidator;
 import org.talframework.objexj.validation.object.SelfIntraObjectValidator;
@@ -29,14 +34,19 @@ privileged aspect OrderImpl_Roo_ObjexObj {
     
     declare parents: OrderImpl implements SelfChildValidator;
     
-    public OrderBean OrderImpl.getLocalState() {
-        return bean;
+    declare @type: OrderImpl: @XmlType(name = "Order");
+    
+    declare @type: OrderImpl: @XmlAccessorType(XmlAccessType.NONE);
+    
+    public String OrderImpl.getType() {
+        return "Order";
     }
     
     public ObjexObjStateBean OrderImpl.getStateBean() {
         return bean;
     }
     
+    @XmlAttribute
     public long OrderImpl.getAccount() {
         long rawValue = bean.getAccount();
         long val = cloneValue(rawValue);
@@ -48,6 +58,7 @@ privileged aspect OrderImpl_Roo_ObjexObj {
         bean.setAccount(SimpleFieldUtils.setSimple(this, bean, "account", rawValue, bean.getAccount()));
     }
     
+    @XmlElement(type = XmlObjexObj.class)
     public java.util.List<OrderItem> OrderImpl.getItems() {
         return ReferenceListFieldUtils.getList(this, OrderItem.class, bean.getItems());
     }
@@ -90,6 +101,7 @@ privileged aspect OrderImpl_Roo_ObjexObj {
         bean.setItems(SimpleFieldUtils.setSimple(this, bean, "ItemRefs", rawValue, bean.getItems()));
     }
     
+    @XmlElement(type = XmlObjexObj.class)
     public OrderItem OrderImpl.getTest() {
         return ReferenceFieldUtils.getReference(this, OrderItem.class, bean.getTest());
     }

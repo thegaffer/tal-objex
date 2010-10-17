@@ -16,6 +16,11 @@
 
 package org.talframework.objexj.sample.model.order.impl;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
@@ -37,10 +42,16 @@ import org.talframework.objexj.sample.beans.order.OrderItemBean;
  *
  * @author Tom Spencer
  */
+@XmlType(name="OrderItem")
+@XmlAccessorType(XmlAccessType.NONE)
 public class OrderItemImpl extends BaseObjexObj implements OrderItem {
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class);
     
     private final OrderItemBean bean;
+    
+    public OrderItemImpl() {
+        throw new IllegalAccessError("Cannot create an ObjexObj instance except through the container");
+    }
     
     public OrderItemImpl(OrderItemBean bean) {
         this.bean = bean;
@@ -51,6 +62,7 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
         return bean;
     }
 
+    @XmlAttribute
 	public String getName() {
 		return bean.getName();
 	}
@@ -63,6 +75,7 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
 		bean.setName(name);
 	}
 	
+	@XmlAttribute
 	public String getDescription() {
 		return bean.getDescription();
 	}
@@ -83,6 +96,7 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
 		return stock.getObject(ref).getBehaviour(Product.class);
 	}
 	
+	@XmlAttribute(name="stockItem")
 	public String getStockItemRef() {
         return bean.getStockItem();
     }
@@ -100,7 +114,8 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
         bean.setStockItem(item);
     }
 	
-	public String getRef() {
+	@XmlAttribute
+    public String getRef() {
 		return bean.getRef();
 	}
 	
@@ -112,7 +127,8 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
         bean.setRef(ref);
 	}
 	
-	public double getQuantity() {
+	@XmlAttribute
+    public double getQuantity() {
 		return bean.getQuantity();
 	}
 	
@@ -123,7 +139,8 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
         bean.setQuantity(quantity);
 	}
 	
-	public String getMeasure() {
+	@XmlAttribute
+    public String getMeasure() {
 		return bean.getMeasure();
 	}
 	
@@ -135,7 +152,8 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
         bean.setMeasure(measure);
 	}
 	
-	public double getPrice() {
+	@XmlAttribute
+    public double getPrice() {
 		return bean.getPrice();
 	}
 	
@@ -146,7 +164,8 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
         bean.setPrice(price);
 	}
 	
-	public String getCurrency() {
+	@XmlAttribute
+    public String getCurrency() {
 		return bean.getCurrency();
 	}
 	

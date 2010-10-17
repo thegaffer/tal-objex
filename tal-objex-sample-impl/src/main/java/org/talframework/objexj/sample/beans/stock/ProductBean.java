@@ -19,8 +19,13 @@ package org.talframework.objexj.sample.beans.stock;
 import java.util.Date;
 
 import javax.jdo.annotations.PersistenceCapable;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.sample.beans.BaseBean;
 
 /**
@@ -29,6 +34,7 @@ import org.talframework.objexj.sample.beans.BaseBean;
  * @author Tom Spencer
  */
 @PersistenceCapable
+@XmlRootElement(name="Product")
 public class ProductBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 
@@ -61,6 +67,7 @@ public class ProductBean extends BaseBean {
         return ret;
     }
 	
+	@XmlTransient
 	public String getObjexObjType() {
         return "Product";
     }
@@ -68,7 +75,8 @@ public class ProductBean extends BaseBean {
     /**
 	 * @return the name
 	 */
-	public String getName() {
+	@XmlAttribute
+    public String getName() {
 		return name;
 	}
 	/**
@@ -80,7 +88,8 @@ public class ProductBean extends BaseBean {
 	/**
 	 * @return the description
 	 */
-	public String getDescription() {
+	@XmlAttribute
+    public String getDescription() {
 		return description;
 	}
 	/**
@@ -92,7 +101,8 @@ public class ProductBean extends BaseBean {
 	/**
 	 * @return the effectiveFrom
 	 */
-	public Date getEffectiveFrom() {
+	@XmlAttribute
+    public Date getEffectiveFrom() {
 		return effectiveFrom;
 	}
 	/**
@@ -104,7 +114,8 @@ public class ProductBean extends BaseBean {
 	/**
 	 * @return the effectiveTo
 	 */
-	public Date getEffectiveTo() {
+	@XmlAttribute
+    public Date getEffectiveTo() {
 		return effectiveTo;
 	}
 	/**
@@ -116,7 +127,8 @@ public class ProductBean extends BaseBean {
 	/**
 	 * @return the price
 	 */
-	public double getPrice() {
+	@XmlAttribute
+    public double getPrice() {
 		return price;
 	}
 	/**
@@ -128,7 +140,8 @@ public class ProductBean extends BaseBean {
 	/**
 	 * @return the currency
 	 */
-	public String getCurrency() {
+	@XmlAttribute
+    public String getCurrency() {
 		return currency;
 	}
 	/**
@@ -137,4 +150,22 @@ public class ProductBean extends BaseBean {
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
+	
+	public void acceptReader(ObjexStateReader reader) {
+        name = reader.read("name", java.lang.String.class, ObjexFieldType.OBJECT, true);
+        description = reader.read("description", java.lang.String.class, ObjexFieldType.OBJECT, true);
+        effectiveFrom = reader.read("effectiveFrom", java.util.Date.class, ObjexFieldType.OBJECT, true);
+        effectiveTo = reader.read("effectiveTo", java.util.Date.class, ObjexFieldType.OBJECT, true);
+        price = reader.read("price", double.class, ObjexFieldType.OBJECT, true);
+        currency = reader.read("currency", java.lang.String.class, ObjexFieldType.OBJECT, true);
+    }
+    
+    public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+        writer.write("name", name, ObjexFieldType.OBJECT, true);
+        writer.write("description", description, ObjexFieldType.OBJECT, true);
+        writer.write("effectiveFrom", effectiveFrom, ObjexFieldType.OBJECT, true);
+        writer.write("effectiveTo", effectiveTo, ObjexFieldType.OBJECT, true);
+        writer.write("price", price, ObjexFieldType.OBJECT, true);
+        writer.write("currency", currency, ObjexFieldType.OBJECT, true);
+    }
 }

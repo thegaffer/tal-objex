@@ -18,6 +18,11 @@ package org.talframework.objexj.sample.model.stock.impl;
 
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationRequest;
@@ -35,10 +40,16 @@ import org.talframework.objexj.sample.beans.stock.ProductBean;
  *
  * @author Tom Spencer
  */
+@XmlType(name="Product")
+@XmlAccessorType(XmlAccessType.NONE)
 public class ProductImpl extends BaseObjexObj implements Product { 
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Product", ProductImpl.class, ProductBean.class);
     
     private final ProductBean bean;
+    
+    public ProductImpl() {
+        throw new IllegalAccessError("Cannot create an ObjexObj instance except through the container");
+    }
 
     public ProductImpl(ProductBean state) {
         this.bean = state;
@@ -49,6 +60,7 @@ public class ProductImpl extends BaseObjexObj implements Product {
         return bean;
     }
 
+    @XmlAttribute
     public String getName() {
         return bean.getName();
     }
@@ -61,6 +73,7 @@ public class ProductImpl extends BaseObjexObj implements Product {
         bean.setName(name);
     }
     
+    @XmlAttribute
     public String getDescription() {
         return bean.getDescription();
     }
@@ -73,6 +86,7 @@ public class ProductImpl extends BaseObjexObj implements Product {
         bean.setDescription(description);
     }
     
+    @XmlAttribute
     public double getPrice() {
         return bean.getPrice();
     }
@@ -84,6 +98,7 @@ public class ProductImpl extends BaseObjexObj implements Product {
         bean.setPrice(price);
     }
     
+    @XmlAttribute
     public String getCurrency() {
         return bean.getCurrency();
     }
@@ -96,6 +111,7 @@ public class ProductImpl extends BaseObjexObj implements Product {
         bean.setCurrency(currency);
     }
     
+    @XmlAttribute
     public Date getEffectiveFrom() {
         return bean.getEffectiveFrom();
     }
@@ -108,6 +124,7 @@ public class ProductImpl extends BaseObjexObj implements Product {
         bean.setEffectiveFrom(effectiveFrom);
     }
     
+    @XmlAttribute
     public Date getEffectiveTo() {
         return bean.getEffectiveTo();
     }

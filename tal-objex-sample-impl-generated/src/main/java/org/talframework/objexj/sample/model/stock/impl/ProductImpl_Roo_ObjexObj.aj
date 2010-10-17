@@ -5,18 +5,26 @@ package org.talframework.objexj.sample.model.stock.impl;
 
 import java.lang.String;
 import java.util.Date;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.SimpleFieldUtils;
-import org.talframework.objexj.sample.beans.stock.ProductBean;
 
 privileged aspect ProductImpl_Roo_ObjexObj {
     
     declare parents: ProductImpl extends BaseObjexObj;
     
-    public ProductBean ProductImpl.getLocalState() {
-        return bean;
+    declare @type: ProductImpl: @XmlType(name = "Product");
+    
+    declare @type: ProductImpl: @XmlAccessorType(XmlAccessType.NONE);
+    
+    public String ProductImpl.getType() {
+        return "Product";
     }
     
+    @XmlAttribute
     public String ProductImpl.getName() {
         String rawValue = bean.getName();
         String val = rawValue;
@@ -28,6 +36,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
         bean.setName(SimpleFieldUtils.setSimple(this, bean, "name", rawValue, bean.getName()));
     }
     
+    @XmlAttribute
     public String ProductImpl.getDescription() {
         String rawValue = bean.getDescription();
         String val = rawValue;
@@ -39,6 +48,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
         bean.setDescription(SimpleFieldUtils.setSimple(this, bean, "description", rawValue, bean.getDescription()));
     }
     
+    @XmlAttribute
     public Date ProductImpl.getEffectiveFrom() {
         Date rawValue = bean.getEffectiveFrom();
         Date val = rawValue;
@@ -50,6 +60,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
         bean.setEffectiveFrom(SimpleFieldUtils.setSimple(this, bean, "effectiveFrom", rawValue, bean.getEffectiveFrom()));
     }
     
+    @XmlAttribute
     public Date ProductImpl.getEffectiveTo() {
         Date rawValue = bean.getEffectiveTo();
         Date val = rawValue;
@@ -61,6 +72,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
         bean.setEffectiveTo(SimpleFieldUtils.setSimple(this, bean, "effectiveTo", rawValue, bean.getEffectiveTo()));
     }
     
+    @XmlAttribute
     public double ProductImpl.getPrice() {
         double rawValue = bean.getPrice();
         double val = cloneValue(rawValue);
@@ -72,6 +84,7 @@ privileged aspect ProductImpl_Roo_ObjexObj {
         bean.setPrice(SimpleFieldUtils.setSimple(this, bean, "price", rawValue, bean.getPrice()));
     }
     
+    @XmlAttribute
     public String ProductImpl.getCurrency() {
         String rawValue = bean.getCurrency();
         String val = rawValue;

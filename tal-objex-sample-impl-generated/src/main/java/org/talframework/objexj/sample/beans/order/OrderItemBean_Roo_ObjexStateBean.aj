@@ -3,7 +3,6 @@
 
 package org.talframework.objexj.sample.beans.order;
 
-import java.io.Writer;
 import java.lang.Object;
 import java.lang.String;
 import javax.jdo.annotations.Extension;
@@ -12,8 +11,15 @@ import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.object.StateBeanUtils;
 
 privileged aspect OrderItemBean_Roo_ObjexStateBean {
@@ -21,6 +27,8 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
     declare parents: OrderItemBean implements ObjexObjStateBean;
     
     declare @type: OrderItemBean: @PersistenceCapable;
+    
+    declare @type: OrderItemBean: @XmlRootElement;
     
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -38,14 +46,28 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         _editable = false;
     }
 
+    @XmlAttribute
+    @XmlID
     public String OrderItemBean.getId() {
         return this.id;
     }
     
+    public void OrderItemBean.setId(String val) {
+        if( this.id != null ) throw new IllegalArgumentException("You cannot set a parent ID on an object once it is set");
+        this.id = val;
+    }
+    
+    @XmlAttribute
     public String OrderItemBean.getParentId() {
         return this.parentId;
     }
     
+    public void OrderItemBean.setParentId(String val) {
+        if( this.parentId != null ) throw new IllegalArgumentException("You cannot set a parent ID on an object once it is set");
+        this.parentId = val;
+    }
+    
+    @XmlTransient
     public boolean OrderItemBean.isEditable() {
         return _editable;
     }
@@ -54,6 +76,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         _editable = true;
     }
     
+    @XmlTransient
     public String OrderItemBean.getObjexObjType() {
         return "OrderItem";
     }
@@ -81,6 +104,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         return ret;
     }
     
+    @XmlAttribute
     public String OrderItemBean.getRef() {
         return ref;
     }
@@ -89,6 +113,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         ref = val;
     }
     
+    @XmlAttribute
     public String OrderItemBean.getName() {
         return name;
     }
@@ -97,6 +122,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         name = val;
     }
     
+    @XmlAttribute
     public String OrderItemBean.getDescription() {
         return description;
     }
@@ -105,6 +131,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         description = val;
     }
     
+    @XmlAttribute
     public String OrderItemBean.getStockItem() {
         return stockItem;
     }
@@ -113,6 +140,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         stockItem = val;
     }
     
+    @XmlAttribute
     public double OrderItemBean.getQuantity() {
         return quantity;
     }
@@ -121,6 +149,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         quantity = val;
     }
     
+    @XmlAttribute
     public String OrderItemBean.getMeasure() {
         return measure;
     }
@@ -129,6 +158,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         measure = val;
     }
     
+    @XmlAttribute
     public double OrderItemBean.getPrice() {
         return price;
     }
@@ -137,6 +167,7 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         price = val;
     }
     
+    @XmlAttribute
     public String OrderItemBean.getCurrency() {
         return currency;
     }
@@ -150,18 +181,26 @@ privileged aspect OrderItemBean_Roo_ObjexStateBean {
         stockItem = StateBeanUtils.updateTempReferences(stockItem, refs);
     }
     
-    public void OrderItemBean.writeBean(Writer writer, ObjexID id, String prefix) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(prefix).append(".id=").append(id.toString()).append('\n');
-        if( parentId != null ) builder.append(prefix).append(".parentId=").append(parentId).append('\n');
-        if( ref != null ) builder.append(prefix).append(".ref=").append(ref).append('\n');
-        if( name != null ) builder.append(prefix).append(".name=").append(name).append('\n');
-        if( description != null ) builder.append(prefix).append(".description=").append(description).append('\n');
-        if( stockItem != null ) builder.append(prefix).append(".stockItem=").append(stockItem).append('\n');
-        builder.append(prefix).append(".quantity=").append(quantity).append('\n');
-        if( measure != null ) builder.append(prefix).append(".measure=").append(measure).append('\n');
-        builder.append(prefix).append(".price=").append(price).append('\n');
-        if( currency != null ) builder.append(prefix).append(".currency=").append(currency).append('\n');
+    public void OrderItemBean.acceptReader(ObjexStateReader reader) {
+        ref = reader.read("ref", java.lang.String.class, ObjexFieldType.STRING, true);
+        name = reader.read("name", java.lang.String.class, ObjexFieldType.STRING, true);
+        description = reader.read("description", java.lang.String.class, ObjexFieldType.STRING, true);
+        stockItem = reader.readReference("stockItem", ObjexFieldType.REFERENCE, true);
+        quantity = reader.read("quantity", double.class, ObjexFieldType.NUMBER, true);
+        measure = reader.read("measure", java.lang.String.class, ObjexFieldType.STRING, true);
+        price = reader.read("price", double.class, ObjexFieldType.NUMBER, true);
+        currency = reader.read("currency", java.lang.String.class, ObjexFieldType.STRING, true);
+    }
+    
+    public void OrderItemBean.acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+        writer.write("ref", ref, ObjexFieldType.STRING, true);
+        writer.write("name", name, ObjexFieldType.STRING, true);
+        writer.write("description", description, ObjexFieldType.STRING, true);
+        writer.writeReference("stockItem", stockItem, ObjexFieldType.REFERENCE, true);
+        writer.write("quantity", quantity, ObjexFieldType.NUMBER, true);
+        writer.write("measure", measure, ObjexFieldType.STRING, true);
+        writer.write("price", price, ObjexFieldType.NUMBER, true);
+        writer.write("currency", currency, ObjexFieldType.STRING, true);
     }
     
 }

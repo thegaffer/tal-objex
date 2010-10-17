@@ -3,10 +3,8 @@
 
 package org.talframework.objexj.sample.beans.stock;
 
-import java.io.Writer;
 import java.lang.Object;
 import java.lang.String;
-import java.util.Iterator;
 import java.util.List;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -14,8 +12,16 @@ import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.object.StateBeanUtils;
 
 privileged aspect CategoryBean_Roo_ObjexStateBean {
@@ -23,6 +29,8 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     declare parents: CategoryBean implements ObjexObjStateBean;
     
     declare @type: CategoryBean: @PersistenceCapable;
+    
+    declare @type: CategoryBean: @XmlRootElement;
     
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -40,14 +48,28 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         _editable = false;
     }
 
+    @XmlAttribute
+    @XmlID
     public String CategoryBean.getId() {
         return this.id;
     }
     
+    public void CategoryBean.setId(String val) {
+        if( this.id != null ) throw new IllegalArgumentException("You cannot set a parent ID on an object once it is set");
+        this.id = val;
+    }
+    
+    @XmlAttribute
     public String CategoryBean.getParentId() {
         return this.parentId;
     }
     
+    public void CategoryBean.setParentId(String val) {
+        if( this.parentId != null ) throw new IllegalArgumentException("You cannot set a parent ID on an object once it is set");
+        this.parentId = val;
+    }
+    
+    @XmlTransient
     public boolean CategoryBean.isEditable() {
         return _editable;
     }
@@ -56,6 +78,7 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         _editable = true;
     }
     
+    @XmlTransient
     public String CategoryBean.getObjexObjType() {
         return "Category";
     }
@@ -79,6 +102,7 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         return ret;
     }
     
+    @XmlAttribute
     public String CategoryBean.getName() {
         return name;
     }
@@ -87,6 +111,7 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         name = val;
     }
     
+    @XmlAttribute
     public String CategoryBean.getDescription() {
         return description;
     }
@@ -95,6 +120,7 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         description = val;
     }
     
+    @XmlList
     public List<String> CategoryBean.getProducts() {
         return products;
     }
@@ -103,6 +129,7 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         products = val;
     }
     
+    @XmlList
     public List<String> CategoryBean.getCategories() {
         return categories;
     }
@@ -117,28 +144,18 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         categories = StateBeanUtils.updateTempReferences(categories, refs);
     }
     
-    public void CategoryBean.writeBean(Writer writer, ObjexID id, String prefix) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(prefix).append(".id=").append(id.toString()).append('\n');
-        if( parentId != null ) builder.append(prefix).append(".parentId=").append(parentId).append('\n');
-        if( name != null ) builder.append(prefix).append(".name=").append(name).append('\n');
-        if( description != null ) builder.append(prefix).append(".description=").append(description).append('\n');
-        if( products != null ) {
-        	Iterator<String> it = products.iterator();
-        	int index = 0;
-        	while( it.hasNext() ) {
-        		builder.append(prefix).append(".products[index]=").append(it.next()).append('\n');
-        		index++;
-        	}
-        }
-        if( categories != null ) {
-        	Iterator<String> it = categories.iterator();
-        	int index = 0;
-        	while( it.hasNext() ) {
-        		builder.append(prefix).append(".categories[index]=").append(it.next()).append('\n');
-        		index++;
-        	}
-        }
+    public void CategoryBean.acceptReader(ObjexStateReader reader) {
+        name = reader.read("name", java.lang.String.class, ObjexFieldType.STRING, true);
+        description = reader.read("description", java.lang.String.class, ObjexFieldType.STRING, true);
+        products = reader.readReferenceList("products", ObjexFieldType.OWNED_REFERENCE, true);
+        categories = reader.readReferenceList("categories", ObjexFieldType.OWNED_REFERENCE, true);
+    }
+    
+    public void CategoryBean.acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+        writer.write("name", name, ObjexFieldType.STRING, true);
+        writer.write("description", description, ObjexFieldType.STRING, true);
+        writer.writeReferenceList("products", products, ObjexFieldType.OWNED_REFERENCE, true);
+        writer.writeReferenceList("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
     }
     
 }

@@ -4,20 +4,28 @@
 package org.talframework.objexj.sample.model.order.impl;
 
 import java.lang.String;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.ReferenceFieldUtils;
 import org.talframework.objexj.object.SimpleFieldUtils;
 import org.talframework.objexj.sample.api.stock.Product;
-import org.talframework.objexj.sample.beans.order.OrderItemBean;
 
 privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     declare parents: OrderItemImpl extends BaseObjexObj;
     
-    public OrderItemBean OrderItemImpl.getLocalState() {
-        return bean;
+    declare @type: OrderItemImpl: @XmlType(name = "OrderItem");
+    
+    declare @type: OrderItemImpl: @XmlAccessorType(XmlAccessType.NONE);
+    
+    public String OrderItemImpl.getType() {
+        return "OrderItem";
     }
     
+    @XmlAttribute
     public String OrderItemImpl.getRef() {
         String rawValue = bean.getRef();
         String val = rawValue;
@@ -29,6 +37,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
         bean.setRef(SimpleFieldUtils.setSimple(this, bean, "ref", rawValue, bean.getRef()));
     }
     
+    @XmlAttribute
     public String OrderItemImpl.getName() {
         String rawValue = bean.getName();
         String val = rawValue;
@@ -40,6 +49,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
         bean.setName(SimpleFieldUtils.setSimple(this, bean, "name", rawValue, bean.getName()));
     }
     
+    @XmlAttribute
     public String OrderItemImpl.getDescription() {
         String rawValue = bean.getDescription();
         String val = rawValue;
@@ -70,6 +80,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
         bean.setStockItem(SimpleFieldUtils.setSimple(this, bean, "StockItemRef", rawValue, bean.getStockItem()));
     }
     
+    @XmlAttribute
     public double OrderItemImpl.getQuantity() {
         double rawValue = bean.getQuantity();
         double val = cloneValue(rawValue);
@@ -81,6 +92,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
         bean.setQuantity(SimpleFieldUtils.setSimple(this, bean, "quantity", rawValue, bean.getQuantity()));
     }
     
+    @XmlAttribute
     public String OrderItemImpl.getMeasure() {
         String rawValue = bean.getMeasure();
         String val = rawValue;
@@ -92,6 +104,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
         bean.setMeasure(SimpleFieldUtils.setSimple(this, bean, "measure", rawValue, bean.getMeasure()));
     }
     
+    @XmlAttribute
     public double OrderItemImpl.getPrice() {
         double rawValue = bean.getPrice();
         double val = cloneValue(rawValue);
@@ -103,6 +116,7 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
         bean.setPrice(SimpleFieldUtils.setSimple(this, bean, "price", rawValue, bean.getPrice()));
     }
     
+    @XmlAttribute
     public String OrderItemImpl.getCurrency() {
         String rawValue = bean.getCurrency();
         String val = rawValue;

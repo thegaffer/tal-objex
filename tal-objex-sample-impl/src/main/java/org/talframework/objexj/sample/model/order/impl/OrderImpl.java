@@ -19,6 +19,12 @@ package org.talframework.objexj.sample.model.order.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationRequest;
@@ -37,10 +43,16 @@ import org.talframework.objexj.sample.beans.order.OrderBean;
  *
  * @author Tom Spencer
  */
+@XmlType(name="Order")
+@XmlAccessorType(XmlAccessType.NONE)
 public class OrderImpl extends BaseObjexObj implements Order {
     public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Order", OrderImpl.class, OrderBean.class);
     
     private final OrderBean bean;
+    
+    public OrderImpl() {
+        throw new IllegalAccessError("Cannot create an ObjexObj instance except through the container");
+    }
 
 	public OrderImpl(OrderBean bean) {
 		this.bean = bean;
@@ -51,6 +63,7 @@ public class OrderImpl extends BaseObjexObj implements Order {
         return bean;
     }
 
+	@XmlAttribute
     public long getAccount() {
 		return bean.getAccount();
 	}
@@ -71,6 +84,7 @@ public class OrderImpl extends BaseObjexObj implements Order {
 		bean.setItems(items);
 	}
 	
+	@XmlElement(type=OrderItemImpl.class)
 	public List<OrderItem> getItems() {
 	    return getContainer().getObjectList(bean.getItems(), OrderItem.class);
     }

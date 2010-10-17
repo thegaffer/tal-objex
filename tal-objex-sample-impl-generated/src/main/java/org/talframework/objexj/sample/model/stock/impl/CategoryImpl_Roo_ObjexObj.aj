@@ -6,21 +6,31 @@ package org.talframework.objexj.sample.model.stock.impl;
 import java.lang.Object;
 import java.lang.String;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.ReferenceListFieldUtils;
 import org.talframework.objexj.object.SimpleFieldUtils;
+import org.talframework.objexj.object.xml.XmlObjexObj;
 import org.talframework.objexj.sample.api.stock.Category;
 import org.talframework.objexj.sample.api.stock.Product;
-import org.talframework.objexj.sample.beans.stock.CategoryBean;
 
 privileged aspect CategoryImpl_Roo_ObjexObj {
     
     declare parents: CategoryImpl extends BaseObjexObj;
     
-    public CategoryBean CategoryImpl.getLocalState() {
-        return bean;
+    declare @type: CategoryImpl: @XmlType(name = "Category");
+    
+    declare @type: CategoryImpl: @XmlAccessorType(XmlAccessType.NONE);
+    
+    public String CategoryImpl.getType() {
+        return "Category";
     }
     
+    @XmlAttribute
     public String CategoryImpl.getName() {
         String rawValue = bean.getName();
         String val = rawValue;
@@ -32,6 +42,7 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
         bean.setName(SimpleFieldUtils.setSimple(this, bean, "name", rawValue, bean.getName()));
     }
     
+    @XmlAttribute
     public String CategoryImpl.getDescription() {
         String rawValue = bean.getDescription();
         String val = rawValue;
@@ -43,6 +54,7 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
         bean.setDescription(SimpleFieldUtils.setSimple(this, bean, "description", rawValue, bean.getDescription()));
     }
     
+    @XmlElement(type = XmlObjexObj.class)
     public java.util.List<Product> CategoryImpl.getProducts() {
         return ReferenceListFieldUtils.getList(this, Product.class, bean.getProducts());
     }
@@ -85,6 +97,7 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
         bean.setProducts(SimpleFieldUtils.setSimple(this, bean, "ProductRefs", rawValue, bean.getProducts()));
     }
     
+    @XmlElement(type = XmlObjexObj.class)
     public java.util.List<Category> CategoryImpl.getCategories() {
         return ReferenceListFieldUtils.getList(this, Category.class, bean.getCategories());
     }

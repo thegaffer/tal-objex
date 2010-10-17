@@ -20,9 +20,15 @@ import java.util.List;
 import java.util.Map;
 
 import javax.jdo.annotations.PersistenceCapable;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.object.StateBeanUtils;
 import org.talframework.objexj.sample.beans.BaseBean;
 
@@ -33,6 +39,7 @@ import org.talframework.objexj.sample.beans.BaseBean;
  * @author Tom Spencer
  */
 @PersistenceCapable
+@XmlRootElement(name="Order")
 public class OrderBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 	
@@ -53,6 +60,7 @@ public class OrderBean extends BaseBean {
 	    return ret;
 	}
 	
+	@XmlTransient
 	public String getObjexObjType() {
 	    return "Order";
 	}
@@ -63,6 +71,7 @@ public class OrderBean extends BaseBean {
 	    items = StateBeanUtils.updateTempReferences(items, refs);
 	}
 	
+	@XmlAttribute
 	public long getAccount() {
 		return account;
 	}
@@ -73,6 +82,7 @@ public class OrderBean extends BaseBean {
 	/**
 	 * @return the items
 	 */
+	@XmlList
 	public List<String> getItems() {
 		return items;
 	}
@@ -82,4 +92,14 @@ public class OrderBean extends BaseBean {
 	public void setItems(List<String> items) {
 		this.items = items;
 	}
+	
+	public void acceptReader(ObjexStateReader reader) {
+        account = reader.read("account", long.class, ObjexFieldType.OBJECT, true);
+        items = reader.readReferenceList("items", ObjexFieldType.OWNED_REFERENCE, true);
+    }
+    
+    public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+        writer.write("account", account, ObjexFieldType.OBJECT, true);
+        writer.writeReferenceList("items", items, ObjexFieldType.OWNED_REFERENCE, true);
+    }
 }

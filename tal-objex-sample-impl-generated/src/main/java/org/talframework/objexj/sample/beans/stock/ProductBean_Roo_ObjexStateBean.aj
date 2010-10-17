@@ -3,7 +3,6 @@
 
 package org.talframework.objexj.sample.beans.stock;
 
-import java.io.Writer;
 import java.lang.Object;
 import java.lang.String;
 import java.util.Date;
@@ -13,8 +12,15 @@ import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.object.StateBeanUtils;
 
 privileged aspect ProductBean_Roo_ObjexStateBean {
@@ -22,6 +28,8 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
     declare parents: ProductBean implements ObjexObjStateBean;
     
     declare @type: ProductBean: @PersistenceCapable;
+    
+    declare @type: ProductBean: @XmlRootElement;
     
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -39,14 +47,28 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         _editable = false;
     }
 
+    @XmlAttribute
+    @XmlID
     public String ProductBean.getId() {
         return this.id;
     }
     
+    public void ProductBean.setId(String val) {
+        if( this.id != null ) throw new IllegalArgumentException("You cannot set a parent ID on an object once it is set");
+        this.id = val;
+    }
+    
+    @XmlAttribute
     public String ProductBean.getParentId() {
         return this.parentId;
     }
     
+    public void ProductBean.setParentId(String val) {
+        if( this.parentId != null ) throw new IllegalArgumentException("You cannot set a parent ID on an object once it is set");
+        this.parentId = val;
+    }
+    
+    @XmlTransient
     public boolean ProductBean.isEditable() {
         return _editable;
     }
@@ -55,6 +77,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         _editable = true;
     }
     
+    @XmlTransient
     public String ProductBean.getObjexObjType() {
         return "Product";
     }
@@ -80,6 +103,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         return ret;
     }
     
+    @XmlAttribute
     public String ProductBean.getName() {
         return name;
     }
@@ -88,6 +112,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         name = val;
     }
     
+    @XmlAttribute
     public String ProductBean.getDescription() {
         return description;
     }
@@ -96,6 +121,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         description = val;
     }
     
+    @XmlAttribute
     public Date ProductBean.getEffectiveFrom() {
         return effectiveFrom;
     }
@@ -104,6 +130,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         effectiveFrom = val;
     }
     
+    @XmlAttribute
     public Date ProductBean.getEffectiveTo() {
         return effectiveTo;
     }
@@ -112,6 +139,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         effectiveTo = val;
     }
     
+    @XmlAttribute
     public double ProductBean.getPrice() {
         return price;
     }
@@ -120,6 +148,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         price = val;
     }
     
+    @XmlAttribute
     public String ProductBean.getCurrency() {
         return currency;
     }
@@ -132,16 +161,22 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         parentId = StateBeanUtils.updateTempReferences(parentId, refs);
     }
     
-    public void ProductBean.writeBean(Writer writer, ObjexID id, String prefix) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(prefix).append(".id=").append(id.toString()).append('\n');
-        if( parentId != null ) builder.append(prefix).append(".parentId=").append(parentId).append('\n');
-        if( name != null ) builder.append(prefix).append(".name=").append(name).append('\n');
-        if( description != null ) builder.append(prefix).append(".description=").append(description).append('\n');
-        if( effectiveFrom != null ) builder.append(prefix).append(".effectiveFrom=").append(effectiveFrom).append('\n');
-        if( effectiveTo != null ) builder.append(prefix).append(".effectiveTo=").append(effectiveTo).append('\n');
-        builder.append(prefix).append(".price=").append(price).append('\n');
-        if( currency != null ) builder.append(prefix).append(".currency=").append(currency).append('\n');
+    public void ProductBean.acceptReader(ObjexStateReader reader) {
+        name = reader.read("name", java.lang.String.class, ObjexFieldType.STRING, true);
+        description = reader.read("description", java.lang.String.class, ObjexFieldType.STRING, true);
+        effectiveFrom = reader.read("effectiveFrom", java.util.Date.class, ObjexFieldType.DATE, true);
+        effectiveTo = reader.read("effectiveTo", java.util.Date.class, ObjexFieldType.DATE, true);
+        price = reader.read("price", double.class, ObjexFieldType.NUMBER, true);
+        currency = reader.read("currency", java.lang.String.class, ObjexFieldType.STRING, true);
+    }
+    
+    public void ProductBean.acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+        writer.write("name", name, ObjexFieldType.STRING, true);
+        writer.write("description", description, ObjexFieldType.STRING, true);
+        writer.write("effectiveFrom", effectiveFrom, ObjexFieldType.DATE, true);
+        writer.write("effectiveTo", effectiveTo, ObjexFieldType.DATE, true);
+        writer.write("price", price, ObjexFieldType.NUMBER, true);
+        writer.write("currency", currency, ObjexFieldType.STRING, true);
     }
     
 }

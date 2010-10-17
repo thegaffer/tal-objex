@@ -26,6 +26,9 @@ import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
@@ -73,6 +76,8 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	/**
 	 * @return the id
 	 */
+	@XmlAttribute
+	@XmlID
 	public String getId() {
 		return id;
 	}
@@ -80,7 +85,7 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Object id) {
+	public void setId(String id) {
 		if( this.id != null ) throw new IllegalArgumentException("You cannot reset a beans ID");
 		this.id = id != null ? id.toString() : null;
 	}
@@ -88,6 +93,7 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	/**
 	 * @return the parentId
 	 */
+	@XmlAttribute
 	public String getParentId() {
 		return parentId;
 	}
@@ -95,10 +101,11 @@ public abstract class BaseBean implements ObjexObjStateBean {
 	/**
 	 * @param parentId the parentId to set
 	 */
-	public void setParentId(Object parentId) {
+	public void setParentId(String parentId) {
 		this.parentId = parentId != null ? parentId.toString() : null;
 	}
 	
+	@XmlTransient
 	public boolean isEditable() {
 	    return editable;
 	}

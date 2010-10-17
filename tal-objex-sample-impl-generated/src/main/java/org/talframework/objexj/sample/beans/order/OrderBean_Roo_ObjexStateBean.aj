@@ -3,10 +3,8 @@
 
 package org.talframework.objexj.sample.beans.order;
 
-import java.io.Writer;
 import java.lang.Object;
 import java.lang.String;
-import java.util.Iterator;
 import java.util.List;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -14,8 +12,16 @@ import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.object.StateBeanUtils;
 
 privileged aspect OrderBean_Roo_ObjexStateBean {
@@ -23,6 +29,8 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
     declare parents: OrderBean implements ObjexObjStateBean;
     
     declare @type: OrderBean: @PersistenceCapable;
+    
+    declare @type: OrderBean: @XmlRootElement;
     
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -40,14 +48,28 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
         _editable = false;
     }
 
+    @XmlAttribute
+    @XmlID
     public String OrderBean.getId() {
         return this.id;
     }
     
+    public void OrderBean.setId(String val) {
+        if( this.id != null ) throw new IllegalArgumentException("You cannot set a parent ID on an object once it is set");
+        this.id = val;
+    }
+    
+    @XmlAttribute
     public String OrderBean.getParentId() {
         return this.parentId;
     }
     
+    public void OrderBean.setParentId(String val) {
+        if( this.parentId != null ) throw new IllegalArgumentException("You cannot set a parent ID on an object once it is set");
+        this.parentId = val;
+    }
+    
+    @XmlTransient
     public boolean OrderBean.isEditable() {
         return _editable;
     }
@@ -56,6 +78,7 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
         _editable = true;
     }
     
+    @XmlTransient
     public String OrderBean.getObjexObjType() {
         return "Order";
     }
@@ -78,6 +101,7 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
         return ret;
     }
     
+    @XmlAttribute
     public long OrderBean.getAccount() {
         return account;
     }
@@ -86,6 +110,7 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
         account = val;
     }
     
+    @XmlList
     public List<String> OrderBean.getItems() {
         return items;
     }
@@ -94,6 +119,7 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
         items = val;
     }
     
+    @XmlAttribute
     public String OrderBean.getTest() {
         return test;
     }
@@ -108,20 +134,16 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
         test = StateBeanUtils.updateTempReferences(test, refs);
     }
     
-    public void OrderBean.writeBean(Writer writer, ObjexID id, String prefix) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(prefix).append(".id=").append(id.toString()).append('\n');
-        if( parentId != null ) builder.append(prefix).append(".parentId=").append(parentId).append('\n');
-        builder.append(prefix).append(".account=").append(account).append('\n');
-        if( items != null ) {
-        	Iterator<String> it = items.iterator();
-        	int index = 0;
-        	while( it.hasNext() ) {
-        		builder.append(prefix).append(".items[index]=").append(it.next()).append('\n');
-        		index++;
-        	}
-        }
-        if( test != null ) builder.append(prefix).append(".test=").append(test).append('\n');
+    public void OrderBean.acceptReader(ObjexStateReader reader) {
+        account = reader.read("account", long.class, ObjexFieldType.NUMBER, true);
+        items = reader.readReferenceList("items", ObjexFieldType.OWNED_REFERENCE, true);
+        test = reader.readReference("test", ObjexFieldType.OWNED_REFERENCE, true);
+    }
+    
+    public void OrderBean.acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+        writer.write("account", account, ObjexFieldType.NUMBER, true);
+        writer.writeReferenceList("items", items, ObjexFieldType.OWNED_REFERENCE, true);
+        writer.writeReference("test", test, ObjexFieldType.OWNED_REFERENCE, true);
     }
     
 }

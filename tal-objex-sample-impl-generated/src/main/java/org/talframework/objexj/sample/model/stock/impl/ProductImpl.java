@@ -26,6 +26,10 @@ public class ProductImpl implements Product {
 
     private final ProductBean bean;
     
+    public ProductImpl() {
+        throw new IllegalAccessError("Cannot construct ObjexObj directly, must use the container");
+    }
+    
     public ProductImpl(ProductBean bean) {
         this.bean = bean;
     }
