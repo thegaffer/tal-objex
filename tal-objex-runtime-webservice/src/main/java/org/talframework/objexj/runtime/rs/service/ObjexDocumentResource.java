@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.runtime.rs.service.container;
+package org.talframework.objexj.runtime.rs.service;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -24,7 +24,9 @@ import org.talframework.objexj.Container;
 import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.locator.ContainerFactory;
-import org.talframework.objexj.runtime.rs.ContainerResult;
+import org.talframework.objexj.runtime.rs.DocumentResult;
+import org.talframework.tal.aspects.annotations.Profile;
+import org.talframework.tal.aspects.annotations.Trace;
 
 /**
  * This Restful WebService exposes a container in its natural
@@ -32,10 +34,12 @@ import org.talframework.objexj.runtime.rs.ContainerResult;
  * This class is a base class and you must derive from it and
  * provide both the container factory and annotate your class
  * with @Path to set the root path this webservice responds to.
+ * 
+ * FUTURE: Handle queries? (Possibly not as this response is hierachial
  *
  * @author Tom Spencer
  */
-public abstract class ObjexContainerResource {
+public abstract class ObjexDocumentResource {
     
     /**
      * This must be implemented by the derived class to get
@@ -47,24 +51,18 @@ public abstract class ObjexContainerResource {
     
     @GET
     @Path("/{containerId}")
-    public ContainerResult get(@PathParam("containerId") String containerId) {
+    @Trace @Profile
+    public DocumentResult get(@PathParam("containerId") String containerId) {
         Container container = getFactory().get(containerId);
-        return new ContainerResult(container.getId(), false, container.getRootObject());
+        return new DocumentResult(container.getId(), false, container.getRootObject());
     }
-    
-    /*@GET
-    @Path("/{containerId}/{objectType}/{objectId}")
-    public ObjexObj getObject(@PathParam("containerId") String containerId, @PathParam("objectType") String type, @PathParam("objectId") long id) {
-        ObjexID objId = new DefaultObjexID(type, id);
-        Container container = getFactory().get(containerId);
-        return container.getObject(objId);
-    }*/
     
     @GET
     @Path("/{containerId}/{objectType}/{objectId}")
-    public ContainerResult getObject(@PathParam("containerId") String containerId, @PathParam("objectType") String type, @PathParam("objectId") String id) {
+    @Trace @Profile
+    public DocumentResult getObject(@PathParam("containerId") String containerId, @PathParam("objectType") String type, @PathParam("objectId") String id) {
         ObjexID objId = new DefaultObjexID(type, id);
         Container container = getFactory().get(containerId);
-        return new ContainerResult(container.getId(), true, container.getObject(objId));
+        return new DocumentResult(container.getId(), true, container.getObject(objId));
     }
 }

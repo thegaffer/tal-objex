@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.runtime.rs.service.middleware;
+package org.talframework.objexj.runtime.rs.test.middleware;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;

@@ -26,7 +26,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public final class ObjectFieldErrorException extends RuntimeException {
+public final class ObjectFieldErrorException extends BaseObjexException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the field name */
@@ -41,6 +41,11 @@ public final class ObjectFieldErrorException extends RuntimeException {
         this.field = field;
         this.error = error;
         this.params = params;
+    }
+    
+    @Override
+    public <T> T accept(ObjexExceptionVisitor visitor, Class<T> expected) {
+        return visitor.visit(this, expected);
     }
     
     @Override

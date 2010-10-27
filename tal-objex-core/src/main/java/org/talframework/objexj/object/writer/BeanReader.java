@@ -22,9 +22,11 @@ import java.util.Map;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.util.beans.BeanDefinition;
+import org.talframework.util.beans.definition.BeanDefinitionsSingleton;
 
 /**
- * This class allows objects to be read from property maps
+ * This class allows objects to be read from state beans
  * that have been prepared. This is most useful for the
  * Restful Web Services, but is included in the core for
  * any other use in the future as it is not specific to
@@ -32,7 +34,7 @@ import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
  *
  * @author Tom Spencer
  */
-public class PropertyReader implements ObjexStateReader {
+public class BeanReader implements ObjexStateReader {
     
     /** If true then only properties set on the input are actually read */
     private boolean merge = false;
@@ -42,10 +44,22 @@ public class PropertyReader implements ObjexStateReader {
     private boolean includeReferences = false;
     
     /** The bean we are reading from */
-    private Map<String, Object> properties;
+    private Object bean;
+    /** The definition of the bean we are reading */
+    private BeanDefinition beanDefinition;
     
-    public void readObject(Map<String, Object> properties, ObjexObj target) {
-        this.properties = properties;
+    public BeanReader() {
+    }
+    
+    public BeanReader(boolean merge, boolean includeOwned, boolean includeReferences) {
+        this.merge = merge;
+        this.includeOwned = includeOwned;
+        this.includeReferences = includeReferences;
+    }
+    
+    public void readObject(Object bean, ObjexObj target) {
+        this.bean = bean;
+        this.beanDefinition = BeanDefinitionsSingleton.getInstance().getDefinition(bean.getClass());
         target.acceptReader(this);
     }
 
@@ -55,8 +69,26 @@ public class PropertyReader implements ObjexStateReader {
     public <T> T read(String name, T current, Class<T> expected, ObjexFieldType type, boolean persistent) {
         T ret = current;
         
-        if( !merge || properties.containsKey(name) ) {
-            ret = expected.cast(properties.get(name));
+        boolean doSet = true;
+        if( merge ) {
+            String isSet = name + "Set";
+            doSet = beanDefinition.hasProperty(isSet, boolean.class) &&
+                        beanDefinition.canRead(isSet) &&
+                        beanDefinition.read(bean, isSet, Boolean.class);
+        }
+
+        // Set if we can
+        if( doSet ) {
+            ret = null;
+            
+            if( beanDefinition.hasProperty(name) &&
+                    beanDefinition.canRead(name) ) {
+                Object val = expected.cast(beanDefinition.read(bean, name));
+                
+                // TODO: Convert as necc
+                
+                ret = expected.cast(val);
+            }
         }
         
         return ret;
@@ -71,8 +103,20 @@ public class PropertyReader implements ObjexStateReader {
                 
         String ret = current;
         
-        if( !merge || properties.containsKey(name) ) {
-            ret = String.class.cast(properties.get(name));
+        boolean doSet = true;
+        if( merge ) {
+            String isSet = name + "Set";
+            doSet = beanDefinition.hasProperty(isSet, boolean.class) &&
+                        beanDefinition.canRead(isSet) &&
+                        beanDefinition.read(bean, isSet, Boolean.class);
+        }
+        
+        // Set if we can
+        if( doSet &&
+                beanDefinition.hasProperty(name) &&
+                beanDefinition.canRead(name) &&
+                String.class.isAssignableFrom(beanDefinition.getPropertyType(name)) ) {
+            ret = String.class.cast(beanDefinition.read(bean, name));
         }
         
         return ret;
@@ -88,8 +132,20 @@ public class PropertyReader implements ObjexStateReader {
                 
         List<String> ret = current;
         
-        if( !merge || properties.containsKey(name) ) {
-            ret = List.class.cast(properties.get(name));
+        boolean doSet = true;
+        if( merge ) {
+            String isSet = name + "Set";
+            doSet = beanDefinition.hasProperty(isSet, boolean.class) &&
+                        beanDefinition.canRead(isSet) &&
+                        beanDefinition.read(bean, isSet, Boolean.class);
+        }
+        
+        // Set if we can
+        if( doSet &&
+                beanDefinition.hasProperty(name) &&
+                beanDefinition.canRead(name) &&
+                List.class.isAssignableFrom(beanDefinition.getPropertyType(name)) ) {
+            ret = List.class.cast(beanDefinition.read(bean, name));
         }
         
         return ret;
@@ -105,13 +161,25 @@ public class PropertyReader implements ObjexStateReader {
                 
         Map<String, String> ret = current;
         
-        if( !merge || properties.containsKey(name) ) {
-            ret = Map.class.cast(properties.get(name));
+        boolean doSet = true;
+        if( merge ) {
+            String isSet = name + "Set";
+            doSet = beanDefinition.hasProperty(isSet, boolean.class) &&
+                        beanDefinition.canRead(isSet) &&
+                        beanDefinition.read(bean, isSet, Boolean.class);
+        }
+        
+        // Set if we can
+        if( doSet &&
+                beanDefinition.hasProperty(name) &&
+                beanDefinition.canRead(name) &&
+                Map.class.isAssignableFrom(beanDefinition.getPropertyType(name)) ) {
+            ret = Map.class.cast(beanDefinition.read(bean, name));
         }
         
         return ret;
     }
-    
+
     /**
      * @return the merge
      */

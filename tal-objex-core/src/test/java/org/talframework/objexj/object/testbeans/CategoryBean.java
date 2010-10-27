@@ -52,11 +52,11 @@ public class CategoryBean extends BaseTestBean {
 	}
 	
 	public void acceptReader(ObjexStateReader reader) {
-	    name = reader.read("name", String.class, ObjexFieldType.STRING, true);
-	    description = reader.read("description", String.class, ObjexFieldType.MEMO, true);
-	    mainProduct = reader.readReference("mainProduct", ObjexFieldType.REFERENCE, true);
-	    products = reader.readReferenceList("products", ObjexFieldType.OWNED_REFERENCE, true);
-	    categories = reader.readReferenceMap("categories", ObjexFieldType.OWNED_REFERENCE, true);
+	    name = reader.read("name", name, String.class, ObjexFieldType.STRING, true);
+	    description = reader.read("description", description, String.class, ObjexFieldType.MEMO, true);
+	    mainProduct = reader.readReference("mainProduct", mainProduct, ObjexFieldType.REFERENCE, true);
+	    products = reader.readReferenceList("products", products, ObjexFieldType.OWNED_REFERENCE, true);
+	    categories = reader.readReferenceMap("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
 	}
 	
 	public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

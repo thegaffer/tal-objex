@@ -22,7 +22,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public final class ContainerTypeNotFoundException extends RuntimeException {
+public final class ContainerTypeNotFoundException extends BaseObjexException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the type of the container that was not found */
@@ -36,6 +36,11 @@ public final class ContainerTypeNotFoundException extends RuntimeException {
     public ContainerTypeNotFoundException(String id, Exception cause) {
         super(cause);
         this.type = id;
+    }
+    
+    @Override
+    public <T> T accept(ObjexExceptionVisitor visitor, Class<T> expected) {
+        return visitor.visit(this, expected);
     }
     
     @Override

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.runtime.rs.service.middleware;
+package org.talframework.objexj.runtime.rs.service;
 
 import javax.ws.rs.Path;
 
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.container.impl.SimpleContainerStrategy;
 import org.talframework.objexj.container.middleware.InMemoryMiddlewareFactory;
-import org.talframework.objexj.locator.InterceptingContainerFactory;
+import org.talframework.objexj.locator.ContainerFactory;
 import org.talframework.objexj.locator.SimpleContainerFactory;
+import org.talframework.objexj.runtime.rs.service.ObjexDocumentResource;
 import org.talframework.objexj.sample.model.stock.impl.CategoryImpl;
 import org.talframework.objexj.sample.model.stock.impl.ProductImpl;
 
@@ -32,9 +33,9 @@ import org.talframework.objexj.sample.model.stock.impl.ProductImpl;
  *
  * @author Tom Spencer
  */
-@Path("/_test")
-public class SampleMiddlewareResource extends ObjexMiddlewareResource {
-
+@Path("/test")
+public class SampleContainerResource extends ObjexDocumentResource {
+    
     private static ContainerStrategy strategy;
     
     static {
@@ -42,7 +43,7 @@ public class SampleMiddlewareResource extends ObjexMiddlewareResource {
     }
     
     @Override
-    protected InterceptingContainerFactory getFactory() {
+    protected ContainerFactory getFactory() {
         return new SimpleContainerFactory(strategy, new InMemoryMiddlewareFactory());
     }
 }

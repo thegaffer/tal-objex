@@ -24,7 +24,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public final class ObjectTypeNotFoundException extends RuntimeException {
+public final class ObjectTypeNotFoundException extends BaseObjexException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the type of object that was not found */
@@ -38,6 +38,11 @@ public final class ObjectTypeNotFoundException extends RuntimeException {
     public ObjectTypeNotFoundException(String type, Exception cause) {
         super(cause);
         this.type = type;
+    }
+    
+    @Override
+    public <T> T accept(ObjexExceptionVisitor visitor, Class<T> expected) {
+        return visitor.visit(this, expected);
     }
     
     @Override

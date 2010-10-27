@@ -27,7 +27,9 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.SimpleObjectStrategy;
@@ -61,6 +63,16 @@ public class OrderImpl extends BaseObjexObj implements Order {
 	@Override
     protected ObjexObjStateBean getStateBean() {
         return bean;
+    }
+	
+	public void acceptReader(ObjexStateReader reader) {
+	    long account = bean.getAccount();
+        long newAccount = reader.read("account", account, Long.class, ObjexFieldType.OBJECT, true);
+        if( account != newAccount ) setAccount(newAccount);
+        
+        List<String> items = bean.getItems();
+        List<String> newItems = reader.readReferenceList("items", items, ObjexFieldType.OWNED_REFERENCE, true);
+        if( items != newItems ) setItemRefs(newItems);
     }
 
 	@XmlAttribute

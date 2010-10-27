@@ -70,7 +70,7 @@ public class InMemoryMiddleware implements ContainerMiddleware {
             this.idStrategy = new InMemoryIDStrategy();
             
         }
-        else if( id.endsWith("/trans") ) {
+        else if( id.endsWith(":trans") ) {
             this.id = id.substring(0, id.length() - 6);
             this.cache = SingletonContainerCache.getInstance().getCache(id);
             this.objects = SingletonContainerStore.getInstance().getObjects(this.id);
@@ -183,7 +183,7 @@ public class InMemoryMiddleware implements ContainerMiddleware {
     
     public String suspend() {
         String transId = getOrGenerateContainerId();
-        transId += "/trans";
+        transId += ":trans";
         
         SingletonContainerCache.getInstance().setCache(transId, cache);
         

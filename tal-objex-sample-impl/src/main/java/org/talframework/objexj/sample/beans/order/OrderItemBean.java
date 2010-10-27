@@ -161,14 +161,14 @@ public class OrderItemBean extends BaseBean {
 	}
 	
 	public void acceptReader(ObjexStateReader reader) {
-        ref = reader.read("ref", java.lang.String.class, ObjexFieldType.OBJECT, true);
-        name = reader.read("name", java.lang.String.class, ObjexFieldType.OBJECT, true);
-        description = reader.read("description", java.lang.String.class, ObjexFieldType.OBJECT, true);
-        stockItem = reader.readReference("stockItem", ObjexFieldType.REFERENCE, true);
-        quantity = reader.read("quantity", double.class, ObjexFieldType.OBJECT, true);
-        measure = reader.read("measure", java.lang.String.class, ObjexFieldType.OBJECT, true);
-        price = reader.read("price", double.class, ObjexFieldType.OBJECT, true);
-        currency = reader.read("currency", java.lang.String.class, ObjexFieldType.OBJECT, true);
+        ref = reader.read("ref", ref, String.class, ObjexFieldType.OBJECT, true);
+        name = reader.read("name", name, String.class, ObjexFieldType.OBJECT, true);
+        description = reader.read("description", description, String.class, ObjexFieldType.OBJECT, true);
+        stockItem = reader.readReference("stockItem", stockItem, ObjexFieldType.REFERENCE, true);
+        quantity = reader.read("quantity", quantity, double.class, ObjexFieldType.OBJECT, true);
+        measure = reader.read("measure", measure, String.class, ObjexFieldType.OBJECT, true);
+        price = reader.read("price", price, double.class, ObjexFieldType.OBJECT, true);
+        currency = reader.read("currency", currency, String.class, ObjexFieldType.OBJECT, true);
     }
     
     public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

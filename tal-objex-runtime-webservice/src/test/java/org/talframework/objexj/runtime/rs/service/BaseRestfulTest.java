@@ -1,5 +1,6 @@
 package org.talframework.objexj.runtime.rs.service;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,15 +11,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.xml.bind.JAXBContext;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.middleware.SingletonContainerStore;
-import org.talframework.objexj.runtime.rs.MiddlewareRequest;
 import org.talframework.objexj.sample.beans.stock.CategoryBean;
 import org.talframework.objexj.sample.beans.stock.ProductBean;
 
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.WebResource.Builder;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -34,8 +37,19 @@ public class BaseRestfulTest extends JerseyTest {
 
     private static final long VALID_MONTH = 2592000000L;
     
+    /** Holds the JAXB XML Resolver for client requests */
+    private ContextResolver<JAXBContext> xmlResolver;
+    /** Holds the JAXB JSON Resolver for client requests */
+    private ContextResolver<JAXBContext> jsonResolver;
+    
     public BaseRestfulTest(String packageName) throws Exception {
-        super(packageName);
+        super(ObjexExceptionMapper.class.getPackage().getName(), packageName);
+    }
+    
+    public BaseRestfulTest(String packageName, ContextResolver<JAXBContext> xmlResolver, ContextResolver<JAXBContext> jsonResolver) throws Exception {
+        super(ObjexExceptionMapper.class.getPackage().getName(), packageName);
+        this.xmlResolver = xmlResolver;
+        this.jsonResolver = jsonResolver;
     }
     
     /**
@@ -46,8 +60,20 @@ public class BaseRestfulTest extends JerseyTest {
      * @param accept The types we accept (if none no accept is sent)
      * @return The response
      */
-    protected <T> T test(String res, Class<T> expected, MediaType... accept) {
-        return test(res, expected, null, accept);
+    protected <T> T get(String res, Class<T> expected, MediaType... accept) {
+        return get(res, expected, null, accept);
+    }
+    
+    /**
+     * Helper to form a call to a web service that we expect to
+     * fail.
+     * 
+     * @param res
+     * @param expectedStatus
+     * @param accept
+     */
+    protected void getInvalid(String res, int expectedStatus, MediaType... accept) {
+        getInvalid(res, expectedStatus, null, accept);
     }
     
     /**
@@ -59,7 +85,7 @@ public class BaseRestfulTest extends JerseyTest {
      * @param accept The types we accept (if none no accept is sent)
      * @return The response
      */
-    protected <T> T test(String res, Class<T> expected, Map<String, String> params, MediaType... accept) {
+    protected <T> T get(String res, Class<T> expected, Map<String, String> params, MediaType... accept) {
         WebResource resource = resource().path(res);
         if( params != null ) {
             for( String name : params.keySet() ) {
@@ -68,11 +94,23 @@ public class BaseRestfulTest extends JerseyTest {
             }
         }
         
+        String ret = null;
         if( accept != null && accept.length > 0 ) {
-            return resource.accept(accept).get(expected);
+            ret = resource.accept(accept).get(String.class);
         }
         else {
-            return resource.get(expected);
+            ret = resource.get(String.class);
+        }
+        
+        return getResponse(ret, expected, accept);
+    }
+    
+    protected void getInvalid(String res, int expectedStatus, Map<String, String> params, MediaType... accept) {
+        try {
+            get(res, String.class, params, accept);
+        }
+        catch( UniformInterfaceException e ) {
+            Assert.assertEquals(expectedStatus, e.getResponse().getStatus());
         }
     }
     
@@ -87,20 +125,93 @@ public class BaseRestfulTest extends JerseyTest {
      * @return The response
      */
     protected <T> T testPost(String res, Class<T> expected, Object payload, MediaType payloadType, MediaType... accept) {
-        WebResource resource = resource().path(res);
-        
-        Builder builder = resource.entity(payload, payloadType);
-        if( accept != null && accept.length > 0 ) builder = builder.accept(accept);
-        
-        return builder.post(expected);
+        return testPostPut(res, false, expected, payload, payloadType, accept);
     }
     
-    protected String marshallXml(ContextResolver<JAXBContext> resolver, Object object) {
+    /**
+     * Helper method to form a call to a web resource with parameters
+     * 
+     * @param res The resource to hit
+     * @param expected The expected return type
+     * @param payload The object to send in the request
+     * @param payloadType The mime type to send
+     * @param accept The types we accept (if none no accept is sent)
+     * @return The response
+     */
+    protected <T> T testPut(String res, Class<T> expected, Object payload, MediaType payloadType, MediaType... accept) {
+        return testPostPut(res, true, expected, payload, payloadType, accept);
+    }
+    
+    /**
+     * Helper method to form a call to a web resource with parameters
+     * 
+     * @param res The resource to hit
+     * @param put If true then request is a PUT, otherwise a POST
+     * @param expected The expected return type
+     * @param payload The object to send in the request
+     * @param payloadType The mime type to send
+     * @param accept The types we accept (if none no accept is sent)
+     * @return The response
+     */
+    protected <T> T testPostPut(String res, boolean put, Class<T> expected, Object payload, MediaType payloadType, MediaType... accept) {
+        String realPayload = null;
+        
+        if( payload != null ) {
+            if( !(payload instanceof String) ) {
+                if( payloadType.equals(MediaType.APPLICATION_XML_TYPE) && xmlResolver != null ) {
+                    realPayload = marshall(xmlResolver, payload);
+                }
+                else if( payloadType.equals(MediaType.APPLICATION_JSON_TYPE) && jsonResolver != null ) {
+                    realPayload = marshall(jsonResolver, payload);
+                }
+            }
+            else {
+                realPayload = payload.toString();
+            }
+        }
+        
+        WebResource resource = resource().path(res);
+        
+        Builder builder = resource.getRequestBuilder();
+        if( realPayload != null ) builder = builder.entity(realPayload, payloadType);
+        if( accept != null && accept.length > 0 ) builder = builder.accept(accept);
+        
+        String ret = put ? builder.put(String.class) : builder.post(String.class);
+        return getResponse(ret, expected, accept);
+    }
+    
+    private <T> T getResponse(String response, Class<T> expected, MediaType... accept) {
+        if( expected.equals(String.class) ) {
+            return expected.cast(response);
+        }
+        else if( accept != null && accept[0].equals(MediaType.APPLICATION_XML_TYPE) && xmlResolver != null ) {
+            return unmarshall(xmlResolver, response, expected);
+        }
+        else if( accept != null && accept[0].equals(MediaType.APPLICATION_JSON_TYPE) && jsonResolver != null ) {
+            return unmarshall(jsonResolver, response, expected);
+        }
+        else {
+            throw new RuntimeException("Cannot convert result given accept type and resolvers: " + response);
+        }
+    }
+    
+    private String marshall(ContextResolver<JAXBContext> resolver, Object object) {
         try {
-            JAXBContext context = resolver.getContext(MiddlewareRequest.class);
+            JAXBContext context = resolver.getContext(object.getClass());
             StringWriter writer = new StringWriter();
             context.createMarshaller().marshal(object, writer);
             return writer.toString();
+        }
+        catch( Exception e ) {
+            throw new RuntimeException("Caught issue!", e);
+        }
+    }
+    
+    private <T> T unmarshall(ContextResolver<JAXBContext> resolver, String text, Class<T> expected) {
+        try {
+            JAXBContext context = resolver.getContext(expected);
+            StringReader reader = new StringReader(text);
+            return expected.cast(context.createUnmarshaller().unmarshal(reader));
         }
         catch( Exception e ) {
             throw new RuntimeException("Caught issue!", e);
@@ -145,11 +256,13 @@ public class BaseRestfulTest extends JerseyTest {
         objs.add(prod8);
         
         SingletonContainerStore.getInstance().setObjects("123", objs);
+        SingletonContainerStore.getInstance().setObjects("Stock/123", objs);
     }
     
     @After
     public void teardown() {
         SingletonContainerStore.getInstance().setObjects("123", null);
+        SingletonContainerStore.getInstance().setObjects("Stock/123", null);
     }
     
     /**

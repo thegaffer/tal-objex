@@ -94,8 +94,8 @@ public class OrderBean extends BaseBean {
 	}
 	
 	public void acceptReader(ObjexStateReader reader) {
-        account = reader.read("account", long.class, ObjexFieldType.OBJECT, true);
-        items = reader.readReferenceList("items", ObjexFieldType.OWNED_REFERENCE, true);
+        account = reader.read("account", account, long.class, ObjexFieldType.OBJECT, true);
+        items = reader.readReferenceList("items", items, ObjexFieldType.OWNED_REFERENCE, true);
     }
     
     public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

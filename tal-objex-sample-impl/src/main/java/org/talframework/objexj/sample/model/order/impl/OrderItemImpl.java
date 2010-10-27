@@ -24,7 +24,9 @@ import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.locator.SingletonContainerLocator;
 import org.talframework.objexj.object.BaseObjexObj;
@@ -179,4 +181,39 @@ public class OrderItemImpl extends BaseObjexObj implements OrderItem {
 	
 	public void validate(ValidationRequest request) {
 	}
+	
+	public void acceptReader(ObjexStateReader reader) {
+	    String ref = bean.getRef();
+        String newRef = reader.read("ref", ref, String.class, ObjexFieldType.OBJECT, true);
+        if( newRef != ref ) setRef(newRef);
+        
+        String name = bean.getName();
+        String newName = reader.read("name", name, String.class, ObjexFieldType.OBJECT, true);
+        if( name != newName ) setName(newName);
+        
+        String description = bean.getDescription();
+        String newDescription = reader.read("description", description, String.class, ObjexFieldType.OBJECT, true);
+        if( description != newDescription ) setDescription(newDescription);
+        
+        String stockItem = bean.getStockItem();
+        String newStockItem = reader.readReference("stockItem", stockItem, ObjexFieldType.REFERENCE, true);
+        if( stockItem != newStockItem ) setStockItemRef(stockItem);
+        
+        double quantity = bean.getQuantity(); 
+        double newQuantity = reader.read("quantity", quantity, Double.class, ObjexFieldType.OBJECT, true);
+        if( quantity != newQuantity ) setQuantity(newQuantity);
+        
+        String measure = bean.getMeasure();
+        String newMeasure = reader.read("measure", measure, String.class, ObjexFieldType.OBJECT, true);
+        if( measure != newMeasure ) setMeasure(newMeasure);
+        
+        double price = bean.getPrice();
+        double newPrice = reader.read("price", price, Double.class, ObjexFieldType.OBJECT, true);
+        if( price != newPrice ) setPrice(newPrice);
+        
+        String currency = bean.getCurrency();
+        String newCurrency = reader.read("currency", currency, String.class, ObjexFieldType.OBJECT, true);
+        if( currency != newCurrency ) setCurrency(newCurrency);
+        
+    }
 }

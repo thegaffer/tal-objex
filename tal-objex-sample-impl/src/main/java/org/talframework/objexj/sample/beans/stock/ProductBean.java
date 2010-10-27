@@ -152,12 +152,12 @@ public class ProductBean extends BaseBean {
 	}
 	
 	public void acceptReader(ObjexStateReader reader) {
-        name = reader.read("name", java.lang.String.class, ObjexFieldType.OBJECT, true);
-        description = reader.read("description", java.lang.String.class, ObjexFieldType.OBJECT, true);
-        effectiveFrom = reader.read("effectiveFrom", java.util.Date.class, ObjexFieldType.OBJECT, true);
-        effectiveTo = reader.read("effectiveTo", java.util.Date.class, ObjexFieldType.OBJECT, true);
-        price = reader.read("price", double.class, ObjexFieldType.OBJECT, true);
-        currency = reader.read("currency", java.lang.String.class, ObjexFieldType.OBJECT, true);
+        name = reader.read("name", name, java.lang.String.class, ObjexFieldType.OBJECT, true);
+        description = reader.read("description", description, java.lang.String.class, ObjexFieldType.OBJECT, true);
+        effectiveFrom = reader.read("effectiveFrom", effectiveFrom, java.util.Date.class, ObjexFieldType.OBJECT, true);
+        effectiveTo = reader.read("effectiveTo", effectiveTo, java.util.Date.class, ObjexFieldType.OBJECT, true);
+        price = reader.read("price", price, double.class, ObjexFieldType.OBJECT, true);
+        currency = reader.read("currency", currency, java.lang.String.class, ObjexFieldType.OBJECT, true);
     }
     
     public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

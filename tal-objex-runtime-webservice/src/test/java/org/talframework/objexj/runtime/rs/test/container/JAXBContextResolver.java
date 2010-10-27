@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.runtime.rs.service.middleware;
+package org.talframework.objexj.runtime.rs.test.container;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -22,12 +22,11 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 
-import org.talframework.objexj.runtime.rs.MiddlewareRequest;
-import org.talframework.objexj.runtime.rs.MiddlewareResult;
-import org.talframework.objexj.sample.beans.order.OrderBean;
-import org.talframework.objexj.sample.beans.order.OrderItemBean;
-import org.talframework.objexj.sample.beans.stock.CategoryBean;
-import org.talframework.objexj.sample.beans.stock.ProductBean;
+import org.talframework.objexj.runtime.rs.DocumentResult;
+import org.talframework.objexj.sample.model.order.impl.OrderImpl;
+import org.talframework.objexj.sample.model.order.impl.OrderItemImpl;
+import org.talframework.objexj.sample.model.stock.impl.CategoryImpl;
+import org.talframework.objexj.sample.model.stock.impl.ProductImpl;
 
 /**
  *
@@ -42,12 +41,11 @@ public class JAXBContextResolver implements ContextResolver<JAXBContext> {
 
     public JAXBContextResolver() throws Exception {
         this.context = JAXBContext.newInstance(
-                MiddlewareResult.class, 
-                MiddlewareRequest.class, 
-                CategoryBean.class,
-                ProductBean.class,
-                OrderBean.class,
-                OrderItemBean.class);
+                DocumentResult.class,
+                CategoryImpl.class, 
+                ProductImpl.class, 
+                OrderImpl.class, 
+                OrderItemImpl.class);
     }
 
     public JAXBContext getContext(Class<?> objectType) {

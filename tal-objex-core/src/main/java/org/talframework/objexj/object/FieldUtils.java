@@ -1,13 +1,11 @@
 package org.talframework.objexj.object;
 
-import java.beans.PropertyDescriptor;
-
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.InternalContainer;
+import org.talframework.util.beans.BeanDefinition;
+import org.talframework.util.beans.definition.BeanDefinitionsSingleton;
 
 /**
  * This base class contains a number of helper methods that
@@ -46,18 +44,14 @@ public abstract class FieldUtils {
     /**
      * Helper to copy all of the incoming objects properties into
      * current where they match on name.
-     * 
-     * FUTURE: Use our own bean implementation
      */
     protected static void copyObjects(Object current, Object incoming) {
-        BeanWrapper currentWrapper = new BeanWrapperImpl(current);
-        BeanWrapper incomingWrapper = new BeanWrapperImpl(incoming);
+        BeanDefinition currentDef = BeanDefinitionsSingleton.getInstance().getDefinition(current.getClass());
+        BeanDefinition incomingDef = BeanDefinitionsSingleton.getInstance().getDefinition(incoming.getClass());
         
-        PropertyDescriptor[] props = incomingWrapper.getPropertyDescriptors();
-        for( int i = 0 ; i < props.length ; i++ ) {
-            if( currentWrapper.isWritableProperty(props[i].getName()) ) {
-                currentWrapper.setPropertyValue(props[i].getName(), incomingWrapper.getPropertyValue(props[i].getName()));
-            }
+        for( String prop : incomingDef.getProperties() ) {
+            if( !incomingDef.canRead(prop) || !currentDef.hasProperty(prop) || !currentDef.canWrite(prop) ) continue;
+            currentDef.write(current, prop, incomingDef.read(incoming, prop));
         }
     }
 }

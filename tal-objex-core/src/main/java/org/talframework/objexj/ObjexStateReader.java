@@ -26,7 +26,7 @@ public interface ObjexStateReader {
      * @param persistent Indicates the field is considered persistent
      * @return The value
      */
-    public <T> T read(String name, Class<T> expected, ObjexFieldType type, boolean persistent);
+    public <T> T read(String name, T current, Class<T> expected, ObjexFieldType type, boolean persistent);
     
     /**
      * Call to read the given reference property
@@ -36,7 +36,7 @@ public interface ObjexStateReader {
      * @param persistent Indicates the field is considered persistent
      * @return The reference
      */
-    public String readReference(String name, ObjexFieldType type, boolean persistent);
+    public String readReference(String name, String current, ObjexFieldType type, boolean persistent);
     
     /**
      * Call to read the given reference list property
@@ -46,7 +46,7 @@ public interface ObjexStateReader {
      * @param persistent Indicates the field is considered persistent
      * @return The reference list
      */
-    public List<String> readReferenceList(String name, ObjexFieldType type, boolean persistent);
+    public List<String> readReferenceList(String name, List<String> current, ObjexFieldType type, boolean persistent);
     
     /**
      * Call to read the given reference map property
@@ -56,5 +56,5 @@ public interface ObjexStateReader {
      * @param persistent Indicates the field is considered persistent
      * @return The reference map
      */
-    public Map<String, String> readReferenceMap(String name, ObjexFieldType type, boolean persistent);
+    public Map<String, String> readReferenceMap(String name, Map<String, String> current, ObjexFieldType type, boolean persistent);
 }

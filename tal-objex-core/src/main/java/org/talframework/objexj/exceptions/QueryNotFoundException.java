@@ -23,7 +23,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public final class QueryNotFoundException extends RuntimeException {
+public final class QueryNotFoundException extends BaseObjexException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the name of the query that was not found */
@@ -37,6 +37,11 @@ public final class QueryNotFoundException extends RuntimeException {
     public QueryNotFoundException(String name, Exception cause) {
         super(cause);
         this.name = name;
+    }
+    
+    @Override
+    public <T> T accept(ObjexExceptionVisitor visitor, Class<T> expected) {
+        return visitor.visit(this, expected);
     }
     
     @Override

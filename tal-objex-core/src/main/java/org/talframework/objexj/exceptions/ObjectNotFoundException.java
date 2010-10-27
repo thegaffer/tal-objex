@@ -22,7 +22,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public final class ObjectNotFoundException extends RuntimeException {
+public final class ObjectNotFoundException extends BaseObjexException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the ID of the container */
@@ -34,6 +34,11 @@ public final class ObjectNotFoundException extends RuntimeException {
         super();
         this.containerId = containerId;
         this.id = id;
+    }
+    
+    @Override
+    public <T> T accept(ObjexExceptionVisitor visitor, Class<T> expected) {
+        return visitor.visit(this, expected);
     }
     
     @Override

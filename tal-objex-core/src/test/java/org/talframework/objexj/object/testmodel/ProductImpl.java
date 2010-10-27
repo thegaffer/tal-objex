@@ -19,6 +19,8 @@ package org.talframework.objexj.object.testmodel;
 import javax.validation.ConstraintValidatorContext;
 
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.object.SimpleFieldUtils;
 import org.talframework.objexj.object.testbeans.ProductBean;
 import org.talframework.objexj.validation.object.SelfIntraObjectEnricher;
@@ -41,6 +43,24 @@ public class ProductImpl extends BaseTestObject implements SelfIntraObjectValida
     @Override
     protected ObjexObjStateBean getStateBean() {
         return bean;
+    }
+    
+    public void acceptReader(ObjexStateReader reader) {
+        String name = bean.getName();
+        String newName = reader.read("name", name, String.class, ObjexFieldType.STRING, true);
+        if( name != newName ) setName(newName);
+        
+        String description = bean.getDescription();
+        String newDescription = reader.read("description", description, String.class, ObjexFieldType.MEMO, true);
+        if( description != newDescription ) setDescription(newDescription);
+        
+        int stockLevel = bean.getStockLevel();
+        int newStockLevel = reader.read("stockLevel", stockLevel, int.class, ObjexFieldType.NUMBER, true);
+        if( stockLevel != newStockLevel ) setStockLevel(newStockLevel);
+        
+        double price = bean.getPrice();
+        double newPrice = reader.read("price", price, double.class, ObjexFieldType.NUMBER, true);
+        if( price != newPrice ) setPrice(newPrice);
     }
     
     public void enrichObject() {

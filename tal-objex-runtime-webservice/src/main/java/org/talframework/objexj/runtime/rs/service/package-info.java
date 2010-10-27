@@ -15,7 +15,12 @@
  */
 
 /**
- * This package is the root for the service elements of the
- * Objex Restful Web Service runtime.
+ * This package contains the various Restful Web Service resources.
+ * These resources use JSR 311 for the plumbing. To enable any
+ * one of the Web Services you extend the class and mark it with
+ * the JSR 311 Path annotation, which is the root Url to serve the
+ * resource up on. You then provide custom providers for your
+ * container, most notably a ContextResult for XML or JSON support
+ * of your containers objects. 
  */
 package org.talframework.objexj.runtime.rs.service;

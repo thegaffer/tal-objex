@@ -32,7 +32,7 @@ import org.talframework.objexj.object.xml.XmlObjexObj;
  */
 @XmlRootElement(name="result")
 @XmlType(propOrder={"containerId", "partial", "object"})
-public class ContainerResult {
+public class DocumentResult {
 
     /** Holds the containers ID */
     private String containerId;
@@ -41,9 +41,9 @@ public class ContainerResult {
     /** The root object of the result */
     private ObjexObj object;
     
-    public ContainerResult() {}
+    public DocumentResult() {}
     
-    public ContainerResult(String id, boolean partial, ObjexObj obj) {
+    public DocumentResult(String id, boolean partial, ObjexObj obj) {
         this.containerId = id;
         this.partial = partial;
         this.object = obj;

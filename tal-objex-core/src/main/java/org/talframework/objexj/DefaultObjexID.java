@@ -73,6 +73,29 @@ public class DefaultObjexID implements ObjexID {
     }
     
     /**
+     * This version of the constructor accepts the type
+     * and ID as separate parameters, but will test the
+     * id to see if it is numeric.
+     * 
+     * @param type The objects type
+     * @param id The ID of the object
+     * @param detectNumeric If true, detects if ID is numeric
+     */
+    public DefaultObjexID(String type, String id, boolean detectNumeric) {
+        this.type = type;
+        
+        long numericId = 0;
+        try {
+            numericId = Long.parseLong(id);
+        }
+        catch( NumberFormatException e ) {
+        }
+        
+        if( numericId > 0 ) this.id = numericId;
+        else this.id = id;
+    }
+    
+    /**
      * Constructs a new ObjexID given the type of
      * object and its ID unique in the container.
      * 

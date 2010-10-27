@@ -53,10 +53,10 @@ public class ProductBean extends BaseTestBean {
     }
     
     public void acceptReader(ObjexStateReader reader) {
-        name = reader.read("name", String.class, ObjexFieldType.STRING, true);
-        description = reader.read("description", String.class, ObjexFieldType.MEMO, true);
-        stockLevel = reader.read("stockLevel", int.class, ObjexFieldType.NUMBER, true);
-        price = reader.read("price", double.class, ObjexFieldType.NUMBER, true);
+        name = reader.read("name", name, String.class, ObjexFieldType.STRING, true);
+        description = reader.read("description", description, String.class, ObjexFieldType.MEMO, true);
+        stockLevel = reader.read("stockLevel", stockLevel, int.class, ObjexFieldType.NUMBER, true);
+        price = reader.read("price", price, double.class, ObjexFieldType.NUMBER, true);
     }
     
     public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

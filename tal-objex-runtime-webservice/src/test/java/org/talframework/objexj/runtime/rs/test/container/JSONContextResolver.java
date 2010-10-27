@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.runtime.rs.service.container;
+package org.talframework.objexj.runtime.rs.test.container;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -22,35 +22,42 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 
-import org.talframework.objexj.runtime.rs.ContainerResult;
+import org.talframework.objexj.runtime.rs.DocumentResult;
 import org.talframework.objexj.sample.model.order.impl.OrderImpl;
 import org.talframework.objexj.sample.model.order.impl.OrderItemImpl;
 import org.talframework.objexj.sample.model.stock.impl.CategoryImpl;
 import org.talframework.objexj.sample.model.stock.impl.ProductImpl;
 
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
+
 /**
- *
+ * This is the default context resolver for JSON. We override
+ * this because the default mapped JSON configuration does not
+ * handle numbers and primitives as anything but a string and
+ * will make a difference between single and multi-valued lists
+ * and arrays.
  *
  * @author Tom Spencer
  */
 @Provider
-@Produces(MediaType.APPLICATION_XML)
-public class JAXBContextResolver implements ContextResolver<JAXBContext> {
+@Produces(MediaType.APPLICATION_JSON)
+public class JSONContextResolver implements ContextResolver<JAXBContext> {
 
+    private static final Class<?>[] types = {
+        DocumentResult.class,
+        CategoryImpl.class, 
+        ProductImpl.class, 
+        OrderImpl.class, 
+        OrderItemImpl.class};
     private final JAXBContext context;
 
-    public JAXBContextResolver() throws Exception {
-        this.context = JAXBContext.newInstance(
-                ContainerResult.class,
-                CategoryImpl.class, 
-                ProductImpl.class, 
-                OrderImpl.class, 
-                OrderItemImpl.class);
+    public JSONContextResolver() throws Exception {
+        this.context = new JSONJAXBContext(JSONConfiguration.natural().build(), types);
     }
 
     public JAXBContext getContext(Class<?> objectType) {
         return context;
     } 
-
 
 }

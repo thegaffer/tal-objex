@@ -19,6 +19,7 @@ package org.talframework.objexj.sample.beans.stock;
 import java.util.List;
 import java.util.Map;
 
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlList;
@@ -52,6 +53,9 @@ import org.talframework.objexj.sample.beans.BaseBean;
 @XmlRootElement(name="Category")
 public class CategoryBean extends BaseBean {
     private final static long serialVersionUID = 1L;
+    
+    @NotPersistent
+    private int setFields = 0;
 	
 	/** The name of the category */
 	private String name;
@@ -94,8 +98,13 @@ public class CategoryBean extends BaseBean {
 	}
 	
     public void setName(String name) {
+        this.setFields |= 0x0001;
 		this.name = name;
 	}
+    
+    public boolean isNameSet() {
+        return (this.setFields & 0x0001) > 0;
+    }
 	
     @XmlAttribute
     public String getDescription() {
@@ -103,8 +112,13 @@ public class CategoryBean extends BaseBean {
 	}
 	
     public void setDescription(String description) {
+        this.setFields |= 0x0002;
 		this.description = description;
 	}
+    
+    public boolean isDescriptionSet() {
+        return (this.setFields & 0x0002) > 0;
+    }
 	
     /**
 	 * @return the products
@@ -117,8 +131,14 @@ public class CategoryBean extends BaseBean {
 	 * @param products the products to set
 	 */
 	public void setProducts(List<String> products) {
+	    this.setFields |= 0x0004;
 		this.products = products;
 	}
+	
+	public boolean isProductsSet() {
+        return (this.setFields & 0x0004) > 0;
+    }
+	
 	/**
 	 * @return the categories
 	 */
@@ -130,14 +150,19 @@ public class CategoryBean extends BaseBean {
 	 * @param categories the categories to set
 	 */
 	public void setCategories(List<String> categories) {
+	    this.setFields |= 0x0008;
 		this.categories = categories;
 	}
 	
+	public boolean isCategoriesSet() {
+        return (this.setFields & 0x0008) > 0;
+    }
+	
 	public void acceptReader(ObjexStateReader reader) {
-        name = reader.read("name", java.lang.String.class, ObjexFieldType.OBJECT, true);
-        description = reader.read("description", java.lang.String.class, ObjexFieldType.OBJECT, true);
-        products = reader.readReferenceList("products", ObjexFieldType.OWNED_REFERENCE, true);
-        categories = reader.readReferenceList("categories", ObjexFieldType.OWNED_REFERENCE, true);
+        name = reader.read("name", name, java.lang.String.class, ObjexFieldType.OBJECT, true);
+        description = reader.read("description", description, java.lang.String.class, ObjexFieldType.OBJECT, true);
+        products = reader.readReferenceList("products", products, ObjexFieldType.OWNED_REFERENCE, true);
+        categories = reader.readReferenceList("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
     }
     
     public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

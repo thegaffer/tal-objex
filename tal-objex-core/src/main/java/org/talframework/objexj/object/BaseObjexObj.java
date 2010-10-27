@@ -183,10 +183,6 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 		else throw new ClassCastException("The behaviour is not supported by this object");
 	}
 	
-	public void acceptReader(ObjexStateReader reader) {
-	    getStateBean().acceptReader(reader);
-	}
-	
 	/**
 	 * Passes the writer to the state bean. The derived class should
 	 * override if it has non-persistent fields.
@@ -288,7 +284,8 @@ public abstract class BaseObjexObj implements InternalObjexObj {
         
         // Try non-plural
         String altCreateMethod = null;
-        if( createMethod.endsWith("s") ) altCreateMethod = createMethod.substring(0, createMethod.length() - 1);
+        if( createMethod.endsWith("ies") ) altCreateMethod = createMethod.substring(0, createMethod.length() - 3) + "y";
+        else if( createMethod.endsWith("s") ) altCreateMethod = createMethod.substring(0, createMethod.length() - 1);
         
         // Find the method
         boolean includeType = false;
@@ -302,9 +299,11 @@ public abstract class BaseObjexObj implements InternalObjexObj {
         if( method == null ) method = findMethod(altCreateMethod, (Class<?>[])null);
         
         // Invoke if found
-        if( method != null && ObjexObj.class.isAssignableFrom(method.getReturnType()) ) {
+        if( method != null ) {
             try {
-                return (ObjexObj)method.invoke(this, includeType ? type : null);
+                Object[] args = null;
+                if( includeType ) args = new Object[]{type};
+                return (ObjexObj)method.invoke(this, args);
             }
             catch( RuntimeException e ) {
                 throw e;

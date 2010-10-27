@@ -24,7 +24,7 @@ import org.talframework.objexj.ValidationRequest;
  * 
  * @author Tom Spencer
  */
-public final class ContainerInvalidException extends RuntimeException {
+public final class ContainerInvalidException extends BaseObjexException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the ID of the container that is invalid */
@@ -36,6 +36,15 @@ public final class ContainerInvalidException extends RuntimeException {
         super();
         this.id = id;
         this.request = request;
+    }
+    
+    public ValidationRequest getRequest() {
+        return request;
+    }
+    
+    @Override
+    public <T> T accept(ObjexExceptionVisitor visitor, Class<T> expected) {
+        return visitor.visit(this, expected);
     }
     
     @Override

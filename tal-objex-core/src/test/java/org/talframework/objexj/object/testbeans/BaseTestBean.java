@@ -16,13 +16,12 @@
 
 package org.talframework.objexj.object.testbeans;
 
-import java.beans.PropertyDescriptor;
 import java.util.Map;
 
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.util.beans.cloner.Cloner;
+import org.talframework.util.beans.cloner.GenericCloner;
 
 /**
  * This class is the base for all of the test beans we use
@@ -122,28 +121,7 @@ public abstract class BaseTestBean implements ObjexObjStateBean {
      * Uses the bean utils wrapper to clone the object
      */
     public ObjexObjStateBean cloneState() {
-        // a. Create the new instance
-        BaseTestBean clone = null;
-        try {
-            clone = this.getClass().newInstance();
-            clone.id = this.id;
-            clone.parentId = this.parentId;
-            clone.editable = false;
-        }
-        catch( Exception e ) {} // Ignore, will get a null pointer which is fine in tests
-        
-        // b. Clone this instance
-        BeanWrapper srcWrapper = new BeanWrapperImpl(this);
-        BeanWrapper dstWrapper = new BeanWrapperImpl(clone);
-        
-        PropertyDescriptor[] props = srcWrapper.getPropertyDescriptors();
-        for( int i = 0 ; i < props.length ; i++ ) {
-            if( props[i].getReadMethod() != null && props[i].getWriteMethod() != null ) {
-                String propertyName = props[i].getName();
-                dstWrapper.setPropertyValue(propertyName, srcWrapper.getPropertyValue(propertyName));
-            }
-        }
-        
-        return clone;
+        Cloner cloner = new GenericCloner();
+        return cloner.shallowClone(this);
     }
 }

@@ -23,6 +23,8 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.object.ReferenceFieldUtils;
 import org.talframework.objexj.object.ReferenceListFieldUtils;
 import org.talframework.objexj.object.ReferenceMapFieldUtils;
@@ -57,6 +59,28 @@ public class CategoryImpl extends BaseTestObject implements SelfInterObjectValid
     @Override
     protected ObjexObjStateBean getStateBean() {
         return bean;
+    }
+    
+    public void acceptReader(ObjexStateReader reader) {
+        String name = bean.getName();
+        String newName = reader.read("name", name, String.class, ObjexFieldType.STRING, true);
+        if( name != newName ) setName(newName);
+        
+        String description = bean.getDescription();
+        String newDescription = reader.read("description", description, String.class, ObjexFieldType.MEMO, true);
+        if( description != newDescription ) setDescription(newDescription);
+        
+        String mainProduct = bean.getMainProduct();
+        String newMainProduct = reader.readReference("mainProduct", mainProduct, ObjexFieldType.REFERENCE, true);
+        if( mainProduct != newMainProduct ) setMainProduct(getContainer().getObject(newMainProduct));
+        
+        List<String> products = bean.getProducts();
+        List<String> newProducts = reader.readReferenceList("products", products, ObjexFieldType.OWNED_REFERENCE, true);
+        if( products != newProducts ) setProducts(getContainer().getObjectList(newProducts));
+        
+        Map<String, String> categories = bean.getCategories();
+        Map<String, String> newCategories = reader.readReferenceMap("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
+        if( categories != newCategories ) setCategories(getContainer().getObjectMap(newCategories));
     }
     
     public String getName() {

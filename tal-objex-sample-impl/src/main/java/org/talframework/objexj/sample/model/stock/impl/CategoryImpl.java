@@ -28,7 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ValidationRequest;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.SimpleObjectStrategy;
@@ -149,5 +151,23 @@ public class CategoryImpl extends BaseObjexObj implements Category {
     }
     
     public void validate(ValidationRequest request) {
+    }
+    
+    public void acceptReader(ObjexStateReader reader) {
+        String name = bean.getName();
+        String newName = reader.read("name", name, java.lang.String.class, ObjexFieldType.OBJECT, true);
+        if( name != newName ) setName(newName);
+        
+        String description = bean.getDescription();
+        String newDescription = reader.read("description", description, java.lang.String.class, ObjexFieldType.OBJECT, true);
+        if( description != newDescription ) setDescription(newDescription);
+        
+        List<String> products = bean.getProducts();
+        List<String> newProducts = reader.readReferenceList("products", products, ObjexFieldType.OWNED_REFERENCE, true);
+        if( products != newProducts ) setProducts(newProducts);
+        
+        List<String> categories = bean.getCategories();
+        List<String> newCategories = reader.readReferenceList("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
+        if( categories != newCategories ) setCategories(newCategories);
     }
 }

@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.object.ReferenceListFieldUtils;
 import org.talframework.objexj.object.testbeans.StockBean;
 
@@ -40,6 +42,12 @@ public class StockImpl extends BaseTestObject {
     @Override
     protected ObjexObjStateBean getStateBean() {
         return bean;
+    }
+    
+    public void acceptReader(ObjexStateReader reader) {
+        List<String> categories = bean.getCategories();
+        List<String> newCategories = reader.readReferenceList("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
+        if( categories != newCategories ) setCategories(getContainer().getObjectList(newCategories));
     }
     
     public List<ObjexObj> getCategories() {

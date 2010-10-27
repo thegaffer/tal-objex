@@ -39,7 +39,7 @@ public class StockBean extends BaseTestBean {
 	}
 	
 	public void acceptReader(ObjexStateReader reader) {
-        categories = reader.readReferenceList("categories", ObjexFieldType.OWNED_REFERENCE, true);
+        categories = reader.readReferenceList("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
     }
     
     public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

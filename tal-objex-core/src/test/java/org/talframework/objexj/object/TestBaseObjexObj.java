@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
 import org.talframework.objexj.object.testbeans.CategoryBean;
@@ -194,6 +195,10 @@ public class TestBaseObjexObj {
         @Override
         protected ObjexObjStateBean getStateBean() {
             return state;
+        }
+        
+        public void acceptReader(ObjexStateReader reader) {
+            // Does nothing as not part of test
         }
         
         /**

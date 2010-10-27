@@ -22,7 +22,7 @@ package org.talframework.objexj.exceptions;
  * 
  * @author Tom Spencer
  */
-public final class ObjectRemovedException extends RuntimeException {
+public final class ObjectRemovedException extends BaseObjexException {
     private static final long serialVersionUID = 1L;
     
     /** Holds the ID of the container */
@@ -34,6 +34,11 @@ public final class ObjectRemovedException extends RuntimeException {
         super();
         this.containerId = containerId;
         this.id = id;
+    }
+    
+    @Override
+    public <T> T accept(ObjexExceptionVisitor visitor, Class<T> expected) {
+        return visitor.visit(this, expected);
     }
     
     @Override

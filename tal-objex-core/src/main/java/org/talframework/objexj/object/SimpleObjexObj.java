@@ -23,17 +23,17 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
+import org.talframework.util.beans.BeanDefinition;
+import org.talframework.util.beans.definition.BeanDefinitionsSingleton;
 
 /**
  * Although ObjexObj objects should be behaviourally rich
@@ -63,7 +63,6 @@ import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
  * </ul>
  * 
  * FUTURE: Allow implementation of simple interfaces via use of a proxy
- * FUTURE: Remove direct use of BeanWrapper
  * 
  * @author Tom Spencer
  */
@@ -161,8 +160,9 @@ public final class SimpleObjexObj extends BaseObjexObj {
         
         String realName = convertReferencePropertyName(name);
         
-        BeanWrapper wrapper = new BeanWrapperImpl(state);
-        Object ret = wrapper.getPropertyValue(realName);
+        BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
+        Object ret = null;
+        if( def.hasProperty(realName) && def.canRead(realName) ) ret = def.read(state, realName);
         
         // See if it is a reference prop and convert
         if( name.equals(realName) && isReferenceProperty(realName) ) {
@@ -180,29 +180,28 @@ public final class SimpleObjexObj extends BaseObjexObj {
     /**
      * Delegates handling to private setProperty method.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void setProperty(String name, Object val) {
         checkUpdateable();
         
-        BeanWrapper wrapper = new BeanWrapperImpl(state);
+        BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
         
-        val = handleReferenceProperty(wrapper, name, val);
+        val = handleReferenceProperty(def, name, val);
         name = convertReferencePropertyName(name);
         
         // Basic checks
-        if( !wrapper.getPropertyType(name).isAssignableFrom(val.getClass()) ) {
-            throw new IllegalArgumentException("Cannot set property because type [" + wrapper.getPropertyType(name) + "] not compatible with: " + val);
+        if( !def.getPropertyType(name).isAssignableFrom(val.getClass()) ) {
+            throw new IllegalArgumentException("Cannot set property because type [" + def.getPropertyType(name) + "] not compatible with: " + val);
         }
-        if( !wrapper.isWritableProperty(name) ) {
+        if( !def.canWrite(name) ) {
             throw new IllegalArgumentException("Cannot set property because it is not updateable: " + name);
         }
         
-        Object current = wrapper.getPropertyValue(name);
+        Object current = def.read(state, name);
         if( (current != null && current.equals(val)) || current == val ) return;
         
         val = SimpleFieldUtils.setSimple(this, state, name, val, current);
-        wrapper.setPropertyValue(name, val);
+        def.write(state, name, val);
     }
     
     /**
@@ -222,8 +221,8 @@ public final class SimpleObjexObj extends BaseObjexObj {
         
         ObjexObj newObj = null;
         if( refProps != null && refProps.containsKey(name) ) {
-            BeanWrapper wrapper = new BeanWrapperImpl(getState());
-            Class<?> refType = wrapper.getPropertyType(name);
+            BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
+            Class<?> refType = def.getPropertyType(name);
             
             // Maps currently unsupported
             if( Map.class.isAssignableFrom(refType) ) {
@@ -256,6 +255,14 @@ public final class SimpleObjexObj extends BaseObjexObj {
         
         return newObj;
     }
+    
+    /**
+     * Simply passes to the state bean as there is no behaviour in
+     * a simple object.
+     */
+    public void acceptReader(ObjexStateReader reader) {
+        getStateBean().acceptReader(reader);
+    }
 	
 	/////////////////////////////////////////////
 	// Internal
@@ -279,13 +286,13 @@ public final class SimpleObjexObj extends BaseObjexObj {
 	 * map as needed). If the property is not a reference prop
 	 * then the value is simply ignored.
 	 */
-	protected Object handleReferenceProperty(BeanWrapper wrapper, String name, Object val) {
+	protected Object handleReferenceProperty(BeanDefinition def, String name, Object val) {
 	    Object ret = val;
 	    
 	    if( isReferenceProperty(name) ) {
 	        Class<?> referenceType = strategy.getReferenceProperties().get(name);
 	        boolean storeAsString = referenceType.equals(String.class);
-	        Class<?> storageType = wrapper.getPropertyType(name);
+	        Class<?> storageType = def.getPropertyType(name);
 	        
 	        ret = null;
 	        
