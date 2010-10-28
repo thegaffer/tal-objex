@@ -29,6 +29,7 @@ import org.talframework.objexj.generator.roo.compiler.ValidationMethodsCompiler;
 import org.talframework.objexj.generator.roo.fields.ObjexField;
 import org.talframework.objexj.generator.roo.generator.object.ObjexObjFieldAccessorGenerator;
 import org.talframework.objexj.generator.roo.generator.object.ObjexObjGenerator;
+import org.talframework.objexj.generator.roo.generator.object.ObjexObjReaderGenerator;
 import org.talframework.objexj.generator.roo.generator.object.ValidationGenerator;
 import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 
@@ -45,6 +46,7 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
     
     private ObjexObjGenerator objGenerator;
     private ObjexObjFieldAccessorGenerator fieldGenerator;
+    private ObjexObjReaderGenerator readerGenerator;
     private ValidationGenerator validationGenerator;
     
     public ObjexObjMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ObjexObjAnnotation values, List<ObjexField> properties) {
@@ -58,6 +60,7 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
         // Call the generators
         objGenerator.generate(values);
         fieldGenerator.generate(properties);
+        readerGenerator.generate(properties);
         validationGenerator.build(getValidationMethods());
         
         itdTypeDetails = builder.build();
@@ -66,6 +69,7 @@ public class ObjexObjMetadata extends AbstractItdTypeDetailsProvidingMetadataIte
     private void initialiseGenerators() {
         if( objGenerator == null ) objGenerator = new ObjexObjGenerator(builder, governorTypeDetails, getId());
         if( fieldGenerator == null ) fieldGenerator = new ObjexObjFieldAccessorGenerator(builder, governorTypeDetails, getId());
+        if( readerGenerator == null ) readerGenerator = new ObjexObjReaderGenerator(builder, governorTypeDetails, getId());
         if( validationGenerator == null ) validationGenerator = new ValidationGenerator(builder, governorTypeDetails, getId());
     }
     

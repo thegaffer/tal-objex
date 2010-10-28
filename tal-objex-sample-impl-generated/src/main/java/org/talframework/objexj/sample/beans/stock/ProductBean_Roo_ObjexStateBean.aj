@@ -22,6 +22,7 @@ import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.util.beans.BeanComparison;
 
 privileged aspect ProductBean_Roo_ObjexStateBean {
     
@@ -41,6 +42,12 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
     
     @NotPersistent
     private transient boolean ProductBean._editable;
+    
+    @NotPersistent
+    private transient int ProductBean.setFields;
+    
+    @NotPersistent
+    private transient int ProductBean.changedFields;
     
     public ProductBean.new() {
         super();
@@ -103,58 +110,151 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
         return ret;
     }
     
-    @XmlAttribute
+    public String ProductBean.toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProductBean: { ");
+        builder.append("id=").append(getId());
+        builder.append("parentId=").append(getParentId());
+        builder.append("name=").append(name);
+        builder.append("description=").append(description);
+        builder.append("effectiveFrom=").append(effectiveFrom);
+        builder.append("effectiveTo=").append(effectiveTo);
+        builder.append("price=").append(price);
+        builder.append("currency=").append(currency);
+        return builder.append(" }").toString();
+    }
+    
+    public int ProductBean.hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getParentId() == null) ? 0 : getParentId().hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((effectiveFrom == null) ? 0 : effectiveFrom.hashCode());
+        result = prime * result + ((effectiveTo == null) ? 0 : effectiveTo.hashCode());
+        long price_temp = Double.doubleToRawLongBits(price);
+        result = prime * result + (int)(price_temp ^ (price_temp >>> 32));
+        result = prime * result + ((currency == null) ? 0 : currency.hashCode());
+        return result;
+    }
+    
+    public boolean ProductBean.equals(Object obj) {
+        ProductBean other = BeanComparison.basic(ProductBean.class, this, obj);
+        boolean same = other != null;
+        if( same ) {
+        	same = BeanComparison.equals(same, getId(), other.getId());
+        	same = BeanComparison.equals(same, getParentId(), other.getParentId());
+        	same = BeanComparison.equals(same, name, other.name);
+        	same = BeanComparison.equals(same, description, other.description);
+        	same = BeanComparison.equals(same, effectiveFrom, other.effectiveFrom);
+        	same = BeanComparison.equals(same, effectiveTo, other.effectiveTo);
+        	same = BeanComparison.equals(same, price, other.price);
+        	same = BeanComparison.equals(same, currency, other.currency);
+        }
+        return same;
+    }
+    
     public String ProductBean.getName() {
         return name;
     }
     
     public void ProductBean.setName(String val) {
+        setFields |= 1;
         name = val;
     }
     
-    @XmlAttribute
+    public boolean ProductBean.isNameSet() {
+        return (setFields & 1) > 0;
+    }
+    
+    public boolean ProductBean.isNameChanged() {
+        return (changedFields & 1) > 0;
+    }
+    
     public String ProductBean.getDescription() {
         return description;
     }
     
     public void ProductBean.setDescription(String val) {
+        setFields |= 2;
         description = val;
     }
     
-    @XmlAttribute
+    public boolean ProductBean.isDescriptionSet() {
+        return (setFields & 2) > 0;
+    }
+    
+    public boolean ProductBean.isDescriptionChanged() {
+        return (changedFields & 2) > 0;
+    }
+    
     public Date ProductBean.getEffectiveFrom() {
         return effectiveFrom;
     }
     
     public void ProductBean.setEffectiveFrom(Date val) {
+        setFields |= 4;
         effectiveFrom = val;
     }
     
-    @XmlAttribute
+    public boolean ProductBean.isEffectiveFromSet() {
+        return (setFields & 4) > 0;
+    }
+    
+    public boolean ProductBean.isEffectiveFromChanged() {
+        return (changedFields & 4) > 0;
+    }
+    
     public Date ProductBean.getEffectiveTo() {
         return effectiveTo;
     }
     
     public void ProductBean.setEffectiveTo(Date val) {
+        setFields |= 8;
         effectiveTo = val;
     }
     
-    @XmlAttribute
+    public boolean ProductBean.isEffectiveToSet() {
+        return (setFields & 8) > 0;
+    }
+    
+    public boolean ProductBean.isEffectiveToChanged() {
+        return (changedFields & 8) > 0;
+    }
+    
     public double ProductBean.getPrice() {
         return price;
     }
     
     public void ProductBean.setPrice(double val) {
+        setFields |= 16;
         price = val;
     }
     
-    @XmlAttribute
+    public boolean ProductBean.isPriceSet() {
+        return (setFields & 16) > 0;
+    }
+    
+    public boolean ProductBean.isPriceChanged() {
+        return (changedFields & 16) > 0;
+    }
+    
     public String ProductBean.getCurrency() {
         return currency;
     }
     
     public void ProductBean.setCurrency(String val) {
+        setFields |= 32;
         currency = val;
+    }
+    
+    public boolean ProductBean.isCurrencySet() {
+        return (setFields & 32) > 0;
+    }
+    
+    public boolean ProductBean.isCurrencyChanged() {
+        return (changedFields & 32) > 0;
     }
     
     public void ProductBean.updateTemporaryReferences(java.util.Map<ObjexID, ObjexID> refs) {
@@ -162,12 +262,12 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
     }
     
     public void ProductBean.acceptReader(ObjexStateReader reader) {
-        name = reader.read("name", java.lang.String.class, ObjexFieldType.STRING, true);
-        description = reader.read("description", java.lang.String.class, ObjexFieldType.STRING, true);
-        effectiveFrom = reader.read("effectiveFrom", java.util.Date.class, ObjexFieldType.DATE, true);
-        effectiveTo = reader.read("effectiveTo", java.util.Date.class, ObjexFieldType.DATE, true);
-        price = reader.read("price", double.class, ObjexFieldType.NUMBER, true);
-        currency = reader.read("currency", java.lang.String.class, ObjexFieldType.STRING, true);
+        name = reader.read("name", name, java.lang.String.class, ObjexFieldType.STRING, true);
+        description = reader.read("description", description, java.lang.String.class, ObjexFieldType.STRING, true);
+        effectiveFrom = reader.read("effectiveFrom", effectiveFrom, java.util.Date.class, ObjexFieldType.DATE, true);
+        effectiveTo = reader.read("effectiveTo", effectiveTo, java.util.Date.class, ObjexFieldType.DATE, true);
+        price = reader.read("price", price, double.class, ObjexFieldType.NUMBER, true);
+        currency = reader.read("currency", currency, java.lang.String.class, ObjexFieldType.STRING, true);
     }
     
     public void ProductBean.acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

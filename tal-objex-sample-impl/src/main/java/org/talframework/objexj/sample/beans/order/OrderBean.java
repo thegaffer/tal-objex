@@ -102,4 +102,12 @@ public class OrderBean extends BaseBean {
         writer.write("account", account, ObjexFieldType.OBJECT, true);
         writer.writeReferenceList("items", items, ObjexFieldType.OWNED_REFERENCE, true);
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "OrderBean [account=" + account + ", items=" + items + "]";
+    }
 }

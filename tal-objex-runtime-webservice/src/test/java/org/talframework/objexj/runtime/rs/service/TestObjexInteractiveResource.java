@@ -5,13 +5,13 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.talframework.objexj.runtime.rs.MiddlewareResult;
+import org.talframework.objexj.runtime.rs.ContainerResult;
 import org.talframework.objexj.runtime.rs.test.middleware.JAXBContextResolver;
 import org.talframework.objexj.runtime.rs.test.middleware.JSONContextResolver;
 import org.talframework.objexj.sample.beans.stock.CategoryBean;
 import org.talframework.objexj.sample.beans.stock.ProductBean;
 
-public class TestObjexInteractiveResource extends BaseRestfulTest {
+public class TestObjexInteractiveResource extends BaseRestJUnit {
     
     public TestObjexInteractiveResource() throws Exception {
         super(JAXBContextResolver.class.getPackage().getName(), new JAXBContextResolver(), new JSONContextResolver());
@@ -22,7 +22,7 @@ public class TestObjexInteractiveResource extends BaseRestfulTest {
      */
     @Test
     public void getRoot() {
-        MiddlewareResult res = get("/_stock/123", MiddlewareResult.class, MediaType.APPLICATION_XML_TYPE);
+        ContainerResult res = get("/_stock/123", ContainerResult.class, MediaType.APPLICATION_XML_TYPE);
         Assert.assertNotNull(res);
         Assert.assertEquals("Stock/123", res.getContainerId());
         Assert.assertEquals(1, res.getObjects().size());
@@ -45,7 +45,7 @@ public class TestObjexInteractiveResource extends BaseRestfulTest {
      */
     @Test
     public void getObject() {
-        MiddlewareResult res = get("/_stock/123/Category/2", MiddlewareResult.class, MediaType.APPLICATION_XML_TYPE);
+        ContainerResult res = get("/_stock/123/Category/2", ContainerResult.class, MediaType.APPLICATION_XML_TYPE);
         Assert.assertNotNull(res);
         Assert.assertEquals("Stock/123", res.getContainerId());
         Assert.assertEquals(1, res.getObjects().size());
@@ -68,7 +68,7 @@ public class TestObjexInteractiveResource extends BaseRestfulTest {
      */
     @Test
     public void getObjectReferences() {
-        MiddlewareResult res = get("/_stock/123/Category/2/products", MiddlewareResult.class, MediaType.APPLICATION_XML_TYPE);
+        ContainerResult res = get("/_stock/123/Category/2/products", ContainerResult.class, MediaType.APPLICATION_XML_TYPE);
         Assert.assertNotNull(res);
         Assert.assertEquals("Stock/123", res.getContainerId());
         Assert.assertEquals(2, res.getObjects().size());
@@ -105,7 +105,7 @@ public class TestObjexInteractiveResource extends BaseRestfulTest {
         bean.setName("New Cat2 Name");
         bean.setDescription("I have set this description");
         
-        MiddlewareResult res = testPost("/_stock/123/Category/2", MiddlewareResult.class, bean, MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_XML_TYPE);
+        ContainerResult res = testPost("/_stock/123/Category/2", ContainerResult.class, bean, MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_XML_TYPE);
         Assert.assertNotNull(res);
         Assert.assertFalse(res.getContainerId().equals("/Stock/123"));
         Assert.assertEquals(1, res.getObjects().size());
@@ -123,7 +123,7 @@ public class TestObjexInteractiveResource extends BaseRestfulTest {
         bean.setName("Laptops");
         bean.setDescription("A new item added via RS");
         
-        MiddlewareResult res = testPut("/_stock/123/Category/2/create/categories", MiddlewareResult.class, bean, MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_XML_TYPE);
+        ContainerResult res = testPut("/_stock/123/Category/2/create/categories", ContainerResult.class, bean, MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_XML_TYPE);
         Assert.assertNotNull(res);
         Assert.assertFalse(res.getContainerId().equals("/Stock/123"));
         Assert.assertEquals(1, res.getObjects().size());
@@ -158,11 +158,11 @@ public class TestObjexInteractiveResource extends BaseRestfulTest {
         bean.setName("New Cat2 Name");
         bean.setDescription("I have set this description");
         
-        MiddlewareResult res = testPost("/_stock/123/Category/2", MiddlewareResult.class, bean, MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_XML_TYPE);
+        ContainerResult res = testPost("/_stock/123/Category/2", ContainerResult.class, bean, MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_XML_TYPE);
         Assert.assertNotNull(res);
         Assert.assertEquals("Stock/123:trans", res.getContainerId());
         
-        res = testPost("/_stock/123:trans/save", MiddlewareResult.class, null, null, MediaType.APPLICATION_XML_TYPE);
+        res = testPost("/_stock/123:trans/save", ContainerResult.class, null, null, MediaType.APPLICATION_XML_TYPE);
         Assert.assertEquals("Stock/123", res.getContainerId());
     }
 }

@@ -288,7 +288,7 @@ public abstract class ObjexField {
      * @return The beans setter method name
      */
     public String getBeanIsChangedMethodName() {
-        return "is" + beanName.getSymbolNameCapitalisedFirstLetter() + "Set";
+        return "is" + beanName.getSymbolNameCapitalisedFirstLetter() + "Changed";
     }
     
     /**

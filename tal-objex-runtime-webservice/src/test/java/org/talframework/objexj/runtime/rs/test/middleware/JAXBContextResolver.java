@@ -22,6 +22,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 
+import org.talframework.objexj.runtime.rs.ContainerResult;
 import org.talframework.objexj.runtime.rs.MiddlewareRequest;
 import org.talframework.objexj.runtime.rs.MiddlewareResult;
 import org.talframework.objexj.sample.beans.order.OrderBean;
@@ -44,6 +45,7 @@ public class JAXBContextResolver implements ContextResolver<JAXBContext> {
         this.context = JAXBContext.newInstance(
                 MiddlewareResult.class, 
                 MiddlewareRequest.class, 
+                ContainerResult.class,
                 CategoryBean.class,
                 ProductBean.class,
                 OrderBean.class,

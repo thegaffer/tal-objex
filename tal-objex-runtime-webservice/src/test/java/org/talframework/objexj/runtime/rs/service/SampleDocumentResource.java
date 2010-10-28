@@ -31,16 +31,16 @@ import org.talframework.objexj.sample.model.stock.impl.ProductImpl;
  *
  * @author Tom Spencer
  */
-@Path("/_test")
-public class SampleMiddlewareResource extends ObjexMiddlewareResource {
-
-private static ContainerStrategy strategy;
+@Path("/test")
+public class SampleDocumentResource extends ObjexDocumentResource {
+    
+    private static ContainerStrategy strategy;
     
     static {
         strategy = new SimpleContainerStrategy("Stock", "Stock", "Category", CategoryImpl.STRATEGY, ProductImpl.STRATEGY);
     }
     
-    public SampleMiddlewareResource() {
+    public SampleDocumentResource() {
         super("Stock", new SimpleContainerFactory(strategy, new InMemoryMiddlewareFactory()));
     }
 }

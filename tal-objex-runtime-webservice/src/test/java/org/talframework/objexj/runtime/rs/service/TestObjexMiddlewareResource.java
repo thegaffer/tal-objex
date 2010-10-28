@@ -15,7 +15,7 @@ import org.talframework.objexj.runtime.rs.test.middleware.JSONContextResolver;
 import org.talframework.objexj.sample.beans.stock.CategoryBean;
 
 
-public class TestObjexMiddlewareResource extends BaseRestfulTest {
+public class TestObjexMiddlewareResource extends BaseRestJUnit {
     
     public TestObjexMiddlewareResource() throws Exception {
         super(JAXBContextResolver.class.getPackage().getName(), new JAXBContextResolver(), new JSONContextResolver());
@@ -69,7 +69,7 @@ public class TestObjexMiddlewareResource extends BaseRestfulTest {
         MiddlewareResult result2 = get("/_test/123", MiddlewareResult.class, params, MediaType.APPLICATION_XML_TYPE);
         System.out.println(System.currentTimeMillis());
         Assert.assertNotNull(result2);
-        Assert.assertEquals("123", result2.getContainerId()); // TODO: Should be test
+        Assert.assertEquals("Stock/123", result2.getContainerId()); // TODO: Should be test
         Assert.assertEquals(1, result2.getObjects().size());
         Assert.assertEquals("Changed Cat1", ((CategoryBean)result2.getObjects().get(0)).getName());
     }

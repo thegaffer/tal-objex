@@ -14,6 +14,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.ReferenceFieldUtils;
 import org.talframework.objexj.object.ReferenceListFieldUtils;
@@ -125,6 +127,18 @@ privileged aspect OrderImpl_Roo_ObjexObj {
     public void OrderImpl.setTestRef(String val) {
         String rawValue = val;
         bean.setTest(SimpleFieldUtils.setSimple(this, bean, "TestRef", rawValue, bean.getTest()));
+    }
+    
+    public void OrderImpl.acceptReader(ObjexStateReader reader) {
+        Long account = bean.getAccount();
+        Long new_account = reader.read("account", account, long.class, ObjexFieldType.NUMBER, true);
+        if( new_account != account ) setAccount(new_account);
+        List<String> items = bean.getItems();
+        List<String> new_items = reader.readReferenceList("items", items, ObjexFieldType.OWNED_REFERENCE, true);
+        if( new_items != items ) setItemRefs(new_items);
+        String test = bean.getTest();
+        String new_test = reader.readReference("test", test, ObjexFieldType.OWNED_REFERENCE, true);
+        if( new_test != test ) setTestRef(new_test);
     }
     
     public boolean OrderImpl.validateObject(ConstraintValidatorContext context) {

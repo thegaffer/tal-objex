@@ -14,7 +14,6 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.talframework.objexj.ObjexID;
@@ -23,6 +22,7 @@ import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.util.beans.BeanComparison;
 
 privileged aspect OrderBean_Roo_ObjexStateBean {
     
@@ -42,6 +42,12 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
     
     @NotPersistent
     private transient boolean OrderBean._editable;
+    
+    @NotPersistent
+    private transient int OrderBean.setFields;
+    
+    @NotPersistent
+    private transient int OrderBean.changedFields;
     
     public OrderBean.new() {
         super();
@@ -101,31 +107,91 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
         return ret;
     }
     
-    @XmlAttribute
+    public String OrderBean.toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("OrderBean: { ");
+        builder.append("id=").append(getId());
+        builder.append("parentId=").append(getParentId());
+        builder.append("account=").append(account);
+        builder.append("items=").append(items);
+        builder.append("test=").append(test);
+        return builder.append(" }").toString();
+    }
+    
+    public int OrderBean.hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getParentId() == null) ? 0 : getParentId().hashCode());
+        long account_temp = Double.doubleToRawLongBits(account);
+        result = prime * result + (int)(account_temp ^ (account_temp >>> 32));
+        result = prime * result + ((items == null) ? 0 : items.hashCode());
+        result = prime * result + ((test == null) ? 0 : test.hashCode());
+        return result;
+    }
+    
+    public boolean OrderBean.equals(Object obj) {
+        OrderBean other = BeanComparison.basic(OrderBean.class, this, obj);
+        boolean same = other != null;
+        if( same ) {
+        	same = BeanComparison.equals(same, getId(), other.getId());
+        	same = BeanComparison.equals(same, getParentId(), other.getParentId());
+        	same = BeanComparison.equals(same, account, other.account);
+        	same = BeanComparison.equals(same, items, other.items);
+        	same = BeanComparison.equals(same, test, other.test);
+        }
+        return same;
+    }
+    
     public long OrderBean.getAccount() {
         return account;
     }
     
     public void OrderBean.setAccount(long val) {
+        setFields |= 1;
         account = val;
     }
     
-    @XmlList
+    public boolean OrderBean.isAccountSet() {
+        return (setFields & 1) > 0;
+    }
+    
+    public boolean OrderBean.isAccountChanged() {
+        return (changedFields & 1) > 0;
+    }
+    
     public List<String> OrderBean.getItems() {
         return items;
     }
     
     public void OrderBean.setItems(List<String> val) {
+        setFields |= 2;
         items = val;
     }
     
-    @XmlAttribute
+    public boolean OrderBean.isItemsSet() {
+        return (setFields & 2) > 0;
+    }
+    
+    public boolean OrderBean.isItemsChanged() {
+        return (changedFields & 2) > 0;
+    }
+    
     public String OrderBean.getTest() {
         return test;
     }
     
     public void OrderBean.setTest(String val) {
+        setFields |= 4;
         test = val;
+    }
+    
+    public boolean OrderBean.isTestSet() {
+        return (setFields & 4) > 0;
+    }
+    
+    public boolean OrderBean.isTestChanged() {
+        return (changedFields & 4) > 0;
     }
     
     public void OrderBean.updateTemporaryReferences(java.util.Map<ObjexID, ObjexID> refs) {
@@ -135,9 +201,9 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
     }
     
     public void OrderBean.acceptReader(ObjexStateReader reader) {
-        account = reader.read("account", long.class, ObjexFieldType.NUMBER, true);
-        items = reader.readReferenceList("items", ObjexFieldType.OWNED_REFERENCE, true);
-        test = reader.readReference("test", ObjexFieldType.OWNED_REFERENCE, true);
+        account = reader.read("account", account, long.class, ObjexFieldType.NUMBER, true);
+        items = reader.readReferenceList("items", items, ObjexFieldType.OWNED_REFERENCE, true);
+        test = reader.readReference("test", test, ObjexFieldType.OWNED_REFERENCE, true);
     }
     
     public void OrderBean.acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

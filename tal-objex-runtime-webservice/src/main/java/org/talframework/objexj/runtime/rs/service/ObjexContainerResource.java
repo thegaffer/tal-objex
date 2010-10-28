@@ -42,14 +42,16 @@ import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.QueryRequest;
 import org.talframework.objexj.QueryResult;
 import org.talframework.objexj.ValidationError;
+import org.talframework.objexj.ValidationRequest.ValidationType;
 import org.talframework.objexj.exceptions.ContainerInvalidException;
 import org.talframework.objexj.locator.InterceptingContainerFactory;
 import org.talframework.objexj.object.writer.BeanReader;
 import org.talframework.objexj.query.DefaultQueryRequest;
-import org.talframework.objexj.runtime.rs.MiddlewareResult;
+import org.talframework.objexj.runtime.rs.ContainerResult;
+import org.talframework.objexj.validation.CurrentValidationRequest;
+import org.talframework.objexj.validation.SimpleValidationRequest;
 import org.talframework.tal.aspects.annotations.Profile;
 import org.talframework.tal.aspects.annotations.Trace;
-import org.talframework.util.beans.cloner.GenericMerger;
 
 /**
  * This Restful Web Service is aimed at exposing a container
@@ -68,12 +70,12 @@ import org.talframework.util.beans.cloner.GenericMerger;
  *
  * @author Tom Spencer
  */
-public abstract class ObjexInteractiveResource {
+public abstract class ObjexContainerResource {
     
     private final String containerType;
     private final InterceptingContainerFactory factory;
     
-    public ObjexInteractiveResource(String type, InterceptingContainerFactory factory) {
+    public ObjexContainerResource(String type, InterceptingContainerFactory factory) {
         this.containerType = type;
         this.factory = factory;
     }
@@ -99,7 +101,7 @@ public abstract class ObjexInteractiveResource {
     @Path("/{containerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult getRoot(@PathParam("containerId") String containerId) {
+    public ContainerResult getRoot(@PathParam("containerId") String containerId) {
         containerId = getFullContainerId(containerId);
         
         WebServiceInterceptor interceptor = new WebServiceInterceptor();
@@ -107,7 +109,7 @@ public abstract class ObjexInteractiveResource {
         ObjexObj root = container.getRootObject();
         ObjexObjStateBean rootBean = interceptor.findObject(root.getId());
         
-        return new MiddlewareResult(containerId, rootBean);
+        return new ContainerResult(containerId, rootBean);
     }
 
     /**
@@ -120,7 +122,7 @@ public abstract class ObjexInteractiveResource {
     @Path("/{containerId}/{objectType}/{objectId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult get(
+    public ContainerResult get(
             @PathParam("containerId") String containerId, 
             @PathParam("objectType") String objectType, 
             @PathParam("objectId") String objectId) {
@@ -132,7 +134,7 @@ public abstract class ObjexInteractiveResource {
         ObjexObj obj = container.getObject(objId);
         ObjexObjStateBean objBean = interceptor.findObject(obj.getId());
         
-        return new MiddlewareResult(containerId, objBean);
+        return new ContainerResult(containerId, objBean);
     }
     
     /**
@@ -147,7 +149,7 @@ public abstract class ObjexInteractiveResource {
     @Path("/{containerId}/{objectType}/{objectId}/{fieldName}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult getReferences(
+    public ContainerResult getReferences(
             @PathParam("containerId") String containerId, 
             @PathParam("objectType") String objectType, 
             @PathParam("objectId") String objectId,
@@ -162,7 +164,7 @@ public abstract class ObjexInteractiveResource {
         Object prop = obj.getProperty(fieldName);
         List<ObjexObjStateBean> objects = interceptor.findObjects(prop);
         
-        return new MiddlewareResult(containerId, objects);
+        return new ContainerResult(containerId, objects);
     }
     
     /**
@@ -175,7 +177,7 @@ public abstract class ObjexInteractiveResource {
     @Path("/{containerId}/query/{queryName}/{offset}/{pageSize}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult query(
+    public ContainerResult query(
             @PathParam("containerId") String containerId, 
             @PathParam("queryName") String query,
             @PathParam("offset") @DefaultValue("0") int offset,
@@ -194,15 +196,13 @@ public abstract class ObjexInteractiveResource {
         QueryResult result = container.executeQuery(request);
         List<ObjexObjStateBean> beans = interceptor.findObjects(result.getResults());
 
-        return new MiddlewareResult(containerId, beans);
+        return new ContainerResult(containerId, beans);
     }
     
     /**
      * This method allows the client to set the
      * state of the given object(s). Only the
      * simple state fields are updated.
-     * 
-     * FUTURE: No events will be kicked off here!?! Apply to object directly!
      * 
      * @return The result containing any errors and the objects back
      */
@@ -211,7 +211,7 @@ public abstract class ObjexInteractiveResource {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult set(
+    public ContainerResult set(
             @PathParam("containerId") String containerId,
             @PathParam("objectType") String objectType, 
             @PathParam("objectId") String objectId,
@@ -223,12 +223,24 @@ public abstract class ObjexInteractiveResource {
         Container container = factory.open(interceptor, containerId);
         
         ObjexObj obj = container.getObject(objId); // Ensures it is loaded
-        BeanReader reader = new BeanReader(true, true, true);
-        reader.readObject(bean, obj);
+        
+        SimpleValidationRequest request = new SimpleValidationRequest(ValidationType.FIELD);
+        try {
+            CurrentValidationRequest.start(request);
+            
+            BeanReader reader = new BeanReader(true, true, true);
+            reader.readObject(bean, obj);
+            
+            request.setType(ValidationType.INTRA_OBJECT);
+            obj.validate(request);
+        }
+        finally {
+            CurrentValidationRequest.end(null);
+        }
         
         containerId = container.suspend();
         
-        return new MiddlewareResult(containerId, interceptor.findObject(obj.getId()));
+        return new ContainerResult(containerId, interceptor.findObject(obj.getId()), request.getErrors());
     }
     
     /**
@@ -245,7 +257,7 @@ public abstract class ObjexInteractiveResource {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult create(
+    public ContainerResult create(
             @PathParam("containerId") String containerId, 
             @PathParam("objectType") String objectType, 
             @PathParam("objectId") String objectId,
@@ -261,13 +273,24 @@ public abstract class ObjexInteractiveResource {
         ObjexObjStateBean newBean = interceptor.findObject(newObj.getId());
         
         if( bean != null ) {
-            GenericMerger merger = new GenericMerger();
-            merger.shallowClone(bean, newBean);
+            SimpleValidationRequest request = new SimpleValidationRequest(ValidationType.FIELD);
+            try {
+                CurrentValidationRequest.start(request);
+                
+                BeanReader reader = new BeanReader(true, true, true);
+                reader.readObject(bean, newObj);
+                
+                request.setType(ValidationType.INTRA_OBJECT);
+                obj.validate(request);
+            }
+            finally {
+                CurrentValidationRequest.end(null);
+            }
         }
         
         containerId = container.suspend();
         
-        return new MiddlewareResult(containerId, newBean);
+        return new ContainerResult(containerId, newBean);
     }
     
     /**
@@ -282,7 +305,7 @@ public abstract class ObjexInteractiveResource {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult add(
+    public ContainerResult add(
             @PathParam("containerId") String containerId, 
             @PathParam("objectType") String objectType, 
             @PathParam("objectId") String objectId,
@@ -302,7 +325,7 @@ public abstract class ObjexInteractiveResource {
     @Path("/{containerId}/{objectType}/{objectId}/removeIndex/{fieldName}/{index}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult removeIndex(
+    public ContainerResult removeIndex(
             @PathParam("containerId") String containerId, 
             @PathParam("objectType") String objectType, 
             @PathParam("objectId") String objectId,
@@ -323,7 +346,7 @@ public abstract class ObjexInteractiveResource {
     @Path("/{containerId}/{objectType}/{objectId}/removeKey/{fieldName}/{key}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult removeKey(
+    public ContainerResult removeKey(
             @PathParam("containerId") String containerId, 
             @PathParam("objectType") String objectType, 
             @PathParam("objectId") String objectId,
@@ -342,7 +365,7 @@ public abstract class ObjexInteractiveResource {
     @Path("/{containerId}/save")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Trace @Profile
-    public MiddlewareResult save(@PathParam("containerId") String containerId) {
+    public ContainerResult save(@PathParam("containerId") String containerId) {
         containerId = getFullContainerId(containerId);
         
         WebServiceInterceptor interceptor = new WebServiceInterceptor();
@@ -351,11 +374,11 @@ public abstract class ObjexInteractiveResource {
         
         try {
             containerId = container.saveContainer();
-            return new MiddlewareResult(containerId);
+            return new ContainerResult(containerId);
         }
         catch( ContainerInvalidException e ) {
             List<ValidationError> errors = e.getRequest().getErrors();
-            return new MiddlewareResult(containerId, errors, true);
+            return new ContainerResult(containerId, errors, true);
         }
     }
 }

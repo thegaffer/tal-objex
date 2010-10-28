@@ -29,40 +29,72 @@ import org.talframework.tal.aspects.annotations.Profile;
 import org.talframework.tal.aspects.annotations.Trace;
 
 /**
- * This Restful WebService exposes a container in its natural
- * form. Consequently it does not support updates at present.
- * This class is a base class and you must derive from it and
- * provide both the container factory and annotate your class
- * with @Path to set the root path this webservice responds to.
+ * This Restful WebService exposes the container as a Document.
+ * Typically Stores are not exposed vai thia Web Service.
  * 
- * FUTURE: Handle queries? (Possibly not as this response is hierachial
- *
+ * <p>As with all the Objex Restful WebServices you must derived
+ * from this class and provide the root path to expose on. 
+ * For instance:</p>
+ * 
+ * <code><pre>
+ * @Path("/someRoot")
+ * public class MyContainerResource extends ObjexDocumentResource {
+ *      
+ * }
+ * </pre></code>
+ * 
  * @author Tom Spencer
  */
 public abstract class ObjexDocumentResource {
     
-    /**
-     * This must be implemented by the derived class to get
-     * the actual container factory.
-     * 
-     * @return The container factory to get instances from
-     */
-    protected abstract ContainerFactory getFactory();
+    private final String containerType;
+    private final ContainerFactory factory;
     
+    public ObjexDocumentResource(String type, ContainerFactory factory) {
+        this.containerType = type;
+        this.factory = factory;
+    }
+    
+    /**
+     * Helper to get the full containerId given the ID
+     * part passed in a request.
+     * 
+     * @param containerId The ID part of the container
+     * @return The full ID
+     */
+    private String getFullContainerId(String containerId) {
+        return containerType + "/" + containerId;
+    }
+    
+    /**
+     * Gets the full container from the root object.
+     * 
+     * @param containerId The containerId to get
+     * @return The result to then output
+     */
     @GET
     @Path("/{containerId}")
     @Trace @Profile
     public DocumentResult get(@PathParam("containerId") String containerId) {
-        Container container = getFactory().get(containerId);
+        Container container = factory.get(getFullContainerId(containerId));
         return new DocumentResult(container.getId(), false, container.getRootObject());
     }
     
+    /**
+     * Gets only a particular object from the root and
+     * then outputs it (and its children).
+     * 
+     * @param containerId The containerId
+     * @param type The type of object
+     * @param id The ID of the object
+     * @return The result to then output
+     */
     @GET
     @Path("/{containerId}/{objectType}/{objectId}")
     @Trace @Profile
     public DocumentResult getObject(@PathParam("containerId") String containerId, @PathParam("objectType") String type, @PathParam("objectId") String id) {
         ObjexID objId = new DefaultObjexID(type, id);
-        Container container = getFactory().get(containerId);
+        Container container = factory.get(getFullContainerId(containerId));
         return new DocumentResult(container.getId(), true, container.getObject(objId));
     }
 }

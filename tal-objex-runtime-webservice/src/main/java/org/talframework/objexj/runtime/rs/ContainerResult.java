@@ -18,7 +18,6 @@ package org.talframework.objexj.runtime.rs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -28,20 +27,25 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationError;
+import org.talframework.objexj.runtime.rs.service.ObjexContainerResource;
 
-@XmlRootElement(name="middleware-result")
-public class MiddlewareResult {
+/**
+ * This object represents a result from interacting with the
+ * {@link ObjexContainerResource} Web Service.
+ *
+ * @author Tom Spencer
+ */
+@XmlRootElement(name="container-result")
+public class ContainerResult {
 
-    /** Holds the ID of the container (or transactionId if suspended) */
+    /** Holds the containers ID - always provided and will change due to suspending transactions */
     private String containerId;
-    /** Holds the objects requested */
+    /** Holds the requested object (or objects if query/property) or the created/updated object back */
     private List<ObjexObjStateBean> objects;
-    /** Holds the new references to any objects that have been created (if posted or put) */
-    private Map<String, String> newReferences;
     /** Holds any validation errors in fulfilling the request */
     private List<ValidationError> errors;
     
-    public MiddlewareResult() {}
+    public ContainerResult() {}
     
     /**
      * Constructs a successful response containing just
@@ -49,7 +53,7 @@ public class MiddlewareResult {
      * 
      * @param containerId The containerId
      */
-    public MiddlewareResult(String containerId) {
+    public ContainerResult(String containerId) {
         this.containerId = containerId;
     }
     
@@ -59,10 +63,25 @@ public class MiddlewareResult {
      * @param containerId The containerId
      * @param object The object
      */
-    public MiddlewareResult(String containerId, ObjexObjStateBean bean) {
+    public ContainerResult(String containerId, ObjexObjStateBean bean) {
         this.containerId = containerId;
         this.objects = new ArrayList<ObjexObjStateBean>();
         this.objects.add(bean);
+    }
+    
+    /**
+     * Constructs a response containing the object that has
+     * been created/updated and any errors it now has.
+     * 
+     * @param containerId The containerId
+     * @param object The object
+     * @param errors The errors
+     */
+    public ContainerResult(String containerId, ObjexObjStateBean bean, List<ValidationError> errors) {
+        this.containerId = containerId;
+        this.objects = new ArrayList<ObjexObjStateBean>();
+        this.objects.add(bean);
+        this.errors = errors;
     }
     
     /**
@@ -71,20 +90,9 @@ public class MiddlewareResult {
      * @param containerId The containerId
      * @param objects The objects
      */
-    public MiddlewareResult(String containerId, List<ObjexObjStateBean> objects) {
+    public ContainerResult(String containerId, List<ObjexObjStateBean> objects) {
         this.containerId = containerId;
         this.objects = objects;
-    }
-    
-    /**
-     * Constructs a response that updated including new references
-     * 
-     * @param containerId The containerId
-     * @param newReferences The new references
-     */
-    public MiddlewareResult(String containerId, Map<String, String> newReferences) {
-        this.containerId = containerId;
-        this.newReferences = newReferences;
     }
     
     /**
@@ -94,7 +102,7 @@ public class MiddlewareResult {
      * @param errors The errors when validating
      * @param hasErrors Unused, keeps the constructor separate from others
      */
-    public MiddlewareResult(String containerId, List<ValidationError> errors, boolean hasErrors) {
+    public ContainerResult(String containerId, List<ValidationError> errors, boolean hasErrors) {
         this.containerId = containerId;
         this.errors = errors;
     }
@@ -127,24 +135,6 @@ public class MiddlewareResult {
      */
     public void setContainerId(String containerId) {
         this.containerId = containerId;
-    }
-
-    /**
-     * @return the newReferences
-     */
-    //@XmlElement
-    @XmlTransient // TODO: Remove transient
-    public Map<String, String> getNewReferences() {
-        return newReferences;
-    }
-
-    /**
-     * Setter for the newReferences field
-     *
-     * @param newReferences the newReferences to set
-     */
-    public void setNewReferences(Map<String, String> newReferences) {
-        this.newReferences = newReferences;
     }
 
     /**

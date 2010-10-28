@@ -62,21 +62,21 @@ public class StateWriterGenerator extends BaseGenerator implements FieldVisitor 
 
     public void visitSimple(SimpleField prop) {
         writerMethod.addBody("writer.write(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
-        readerMethod.addBody(prop.getBeanName() + " = reader.read(\"" + prop.getBeanName() + "\", " + prop.getBeanTypeName() + ".class, " + prop.getObjexType() + ", true);");
+        readerMethod.addBody(prop.getBeanName() + " = reader.read(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getBeanTypeName() + ".class, " + prop.getObjexType() + ", true);");
     }
     
     public void visitReference(SimpleReferenceField prop) {
         writerMethod.addBody("writer.writeReference(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
-        readerMethod.addBody(prop.getBeanName() + " = reader.readReference(\"" + prop.getBeanName() + "\", " + prop.getObjexType() + ", true);");
+        readerMethod.addBody(prop.getBeanName() + " = reader.readReference(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
     }
     
     public void visitList(ListReferenceField prop) {
         writerMethod.addBody("writer.writeReferenceList(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
-        readerMethod.addBody(prop.getBeanName() + " = reader.readReferenceList(\"" + prop.getBeanName() + "\", " + prop.getObjexType() + ", true);");
+        readerMethod.addBody(prop.getBeanName() + " = reader.readReferenceList(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
     }
     
     public void visitMap(MapReferenceField prop) {
         writerMethod.addBody("writer.writeReferenceMap(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
-        readerMethod.addBody(prop.getBeanName() + " = reader.readReferenceMap(\"" + prop.getBeanName() + "\", " + prop.getObjexType() + ", true);");
+        readerMethod.addBody(prop.getBeanName() + " = reader.readReferenceMap(\"" + prop.getBeanName() + "\", " + prop.getBeanName() + ", " + prop.getObjexType() + ", true);");
     }
 }

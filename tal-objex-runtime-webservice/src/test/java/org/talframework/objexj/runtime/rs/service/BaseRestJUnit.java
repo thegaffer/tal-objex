@@ -33,7 +33,7 @@ import com.sun.jersey.test.framework.JerseyTest;
  *
  * @author Tom Spencer
  */
-public class BaseRestfulTest extends JerseyTest {
+public class BaseRestJUnit extends JerseyTest {
 
     private static final long VALID_MONTH = 2592000000L;
     
@@ -42,11 +42,11 @@ public class BaseRestfulTest extends JerseyTest {
     /** Holds the JAXB JSON Resolver for client requests */
     private ContextResolver<JAXBContext> jsonResolver;
     
-    public BaseRestfulTest(String packageName) throws Exception {
+    /*public BaseRestfulTest(String packageName) throws Exception {
         super(ObjexExceptionMapper.class.getPackage().getName(), packageName);
-    }
+    }*/
     
-    public BaseRestfulTest(String packageName, ContextResolver<JAXBContext> xmlResolver, ContextResolver<JAXBContext> jsonResolver) throws Exception {
+    public BaseRestJUnit(String packageName, ContextResolver<JAXBContext> xmlResolver, ContextResolver<JAXBContext> jsonResolver) throws Exception {
         super(ObjexExceptionMapper.class.getPackage().getName(), packageName);
         this.xmlResolver = xmlResolver;
         this.jsonResolver = jsonResolver;

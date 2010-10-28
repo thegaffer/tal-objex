@@ -171,4 +171,15 @@ public class CategoryBean extends BaseBean {
         writer.writeReferenceList("products", products, ObjexFieldType.OWNED_REFERENCE, true);
         writer.writeReferenceList("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "CategoryBean [categories=" + categories + ", description=" + description + ", name=" + name + ", products=" + products + ", setFields="
+                + setFields + "]";
+    }
+    
+    
 }

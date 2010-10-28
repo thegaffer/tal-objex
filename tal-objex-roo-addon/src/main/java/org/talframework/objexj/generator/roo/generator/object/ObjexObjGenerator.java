@@ -16,6 +16,7 @@ import org.talframework.objexj.generator.roo.annotations.ObjexObjAnnotation;
 import org.talframework.objexj.generator.roo.generator.BaseGenerator;
 import org.talframework.objexj.generator.roo.utils.ConstructorMetadataWrapper;
 import org.talframework.objexj.generator.roo.utils.MethodMetadataWrapper;
+import org.talframework.objexj.generator.roo.utils.PropertyMetadataWrapper;
 import org.talframework.objexj.generator.roo.utils.TypeConstants;
 import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 
@@ -75,6 +76,9 @@ public class ObjexObjGenerator extends BaseGenerator {
      * @return The metadata item for the ID field
      */
     private void addStateAccessor() {
+        PropertyMetadataWrapper prop = new PropertyMetadataWrapper(new JavaSymbolName("bean"), annotationValues.getValue());
+        prop.addMetadata(builder, typeDetails, typeId);
+        
         MethodMetadataWrapper getter = new MethodMetadataWrapper("getStateBean", TypeConstants.OBJEXSTATEBEAN);
         getter.addBody("return bean;");
         getter.addMetadata(builder, typeDetails, typeId);

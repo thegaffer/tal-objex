@@ -75,7 +75,7 @@ public class StateFieldAccessorGenerator extends BaseGenerator implements FieldV
     
     private void addChangedField(int size) {
         JavaType type = size > 31 ? JavaType.LONG_PRIMITIVE : JavaType.INT_PRIMITIVE;
-        PropertyMetadataWrapper changedProp = new PropertyMetadataWrapper(new JavaSymbolName("setFields"), type);
+        PropertyMetadataWrapper changedProp = new PropertyMetadataWrapper(new JavaSymbolName("changedFields"), type);
         changedProp.addModifier(Modifier.TRANSIENT);
         changedProp.addAnnotation("javax.jdo.annotations.NotPersistent");
         changedProp.addMetadata(builder, typeDetails, typeId);
@@ -99,22 +99,22 @@ public class StateFieldAccessorGenerator extends BaseGenerator implements FieldV
     
     private void addMethods(ObjexField prop) {
         MethodMetadataWrapper getter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanGetterMethodName()), prop.getBeanType());
-        getter.addBody("return " + prop.getBeanName().getSymbolName() + ";");
+        getter.addBody("return this." + prop.getBeanName().getSymbolName() + ";");
         methods.add(getter);
         
         MethodMetadataWrapper setter = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanSetterMethodName()), JavaType.VOID_PRIMITIVE);
         setter.addParameter(new JavaSymbolName("val"), prop.getBeanType(), null);
-        setter.addBody("setFields |= " + (1 << index));
+        setter.addBody("this.setFields |= " + (1 << index) + ";");
         // TODO: Determine if changed
-        setter.addBody(prop.getBeanName().getSymbolName() + " = val;");
+        setter.addBody("this." + prop.getBeanName().getSymbolName() + " = val;");
         methods.add(setter);
         
         MethodMetadataWrapper isSet = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanIsSetMethodName()), JavaType.BOOLEAN_PRIMITIVE);
-        isSet.addBody("return setFields & " + (1 << index));
+        isSet.addBody("return (this.setFields & " + (1 << index) + ") > 0;");
         methods.add(isSet);
         
-        MethodMetadataWrapper isChanged = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanIsSetMethodName()), JavaType.BOOLEAN_PRIMITIVE);
-        isChanged.addBody("return changedFields & " + (1 << index));
+        MethodMetadataWrapper isChanged = new MethodMetadataWrapper(new JavaSymbolName(prop.getBeanIsChangedMethodName()), JavaType.BOOLEAN_PRIMITIVE);
+        isChanged.addBody("return (this.changedFields & " + (1 << index) + ") > 0;");
         methods.add(isChanged);
     }
 }

@@ -181,4 +181,74 @@ public class OrderItemBean extends BaseBean {
         writer.write("price", price, ObjexFieldType.OBJECT, true);
         writer.write("currency", currency, ObjexFieldType.OBJECT, true);
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "OrderItemBean [currency=" + currency + ", description=" + description + ", measure=" + measure + ", name=" + name + ", price=" + price
+                + ", quantity=" + quantity + ", ref=" + ref + ", stockItem=" + stockItem + "]";
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((currency == null) ? 0 : currency.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((measure == null) ? 0 : measure.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        long temp;
+        temp = Double.doubleToLongBits(price);
+        result = prime * result + (int)(temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(quantity);
+        result = prime * result + (int)(temp ^ (temp >>> 32));
+        result = prime * result + ((ref == null) ? 0 : ref.hashCode());
+        result = prime * result + ((stockItem == null) ? 0 : stockItem.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if( this == obj ) return true;
+        if( obj == null ) return false;
+        if( getClass() != obj.getClass() ) return false;
+        OrderItemBean other = (OrderItemBean)obj;
+        if( currency == null ) {
+            if( other.currency != null ) return false;
+        }
+        else if( !currency.equals(other.currency) ) return false;
+        if( description == null ) {
+            if( other.description != null ) return false;
+        }
+        else if( !description.equals(other.description) ) return false;
+        if( measure == null ) {
+            if( other.measure != null ) return false;
+        }
+        else if( !measure.equals(other.measure) ) return false;
+        if( name == null ) {
+            if( other.name != null ) return false;
+        }
+        else if( !name.equals(other.name) ) return false;
+        if( Double.doubleToLongBits(price) != Double.doubleToLongBits(other.price) ) return false;
+        if( Double.doubleToLongBits(quantity) != Double.doubleToLongBits(other.quantity) ) return false;
+        if( ref == null ) {
+            if( other.ref != null ) return false;
+        }
+        else if( !ref.equals(other.ref) ) return false;
+        if( stockItem == null ) {
+            if( other.stockItem != null ) return false;
+        }
+        else if( !stockItem.equals(other.stockItem) ) return false;
+        return true;
+    }
+    
+    
 }

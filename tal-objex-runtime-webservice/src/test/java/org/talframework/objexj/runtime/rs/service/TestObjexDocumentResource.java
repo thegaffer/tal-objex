@@ -6,13 +6,13 @@ import junit.framework.Assert;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.talframework.objexj.runtime.rs.DocumentResult;
 import org.talframework.objexj.runtime.rs.test.container.JAXBContextResolver;
+import org.talframework.objexj.runtime.rs.test.container.JSONContextResolver;
 
-public class TestObjexContainerResource extends BaseRestfulTest {
+public class TestObjexDocumentResource extends BaseRestJUnit {
     
-    public TestObjexContainerResource() throws Exception {
-        super(JAXBContextResolver.class.getPackage().getName());
+    public TestObjexDocumentResource() throws Exception {
+        super(JAXBContextResolver.class.getPackage().getName(), new JAXBContextResolver(), new JSONContextResolver());
     }
     
     @Test
@@ -23,27 +23,21 @@ public class TestObjexContainerResource extends BaseRestfulTest {
     
     @Test
     public void getXml() {
-        DocumentResult result = get("/test/123", DocumentResult.class, MediaType.APPLICATION_XML_TYPE);
+        String result = get("/test/123", String.class, MediaType.APPLICATION_XML_TYPE);
         Assert.assertNotNull(result);
-        Assert.assertEquals("123", result.getContainerId());
-        Assert.assertFalse(result.isPartial());
-        Assert.assertNotNull(result.getObject());
     }
     
     @Test
     public void getJson() {
-        DocumentResult result = get("/test/123", DocumentResult.class, MediaType.APPLICATION_JSON_TYPE);
+        String result = get("/test/123", String.class, MediaType.APPLICATION_JSON_TYPE);
         Assert.assertNotNull(result);
-        Assert.assertEquals("123", result.getContainerId());
-        Assert.assertFalse(result.isPartial());
-        Assert.assertNotNull(result.getObject());
     }
     
     @Test
     @Ignore("HTML not added yet")
     public void getHtml() {
         String resp = get("/test/123", String.class, MediaType.TEXT_HTML_TYPE);
-        System.out.println(resp);
+        Assert.assertNotNull(resp);
     }
     
     // TODO: Get a specific object

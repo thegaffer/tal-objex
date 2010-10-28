@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.SimpleFieldUtils;
 
@@ -94,6 +96,27 @@ privileged aspect ProductImpl_Roo_ObjexObj {
     public void ProductImpl.setCurrency(String val) {
         String rawValue = val;
         bean.setCurrency(SimpleFieldUtils.setSimple(this, bean, "currency", rawValue, bean.getCurrency()));
+    }
+    
+    public void ProductImpl.acceptReader(ObjexStateReader reader) {
+        String name = bean.getName();
+        String new_name = reader.read("name", name, java.lang.String.class, ObjexFieldType.STRING, true);
+        if( new_name != name ) setName(new_name);
+        String description = bean.getDescription();
+        String new_description = reader.read("description", description, java.lang.String.class, ObjexFieldType.STRING, true);
+        if( new_description != description ) setDescription(new_description);
+        Date effectiveFrom = bean.getEffectiveFrom();
+        Date new_effectiveFrom = reader.read("effectiveFrom", effectiveFrom, java.util.Date.class, ObjexFieldType.DATE, true);
+        if( new_effectiveFrom != effectiveFrom ) setEffectiveFrom(new_effectiveFrom);
+        Date effectiveTo = bean.getEffectiveTo();
+        Date new_effectiveTo = reader.read("effectiveTo", effectiveTo, java.util.Date.class, ObjexFieldType.DATE, true);
+        if( new_effectiveTo != effectiveTo ) setEffectiveTo(new_effectiveTo);
+        Double price = bean.getPrice();
+        Double new_price = reader.read("price", price, double.class, ObjexFieldType.NUMBER, true);
+        if( new_price != price ) setPrice(new_price);
+        String currency = bean.getCurrency();
+        String new_currency = reader.read("currency", currency, java.lang.String.class, ObjexFieldType.STRING, true);
+        if( new_currency != currency ) setCurrency(new_currency);
     }
     
 }

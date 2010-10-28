@@ -30,7 +30,7 @@ import org.talframework.objexj.object.xml.XmlObjexObj;
  *
  * @author Tom Spencer
  */
-@XmlRootElement(name="result")
+@XmlRootElement(name="document-result")
 @XmlType(propOrder={"containerId", "partial", "object"})
 public class DocumentResult {
 

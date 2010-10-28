@@ -36,6 +36,7 @@ import org.talframework.objexj.annotations.ObjexStateBean;
 import org.talframework.objexj.generator.roo.annotations.ObjexObjStateBeanAnnotation;
 import org.talframework.objexj.generator.roo.compiler.PropertyCompiler;
 import org.talframework.objexj.generator.roo.fields.ObjexField;
+import org.talframework.objexj.generator.roo.generator.state.StateBeanGenerator;
 import org.talframework.objexj.generator.roo.generator.state.StateCloneGenerator;
 import org.talframework.objexj.generator.roo.generator.state.StateFieldAccessorGenerator;
 import org.talframework.objexj.generator.roo.generator.state.StateGAEGenerator;
@@ -58,6 +59,7 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     
     private StateGenerator stateGenerator;
     private StateCloneGenerator cloneGenerator;
+    private StateBeanGenerator beanGenerator;
     private StateTempRefsGenerator tempRefsGenerator;
     private StateFieldAccessorGenerator fieldGenerator;
     private StateWriterGenerator writerGenerator;
@@ -82,6 +84,7 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
         // Call the individual generators
         stateGenerator.generate(annotationValues);
         cloneGenerator.generate(getProperties());
+        beanGenerator.generate(getProperties());
         fieldGenerator.generate(getProperties());
         tempRefsGenerator.generate(getProperties());
         gaeGenerator.generate(getProperties());
@@ -94,6 +97,7 @@ public class ObjexStateBeanMetadata extends AbstractItdTypeDetailsProvidingMetad
     private void initialiseGenerators() {
         if( stateGenerator == null ) stateGenerator = new StateGenerator(builder, governorTypeDetails, getId());
         if( cloneGenerator == null ) cloneGenerator = new StateCloneGenerator(builder, governorTypeDetails, getId());
+        if( beanGenerator == null ) beanGenerator = new StateBeanGenerator(builder, governorTypeDetails, getId());
         if( tempRefsGenerator == null ) tempRefsGenerator = new StateTempRefsGenerator(builder, governorTypeDetails, getId());
         if( fieldGenerator == null ) fieldGenerator = new StateFieldAccessorGenerator(builder, governorTypeDetails, getId());
         if( writerGenerator == null ) writerGenerator = new StateWriterGenerator(builder, governorTypeDetails, getId());

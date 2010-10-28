@@ -11,6 +11,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.object.ReferenceListFieldUtils;
 import org.talframework.objexj.object.SimpleFieldUtils;
@@ -138,6 +140,21 @@ privileged aspect CategoryImpl_Roo_ObjexObj {
     public void CategoryImpl.setCategoryRefs(List<String> val) {
         List<String> rawValue = val;
         bean.setCategories(SimpleFieldUtils.setSimple(this, bean, "CategoryRefs", rawValue, bean.getCategories()));
+    }
+    
+    public void CategoryImpl.acceptReader(ObjexStateReader reader) {
+        String name = bean.getName();
+        String new_name = reader.read("name", name, java.lang.String.class, ObjexFieldType.STRING, true);
+        if( new_name != name ) setName(new_name);
+        String description = bean.getDescription();
+        String new_description = reader.read("description", description, java.lang.String.class, ObjexFieldType.STRING, true);
+        if( new_description != description ) setDescription(new_description);
+        List<String> products = bean.getProducts();
+        List<String> new_products = reader.readReferenceList("products", products, ObjexFieldType.OWNED_REFERENCE, true);
+        if( new_products != products ) setProductRefs(new_products);
+        List<String> categories = bean.getCategories();
+        List<String> new_categories = reader.readReferenceList("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
+        if( new_categories != categories ) setCategoryRefs(new_categories);
     }
     
 }

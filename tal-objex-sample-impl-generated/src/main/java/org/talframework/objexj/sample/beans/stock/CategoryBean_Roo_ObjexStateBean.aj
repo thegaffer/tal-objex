@@ -14,7 +14,6 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.talframework.objexj.ObjexID;
@@ -23,6 +22,7 @@ import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.util.beans.BeanComparison;
 
 privileged aspect CategoryBean_Roo_ObjexStateBean {
     
@@ -42,6 +42,12 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     
     @NotPersistent
     private transient boolean CategoryBean._editable;
+    
+    @NotPersistent
+    private transient int CategoryBean.setFields;
+    
+    @NotPersistent
+    private transient int CategoryBean.changedFields;
     
     public CategoryBean.new() {
         super();
@@ -102,40 +108,110 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
         return ret;
     }
     
-    @XmlAttribute
+    public String CategoryBean.toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("CategoryBean: { ");
+        builder.append("id=").append(getId());
+        builder.append("parentId=").append(getParentId());
+        builder.append("name=").append(name);
+        builder.append("description=").append(description);
+        builder.append("products=").append(products);
+        builder.append("categories=").append(categories);
+        return builder.append(" }").toString();
+    }
+    
+    public int CategoryBean.hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getParentId() == null) ? 0 : getParentId().hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((products == null) ? 0 : products.hashCode());
+        result = prime * result + ((categories == null) ? 0 : categories.hashCode());
+        return result;
+    }
+    
+    public boolean CategoryBean.equals(Object obj) {
+        CategoryBean other = BeanComparison.basic(CategoryBean.class, this, obj);
+        boolean same = other != null;
+        if( same ) {
+        	same = BeanComparison.equals(same, getId(), other.getId());
+        	same = BeanComparison.equals(same, getParentId(), other.getParentId());
+        	same = BeanComparison.equals(same, name, other.name);
+        	same = BeanComparison.equals(same, description, other.description);
+        	same = BeanComparison.equals(same, products, other.products);
+        	same = BeanComparison.equals(same, categories, other.categories);
+        }
+        return same;
+    }
+    
     public String CategoryBean.getName() {
         return name;
     }
     
     public void CategoryBean.setName(String val) {
+        setFields |= 1;
         name = val;
     }
     
-    @XmlAttribute
+    public boolean CategoryBean.isNameSet() {
+        return (setFields & 1) > 0;
+    }
+    
+    public boolean CategoryBean.isNameChanged() {
+        return (changedFields & 1) > 0;
+    }
+    
     public String CategoryBean.getDescription() {
         return description;
     }
     
     public void CategoryBean.setDescription(String val) {
+        setFields |= 2;
         description = val;
     }
     
-    @XmlList
+    public boolean CategoryBean.isDescriptionSet() {
+        return (setFields & 2) > 0;
+    }
+    
+    public boolean CategoryBean.isDescriptionChanged() {
+        return (changedFields & 2) > 0;
+    }
+    
     public List<String> CategoryBean.getProducts() {
         return products;
     }
     
     public void CategoryBean.setProducts(List<String> val) {
+        setFields |= 4;
         products = val;
     }
     
-    @XmlList
+    public boolean CategoryBean.isProductsSet() {
+        return (setFields & 4) > 0;
+    }
+    
+    public boolean CategoryBean.isProductsChanged() {
+        return (changedFields & 4) > 0;
+    }
+    
     public List<String> CategoryBean.getCategories() {
         return categories;
     }
     
     public void CategoryBean.setCategories(List<String> val) {
+        setFields |= 8;
         categories = val;
+    }
+    
+    public boolean CategoryBean.isCategoriesSet() {
+        return (setFields & 8) > 0;
+    }
+    
+    public boolean CategoryBean.isCategoriesChanged() {
+        return (changedFields & 8) > 0;
     }
     
     public void CategoryBean.updateTemporaryReferences(java.util.Map<ObjexID, ObjexID> refs) {
@@ -145,10 +221,10 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     }
     
     public void CategoryBean.acceptReader(ObjexStateReader reader) {
-        name = reader.read("name", java.lang.String.class, ObjexFieldType.STRING, true);
-        description = reader.read("description", java.lang.String.class, ObjexFieldType.STRING, true);
-        products = reader.readReferenceList("products", ObjexFieldType.OWNED_REFERENCE, true);
-        categories = reader.readReferenceList("categories", ObjexFieldType.OWNED_REFERENCE, true);
+        name = reader.read("name", name, java.lang.String.class, ObjexFieldType.STRING, true);
+        description = reader.read("description", description, java.lang.String.class, ObjexFieldType.STRING, true);
+        products = reader.readReferenceList("products", products, ObjexFieldType.OWNED_REFERENCE, true);
+        categories = reader.readReferenceList("categories", categories, ObjexFieldType.OWNED_REFERENCE, true);
     }
     
     public void CategoryBean.acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {

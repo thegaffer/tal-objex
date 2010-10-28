@@ -168,4 +168,15 @@ public class ProductBean extends BaseBean {
         writer.write("price", price, ObjexFieldType.OBJECT, true);
         writer.write("currency", currency, ObjexFieldType.OBJECT, true);
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "ProductBean [currency=" + currency + ", description=" + description + ", effectiveFrom=" + effectiveFrom + ", effectiveTo=" + effectiveTo
+                + ", name=" + name + ", price=" + price + "]";
+    }
+    
+    
 }

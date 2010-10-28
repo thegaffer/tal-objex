@@ -65,7 +65,7 @@ public class TestInMemoryMiddleware {
         objs.add(new CategoryBean("Cat2", "Cat2"));
         SingletonContainerStore.getInstance().setObjects("789", objs);
         
-        SingletonContainerCache.getInstance().setCache("123/trans", new SimpleTransactionCache());
+        SingletonContainerCache.getInstance().setCache("123:trans", new SimpleTransactionCache());
     }
 
     @Test
@@ -131,7 +131,7 @@ public class TestInMemoryMiddleware {
     
     @Test
     public void openExistingTransaction() {
-        InMemoryMiddleware underTest = new InMemoryMiddleware("123/trans", true);
+        InMemoryMiddleware underTest = new InMemoryMiddleware("123:trans", true);
         Assert.assertEquals("123", underTest.getContainerId());
         Assert.assertFalse(underTest.isNew());
         Assert.assertNotNull(underTest.getIdStrategy());
@@ -167,7 +167,7 @@ public class TestInMemoryMiddleware {
         cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Category", 1), new CategoryBean("Cat1_edited", "Cat1"));
         cache.addObject(ObjectRole.REMOVED, new DefaultObjexID("Category", 2), new CategoryBean("Cat2_removed", "Cat2"));
         
-        Assert.assertEquals("789/trans", underTest.suspend());
-        Assert.assertNotNull(SingletonContainerCache.getInstance().getCache("789/trans"));
+        Assert.assertEquals("789:trans", underTest.suspend());
+        Assert.assertNotNull(SingletonContainerCache.getInstance().getCache("789:trans"));
     }
 }

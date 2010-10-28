@@ -55,6 +55,11 @@ import org.talframework.tal.aspects.annotations.Trace;
  * Objex objects as exposed in the {@link ObjexDocumentResource}
  * service.
  * 
+ * TODO: Get specific object
+ * TODO: Get objects from property of object
+ * TODO: Run query (more complex as objects not known)
+ * TODO: Generating New IDs is not currently done!?!
+ * 
  * @author Tom Spencer
  */
 public abstract class ObjexMiddlewareResource {
@@ -102,10 +107,17 @@ public abstract class ObjexMiddlewareResource {
         return new MiddlewareResult(container.getId(), objs);
     }
     
-    // TODO: Get specific object
-    // TODO: Get objects from property of object
-    // TODO: Run query (more complex as objects not known)
-
+    /**
+     * Call to post a set of updates to an existing container
+     * and then save the container. The input request can
+     * contain new, updated or removed objects. The changes
+     * are applied to the existing container via the business
+     * object - so additional processing etc is preserved. 
+     * 
+     * @param containerId
+     * @param request
+     * @return
+     */
     @POST
     @Path("/{containerId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -130,10 +142,12 @@ public abstract class ObjexMiddlewareResource {
     }
     
     /**
-     * Services a request to create a new container
+     * Call to create a new container and add all the given objects
+     * into this container. Other than creating the container acts
+     * just as is post() above.
      * 
-     * @param request
-     * @return
+     * @param request The request holding the object
+     * @return The result holding ID of container and any errors
      */
     @PUT
     @Path("/create")
@@ -143,10 +157,9 @@ public abstract class ObjexMiddlewareResource {
         WebServiceInterceptor interceptor = new WebServiceInterceptor();
         Container container = factory.create(interceptor);
         
-        Map<String, String> newRefs = processRequest(container, interceptor, request);
-        List<ObjexObjStateBean> objs = interceptor.findObjects(getObjects(container, null, 0).keySet());
-        
         try {
+            Map<String, String> newRefs = processRequest(container, interceptor, request);
+            
             String containerId = container.saveContainer();
             return new MiddlewareResult(containerId, newRefs);
         }
@@ -156,33 +169,7 @@ public abstract class ObjexMiddlewareResource {
     }
     
     /**
-     * Services a request to save a suspended container.
-     * 
-     * @param containerId The ID of the container (or transaction)
-     * @return
-     */
-    /*@POST
-    @Path("/save/{containerId}")
-    @Trace @Profile
-    public MiddlewareResult save(@PathParam("containerId") String containerId) {
-        containerId = getFullContainerId(containerId);
-        
-        WebServiceInterceptor interceptor = new WebServiceInterceptor();
-        Container container = factory.create(interceptor);
-        
-        try {
-            containerId = container.saveContainer();
-            return new MiddlewareResult(containerId);
-        }
-        catch( ContainerInvalidException e ) {
-            return new MiddlewareResult(null, e.getRequest().getErrors(), true);
-        }
-    }*/
-
-    /**
      * Helper method to process a post or put request.
-     * 
-     * TODO: Return new references & apply each object
      * 
      * @param container The container
      * @param interceptor The interceptor
@@ -193,27 +180,32 @@ public abstract class ObjexMiddlewareResource {
         
         // Add in any new objects directly to the cache
         List<ObjexObjStateBean> beans = request.getNewObjects();
-        for( ObjexObjStateBean bean : beans ) {
-            // FUTURE: Do we need to generate a new ID
-            cache.addObject(ObjectRole.NEW, DefaultObjexID.getId(bean.getId()), bean);
+        if( beans != null ) {
+            for( ObjexObjStateBean bean : beans ) {
+                // FUTURE: Do we need to generate a new ID
+                cache.addObject(ObjectRole.NEW, DefaultObjexID.getId(bean.getId()), bean);
+            }
         }
         
         // Remove any deleted objects directly
         List<ObjexID> removedBeans = request.getRemovedObjects();
-        for( ObjexID id : removedBeans ) {
-            cache.addObject(ObjectRole.REMOVED, id, interceptor.findObject(container.getObject(id).getId()));
+        if( removedBeans != null ) {
+            for( ObjexID id : removedBeans ) {
+                cache.addObject(ObjectRole.REMOVED, id, interceptor.findObject(container.getObject(id).getId()));
+            }
         }
         
         // Read in each new and updated object
         BeanReader reader = new BeanReader();
         if( beans != null ) beans.addAll(request.getObjects());
         else beans = request.getObjects();
-        for( ObjexObjStateBean bean : beans ) {
-            ObjexObj obj = container.getObject(bean.getId());
-            reader.readObject(bean, obj);
+        if( beans != null ) {
+            for( ObjexObjStateBean bean : beans ) {
+                ObjexObj obj = container.getObject(bean.getId());
+                reader.readObject(bean, obj);
+            }
         }
     
-        // FUTURE: Need to determine new references
         return null;
     }
     
