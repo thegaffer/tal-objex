@@ -1,4 +1,4 @@
-package org.talframework.objexj.object;
+package org.talframework.objexj.object.utils;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -12,6 +12,7 @@ import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.exceptions.ObjectErrorException;
+import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.objexj.validation.CurrentValidationRequest;
 import org.talframework.objexj.validation.SimpleValidationRequest;
 import org.talframework.objexj.validation.groups.FieldChangeGroup;

@@ -21,8 +21,8 @@ import javax.validation.ConstraintValidatorContext;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
-import org.talframework.objexj.object.SimpleFieldUtils;
 import org.talframework.objexj.object.testbeans.ProductBean;
+import org.talframework.objexj.object.utils.SimpleFieldUtils;
 import org.talframework.objexj.validation.object.SelfIntraObjectEnricher;
 import org.talframework.objexj.validation.object.SelfIntraObjectValidator;
 

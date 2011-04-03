@@ -1,7 +1,8 @@
-package org.talframework.objexj.object;
+package org.talframework.objexj.object.utils;
 
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.object.BaseObjexObj;
 
 /**
  * This static class contains various methods that the

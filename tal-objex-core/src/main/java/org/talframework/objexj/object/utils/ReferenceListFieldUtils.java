@@ -1,4 +1,4 @@
-package org.talframework.objexj.object;
+package org.talframework.objexj.object.utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,6 +8,7 @@ import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.object.BaseObjexObj;
 
 /**
  * This static class contains various methods that the

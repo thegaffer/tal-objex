@@ -35,7 +35,6 @@ import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
@@ -168,7 +167,7 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	 * 
 	 * @return The container
 	 */
-	protected InternalContainer getInternalContainer() {
+	public InternalContainer getInternalContainer() {
 	    checkInitialised();
 	    return container;
 	}

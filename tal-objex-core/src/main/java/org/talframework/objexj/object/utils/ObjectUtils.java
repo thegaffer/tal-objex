@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.object;
+package org.talframework.objexj.object.utils;
 
 import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;

@@ -18,6 +18,13 @@ package org.talframework.objexj.object;
 
 import org.talframework.objexj.ObjexID;
 
+/**
+ * This class can be used to create an ID that is temporary. This is
+ * when the container is saved any object with a temporary ID will be
+ * updated with it's correct ID.
+ *
+ * @author Tom Spencer
+ */
 public final class TempObjexID implements ObjexID {
     private static final long serialVersionUID = 1L;
     

@@ -25,11 +25,11 @@ import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
-import org.talframework.objexj.object.ReferenceFieldUtils;
-import org.talframework.objexj.object.ReferenceListFieldUtils;
-import org.talframework.objexj.object.ReferenceMapFieldUtils;
-import org.talframework.objexj.object.SimpleFieldUtils;
 import org.talframework.objexj.object.testbeans.CategoryBean;
+import org.talframework.objexj.object.utils.ReferenceFieldUtils;
+import org.talframework.objexj.object.utils.ReferenceListFieldUtils;
+import org.talframework.objexj.object.utils.ReferenceMapFieldUtils;
+import org.talframework.objexj.object.utils.SimpleFieldUtils;
 import org.talframework.objexj.validation.object.SelfInterObjectEnricher;
 import org.talframework.objexj.validation.object.SelfInterObjectValidator;
 

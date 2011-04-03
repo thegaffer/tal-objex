@@ -164,6 +164,13 @@ public interface Container {
     public boolean isOpen();
     
     /**
+     * Call to validate the container prior to a save
+     * 
+     * @return The validation request with the errors (if any)
+     */
+    public ValidationRequest validate();
+    
+    /**
      * Call to save the container. Once this is done the
      * no further changes can be made via this editable
      * container.

@@ -32,6 +32,7 @@ import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
+import org.talframework.objexj.object.utils.SimpleFieldUtils;
 import org.talframework.util.beans.BeanDefinition;
 import org.talframework.util.beans.definition.BeanDefinitionsSingleton;
 

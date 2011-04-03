@@ -22,8 +22,8 @@ import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
-import org.talframework.objexj.object.ReferenceListFieldUtils;
 import org.talframework.objexj.object.testbeans.StockBean;
+import org.talframework.objexj.object.utils.ReferenceListFieldUtils;
 
 /**
  * A test objex object that allows us to test elements of 

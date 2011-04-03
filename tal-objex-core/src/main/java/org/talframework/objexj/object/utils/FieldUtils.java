@@ -1,9 +1,10 @@
-package org.talframework.objexj.object;
+package org.talframework.objexj.object.utils;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.object.BaseObjexObj;
 import org.talframework.util.beans.BeanDefinition;
 import org.talframework.util.beans.definition.BeanDefinitionsSingleton;
 

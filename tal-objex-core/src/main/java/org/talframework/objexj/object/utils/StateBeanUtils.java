@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.object;
+package org.talframework.objexj.object.utils;
 
 import java.util.Iterator;
 import java.util.List;
