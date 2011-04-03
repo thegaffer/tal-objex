@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.objexj.object.utils.StateBeanUtils;
 
 /**
  * Base class for any bean class. Holds the objects

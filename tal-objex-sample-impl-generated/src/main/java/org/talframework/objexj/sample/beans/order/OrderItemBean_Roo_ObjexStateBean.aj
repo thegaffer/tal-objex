@@ -20,7 +20,7 @@ import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexStateWriter;
-import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.objexj.object.utils.StateBeanUtils;
 import org.talframework.util.beans.BeanComparison;
 
 privileged aspect OrderItemBean_Roo_ObjexStateBean {

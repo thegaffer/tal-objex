@@ -29,7 +29,7 @@ import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexStateWriter;
-import org.talframework.objexj.object.StateBeanUtils;
+import org.talframework.objexj.object.utils.StateBeanUtils;
 import org.talframework.objexj.sample.beans.BaseBean;
 
 /**

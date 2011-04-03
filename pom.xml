@@ -15,20 +15,24 @@
   	<module>tal-objex-parent</module>
   	<module>tal-objex-annotations</module>
   	<module>tal-objex-core</module>
-  	<module>tal-objex-roo-addon</module>
+  	<module>tal-objex-sample</module>
   	
-  	<!-- Sample -->
+  	<!-- Runtime Environments -->
+  	<module>tal-objex-gae</module>
+  	<module>tal-objex-gae-testapp</module>
+  	<module>tal-objex-runtime-webservice</module>
+  	<module>tal-objex-runtime-globals</module>
+  	
+  	<!-- Extensions -->
+  	<!-- Non-Proxy Objex -->
+  	<module>tal-objex-roo-addon</module>
   	<module>tal-objex-sample-api</module>
   	<module>tal-objex-sample-impl</module>
   	<module>tal-objex-sample-impl-generated</module>
   	
-  	<!-- Modules below provide runtime implementations of Objex -->
-  	<module>tal-objex-gae</module>
-  	<module>tal-objex-gae-testapp</module>
-  	<module>tal-objex-runtime-webservice</module>
-  	
-  	<!-- Maven Archetypes -->
+  	<!-- Maven Archetype Projects -->
   	<module>tal-objex-archetype-domain</module>
+  	
   </modules>
   
   <licenses>
@@ -107,7 +111,7 @@
       	<groupId>org.apache.maven.plugins</groupId>
       	<artifactId>maven-javadoc-plugin</artifactId>
       	<configuration>
-			<source>1.5</source>
+			<source>1.6</source>
 			<aggregate>true</aggregate>
 			<doclet>gr.spinellis.umlgraph.doclet.UmlGraphDoc</doclet>
 			<docletArtifact>
@@ -139,7 +143,7 @@
       	<groupId>org.apache.maven.plugins</groupId>
       	<artifactId>maven-pmd-plugin</artifactId>
       	<configuration>
-      		<targetJdk>1.5</targetJdk>
+      		<targetJdk>1.6</targetJdk>
       		<rulesets>
       			<ruleset>/rulesets/basic.xml</ruleset>
 				<ruleset>/rulesets/controversial.xml</ruleset>
