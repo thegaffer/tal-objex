@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+  	<groupId>org.talframework.objex</groupId>
+  	<artifactId>tal-objex-parent</artifactId>
+  	<version>1.0-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>tal-objex-sample</artifactId>
+  <name>Objex Sample</name>
+  <description>The project contains a number of sample Containers and Objects and is used to demonstrate Objex</description>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-core</artifactId>
+  		<version>${project.version}</version>
+  		<scope>test</scope>
+  	</dependency>
+  </dependencies>
+</project>
