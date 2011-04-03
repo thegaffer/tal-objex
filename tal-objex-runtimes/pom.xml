@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+  	<groupId>org.talframework.objex</groupId>
+  	<artifactId>tal-objex</artifactId>
+  	<version>1.0-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>tal-objex-runtimes</artifactId>
+  <packaging>pom</packaging>
+  
+  <name>Objex Runtimes</name>
+  <description>The runtime engines supported by Objex (at least thouse that are part of the source anyway)</description>
+  
+  <modules>
+  	<module>tal-objex-gae</module>
+  	<module>tal-objex-gae-testapp</module>
+  	<module>tal-objex-runtime-webservice</module>
+  	<module>tal-objex-runtime-globals</module>
+  </modules>
+</project>
