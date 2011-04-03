@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.SimpleFieldUtils;
+import org.talframework.objexj.object.utils.SimpleFieldUtils;
 
 privileged aspect ProductImpl_Roo_ObjexObj {
     

@@ -133,7 +133,7 @@ privileged aspect CategoryBean_Roo_ObjexStateBean {
     }
     
     public boolean CategoryBean.equals(Object obj) {
-        CategoryBean other = BeanComparison.basic(CategoryBean.class, this, obj);
+        CategoryBean other = BeanComparison.basic(this, obj);
         boolean same = other != null;
         if( same ) {
         	same = BeanComparison.equals(same, getId(), other.getId());

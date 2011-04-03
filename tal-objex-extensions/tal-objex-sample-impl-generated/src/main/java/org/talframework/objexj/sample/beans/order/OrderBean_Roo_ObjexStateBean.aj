@@ -131,7 +131,7 @@ privileged aspect OrderBean_Roo_ObjexStateBean {
     }
     
     public boolean OrderBean.equals(Object obj) {
-        OrderBean other = BeanComparison.basic(OrderBean.class, this, obj);
+        OrderBean other = BeanComparison.basic(this, obj);
         boolean same = other != null;
         if( same ) {
         	same = BeanComparison.equals(same, getId(), other.getId());

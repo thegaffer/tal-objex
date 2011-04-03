@@ -48,7 +48,7 @@ public class StateTempRefsGenerator extends BaseGenerator implements FieldVisito
         method.addParameter(new JavaSymbolName("refs"), refMap, null);
         
         // Update all reference properties
-        builder.getImportRegistrationResolver().addImport(new JavaType("org.talframework.objexj.object.StateBeanUtils"));
+        builder.getImportRegistrationResolver().addImport(new JavaType("org.talframework.objexj.object.utils.StateBeanUtils"));
         
         method.addBody("parentId = StateBeanUtils.updateTempReferences(parentId, refs);");
         Iterator<ObjexField> it = fields.iterator();

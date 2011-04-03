@@ -16,23 +16,10 @@
   	<module>tal-objex-annotations</module>
   	<module>tal-objex-core</module>
   	<module>tal-objex-sample</module>
-  	
-  	<!-- Runtime Environments -->
-  	<module>tal-objex-gae</module>
-  	<module>tal-objex-gae-testapp</module>
-  	<module>tal-objex-runtime-webservice</module>
-  	<module>tal-objex-runtime-globals</module>
-  	
-  	<!-- Extensions -->
-  	<!-- Non-Proxy Objex -->
-  	<module>tal-objex-roo-addon</module>
-  	<module>tal-objex-sample-api</module>
-  	<module>tal-objex-sample-impl</module>
-  	<module>tal-objex-sample-impl-generated</module>
-  	
-  	<!-- Maven Archetype Projects -->
-  	<module>tal-objex-archetype-domain</module>
-  	
+	
+	<module>tal-objex-extensions</module>
+	<module>tal-objex-runtimes</module>
+	<module>tal-objex-archetypes</module>
   </modules>
   
   <licenses>
@@ -90,13 +77,21 @@
   
   <build>
   	<plugins>
-  	  <plugin>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.0</version>
-        <configuration>
-          <tagBase>https://dev.tpspencer.org/svn/repo/tps-objexj/tags</tagBase>
-        </configuration>
-      </plugin>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-compiler-plugin</artifactId>
+  			<configuration>
+  				<source>1.6</source>
+  				<target>1.6</target>
+  			</configuration>
+  		</plugin>
+  	  	<plugin>
+        	<artifactId>maven-release-plugin</artifactId>
+        	<version>2.0</version>
+        	<configuration>
+          		<tagBase>https://dev.tpspencer.org/svn/repo/tps-objexj/tags</tagBase>
+        	</configuration>
+      	</plugin>
     </plugins>
   </build>
   

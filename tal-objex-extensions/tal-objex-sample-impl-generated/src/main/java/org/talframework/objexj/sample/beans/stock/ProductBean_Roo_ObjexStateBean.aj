@@ -140,7 +140,7 @@ privileged aspect ProductBean_Roo_ObjexStateBean {
     }
     
     public boolean ProductBean.equals(Object obj) {
-        ProductBean other = BeanComparison.basic(ProductBean.class, this, obj);
+        ProductBean other = BeanComparison.basic(this, obj);
         boolean same = other != null;
         if( same ) {
         	same = BeanComparison.equals(same, getId(), other.getId());

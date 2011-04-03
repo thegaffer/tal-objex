@@ -11,8 +11,8 @@ import javax.xml.bind.annotation.XmlType;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.ReferenceFieldUtils;
-import org.talframework.objexj.object.SimpleFieldUtils;
+import org.talframework.objexj.object.utils.ReferenceFieldUtils;
+import org.talframework.objexj.object.utils.SimpleFieldUtils;
 import org.talframework.objexj.sample.api.stock.Product;
 
 privileged aspect OrderItemImpl_Roo_ObjexObj {

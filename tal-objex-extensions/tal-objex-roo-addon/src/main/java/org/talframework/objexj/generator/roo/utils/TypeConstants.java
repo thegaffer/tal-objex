@@ -22,11 +22,11 @@ public class TypeConstants {
     // Object
     
     public static final String BASEOBJ = "org.talframework.objexj.object.BaseObjexObj";
-    public static final String SIMPLEUTILS = "org.talframework.objexj.object.SimpleFieldUtils";
-    public static final String REFUTILS = "org.talframework.objexj.object.ReferenceFieldUtils";
-    public static final String REFLISTUTILS = "org.talframework.objexj.object.ReferenceListFieldUtils";
-    public static final String REFMAPUTILS = "org.talframework.objexj.object.ReferenceMapFieldUtils";
-    public static final String BEANUTILS = "org.talframework.objexj.object.StateBeanUtils";
+    public static final String SIMPLEUTILS = "org.talframework.objexj.object.utils.SimpleFieldUtils";
+    public static final String REFUTILS = "org.talframework.objexj.object.utils.ReferenceFieldUtils";
+    public static final String REFLISTUTILS = "org.talframework.objexj.object.utils.ReferenceListFieldUtils";
+    public static final String REFMAPUTILS = "org.talframework.objexj.object.utils.ReferenceMapFieldUtils";
+    public static final String BEANUTILS = "org.talframework.objexj.object.utils.StateBeanUtils";
     
     ///////////////////////////////
     // Validation

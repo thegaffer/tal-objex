@@ -78,7 +78,7 @@ public class StateBeanGenerator extends BaseGenerator {
         
         MethodMetadataWrapper ret = new MethodMetadataWrapper(new JavaSymbolName("equals"), JavaType.BOOLEAN_PRIMITIVE);
         ret.addParameter("obj", "Object", null);
-        ret.addBody(typeDetails.getName().getSimpleTypeName() + " other = BeanComparison.basic(" + typeDetails.getName().getSimpleTypeName() + ".class, this, obj);");
+        ret.addBody(typeDetails.getName().getSimpleTypeName() + " other = BeanComparison.basic(this, obj);");
         ret.addBody("boolean same = other != null;");
         ret.addBody("if( same ) {");
         ret.addBody("\tsame = BeanComparison.equals(same, getId(), other.getId());");
