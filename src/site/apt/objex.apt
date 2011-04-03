@@ -3,11 +3,14 @@ Objex
  Objex is a concept of how to visual enterprise systems and it is a
  framework supporting that concept.
  
- The main driver behind Objex is to support true Object Orientated 
- systems whereby both data and processes are considered together.
- Very often, particularly in Enterprise systems, largely I think due
- to the widespread use of Relational Databases the object view becomes
- obscured. Objex is a way to put OO at the very heart of applications.
+ There are actually two drivers behind Objex. The first is a Document
+ Orientated approach to enterprise systems - everything is a document
+ of some form. The second is a true Object Orientated approach within
+ the documents, whereby both data and behaviour/process is considered
+ together. Very often, particularly in Enterprise systems, largely I 
+ think due to the widespread use of Relational Databases the object view 
+ becomes obscured. Objex is a way to put documents and OO at the very 
+ heart of applications.
  
 Concept
 

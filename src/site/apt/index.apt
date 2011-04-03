@@ -2,18 +2,24 @@ Objex
 
   Welcome to the site for the Tal Framework Objex project.
   
-  Objex is a framework for creating behaviourally rich persistable business domains.
-  Objex strives to put the concepts of Object Orientism OO first and abstract away
-  the actual persistence. Objex is not, however, an ORM tool - you will still potentially
-  need one of these if using a relational database. Objex simply provides a framework
-  where you can describe you objects and define rich behaviour and collaboration
-  between the objects, relegating the actual persistence into it's own separate layer 
-  where you can concentrate on it separately.
+  Ever noticed that Enterprises don't actually work on neat tables of two dimensional
+  data, but instead fundamentally work by creating, processing and updating documents.
   
-  I use Objex for development and therefore, support it for that purpose. Although
-  licensed as Open Source, it is not aimed as mass open-source framework. I'd welcome
-  comments and would like the framework to provoke thought and perhaps for some of
-  the ideas to make their way into mainstream frameworks.
+  Our databases systems, however, do tend to group data by type - so all invoice items,
+  for example, are grouped together, when in fact it would make more sense to group
+  them by invoice. This in itself is not neccessarily bad, there may be good technical
+  reasons for grouping the data in this way. However, what constantly amazes me is that
+  we still very often create our systems around the fact that all data of a particular
+  type is stored together. Even ORM technologies often encourage this thinking.
+  
+  Objex represents my personal thoughts on redressing the balance. A framework that
+  encourages systems to be build around the concept of a document. Where the document
+  contains objects that reference and interact with one another. But, where the integrity
+  of the document is the most important concept.  
+  
+  Please note that this project is just a personal project. Although licensed as Open
+  Source, it's real purpose is as a vehicle for me to explore my ideas - not set the
+  world alight. If your interested in the ideas then I'd love to hear from you.
   
 Releases
 

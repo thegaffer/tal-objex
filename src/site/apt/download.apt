@@ -21,11 +21,21 @@ Installation
   <artifactId>tal-objex-annotations</artifactId>
 </dependency>
 
-<!-- The core which your code or generated code will depend upon --> 
+<!-- The core which your code or generated code will depend upon 
+     This also includes a runtime in-memory engine --> 
 <dependency>
   <groupId>org.talframework.objex</groupId>
   <artifactId>tal-objex-core</artifactId>
 </dependency>
+
+<!-- A runtime environment using the free GlobalsDB.
+	 GlobalsDB will need to be on your system at present -->
+<dependency>
+  <groupId>org.talframework.objex</groupId>
+  <artifactId>tal-objex-runtime-globals</artifactId>
+  <scope>runtime</scope> <!-- You should not compile against this -->
+</dependency>
++--
 
 <!-- A runtime environment, here we use Google App Engine -->
 <dependency>

@@ -25,6 +25,8 @@ Version 1.1
 
   Version 1.1 will concentrate on adding more runtime environments.
   
+    * Globals DB runtime engine
+  
     * Amazon Web Service platform, using SimpleDB, RDB and the Queing service
     
     * Web Service access to Containers and Web Service client runtime environment to

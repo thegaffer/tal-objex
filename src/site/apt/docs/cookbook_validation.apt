@@ -19,6 +19,7 @@ Validation Basics
     
     * Child validation where you check that any children, some of which
     might have changed, are still valid as far as the parent is concerned.
+    Ultimately this validation is applied to the document or container.
     
   Objects applies all 4 levels of validation and allows you to separate 
   them. All you need to decide is in what level your validation rule

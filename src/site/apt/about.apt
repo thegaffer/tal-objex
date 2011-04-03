@@ -1,12 +1,17 @@
-  Objex is somewhat a labour of love, the ideas of which I have worked with for over
-  a decade. It encapsulates what I think are the best patterns surrounding OO domains
-  and exists to make it both easier to create those elements of a system and crucially
-  to make them more maintainable.
+  Objex is a long-term personal project for its author Tom Spencer. I conceived the idea
+  in the mid-nineties after constructing my first software project. I was shocked about
+  the concepts of the relational database and how fundamentally it stored information 
+  together that had no business relationship. I could not understand how such a model could 
+  scale.
   
-  I use Objex for my development and projects and license it as open-source, however, 
-  I do not propose it as a wide spread open source framework. It allows me to increase
-  the value of my own projects such that the core can be maintained and developed
-  independently of me.
+  I of course now understand more of the constraints that do or have existed that made 
+  relational database technology mainstream, and some of the mechanisms the RDBMS vendors 
+  have for scalability. I still fundamentally hold the belief though that when I pull a 
+  file from a filing cabinet the speed at which I can find information inside that file 
+  should be proportional to the amount of information inside the file, not proportional to 
+  the amount of similar pieces of information that exist across all the files in the filing
+  cabinet.
   
-  I also use Objex and the wider Tal Framework to demonstrate my own skill set, and
-  to keep my skills up to date, even if not actually using the framework in anger.
+  So over the years Objex has been a way of expressing and proving some of these ideas.
+  I've partially implemented it in both C++ and Java, although currently it is only the
+  Java version I actively work on. 
