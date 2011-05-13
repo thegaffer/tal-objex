@@ -26,11 +26,11 @@ import org.talframework.util.beans.BeanComparison;
 
 privileged aspect ProductBean_Roo_ObjexStateBean {
     
-    declare parents: ProductBean implements ObjexObjStateBean;
+    declare parents: Product implements ObjexObjStateBean;
     
-    declare @type: ProductBean: @PersistenceCapable;
+    declare @type: Product: @PersistenceCapable;
     
-    declare @type: ProductBean: @XmlRootElement;
+    declare @type: Product: @XmlRootElement;
     
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)

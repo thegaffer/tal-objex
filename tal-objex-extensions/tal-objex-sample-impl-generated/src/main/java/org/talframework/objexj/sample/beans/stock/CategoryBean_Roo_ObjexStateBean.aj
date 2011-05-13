@@ -26,11 +26,11 @@ import org.talframework.util.beans.BeanComparison;
 
 privileged aspect CategoryBean_Roo_ObjexStateBean {
     
-    declare parents: CategoryBean implements ObjexObjStateBean;
+    declare parents: Category implements ObjexObjStateBean;
     
-    declare @type: CategoryBean: @PersistenceCapable;
+    declare @type: Category: @PersistenceCapable;
     
-    declare @type: CategoryBean: @XmlRootElement;
+    declare @type: Category: @XmlRootElement;
     
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)

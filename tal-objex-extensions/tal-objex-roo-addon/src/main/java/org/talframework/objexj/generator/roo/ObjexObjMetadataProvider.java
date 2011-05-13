@@ -25,7 +25,7 @@ import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.talframework.objexj.annotations.ObjexObj;
+import org.talframework.objexj.annotations.source.ObjexObj;
 import org.talframework.objexj.generator.roo.annotations.ObjexObjAnnotation;
 
 /**

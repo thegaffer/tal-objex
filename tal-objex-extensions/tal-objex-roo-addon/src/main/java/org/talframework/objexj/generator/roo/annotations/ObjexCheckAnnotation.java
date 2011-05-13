@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
-import org.talframework.objexj.annotations.ObjexCheck;
+import org.talframework.objexj.annotations.source.ObjexCheck;
 import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 
 /**

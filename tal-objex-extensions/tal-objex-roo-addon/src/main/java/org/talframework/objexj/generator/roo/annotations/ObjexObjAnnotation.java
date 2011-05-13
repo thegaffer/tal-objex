@@ -21,7 +21,7 @@ import org.springframework.roo.classpath.details.annotations.populator.AbstractA
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.model.JavaType;
-import org.talframework.objexj.annotations.ObjexObj;
+import org.talframework.objexj.annotations.source.ObjexObj;
 
 public class ObjexObjAnnotation extends AbstractAnnotationValues {
     

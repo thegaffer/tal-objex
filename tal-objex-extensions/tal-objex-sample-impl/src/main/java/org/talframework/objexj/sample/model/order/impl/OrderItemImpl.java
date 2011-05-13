@@ -30,7 +30,7 @@ import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.locator.SingletonContainerLocator;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.SimpleObjectStrategy;
+import org.talframework.objexj.object.DefaultObjectStrategy;
 import org.talframework.objexj.object.utils.ObjectUtils;
 import org.talframework.objexj.sample.api.order.OrderItem;
 import org.talframework.objexj.sample.api.stock.Product;
@@ -47,7 +47,7 @@ import org.talframework.objexj.sample.beans.order.OrderItemBean;
 @XmlType(name="OrderItem")
 @XmlAccessorType(XmlAccessType.NONE)
 public class OrderItemImpl extends BaseObjexObj implements OrderItem {
-    public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class);
+    public static final ObjectStrategy STRATEGY = new DefaultObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class);
     
     private final OrderItemBean bean;
     

@@ -17,7 +17,7 @@
 package org.talframework.objexj.sample.model.stock.impl;
 
 import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.annotations.ObjexObj;
+import org.talframework.objexj.annotations.source.ObjexObj;
 import org.talframework.objexj.sample.api.stock.Product;
 import org.talframework.objexj.sample.beans.stock.ProductBean;
 

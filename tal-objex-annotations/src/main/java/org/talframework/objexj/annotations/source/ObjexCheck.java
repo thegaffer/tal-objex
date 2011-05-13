@@ -1,4 +1,4 @@
-package org.talframework.objexj.annotations;
+package org.talframework.objexj.annotations.source;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

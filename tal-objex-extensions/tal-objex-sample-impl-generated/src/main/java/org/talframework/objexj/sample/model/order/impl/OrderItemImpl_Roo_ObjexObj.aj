@@ -29,14 +29,14 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     
     @XmlAttribute
     public String OrderItemImpl.getRef() {
-        String rawValue = bean.getRef();
+        String rawValue = bean.getId();
         String val = rawValue;
         return val;
     }
     
     public void OrderItemImpl.setRef(String val) {
         String rawValue = val;
-        bean.setRef(SimpleFieldUtils.setSimple(this, bean, "ref", rawValue, bean.getRef()));
+        bean.setId(SimpleFieldUtils.setSimple(this, bean, "ref", rawValue, bean.getId()));
     }
     
     @XmlAttribute
@@ -131,9 +131,9 @@ privileged aspect OrderItemImpl_Roo_ObjexObj {
     }
     
     public void OrderItemImpl.acceptReader(ObjexStateReader reader) {
-        String ref = bean.getRef();
+        String ref = bean.getId();
         String new_ref = reader.read("ref", ref, java.lang.String.class, ObjexFieldType.STRING, true);
-        if( new_ref != ref ) setRef(new_ref);
+        if( new_ref != ref ) setId(new_ref);
         String name = bean.getName();
         String new_name = reader.read("name", name, java.lang.String.class, ObjexFieldType.STRING, true);
         if( new_name != name ) setName(new_name);

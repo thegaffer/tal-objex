@@ -30,7 +30,7 @@ import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.SimpleObjectStrategy;
+import org.talframework.objexj.object.DefaultObjectStrategy;
 import org.talframework.objexj.sample.api.stock.Product;
 import org.talframework.objexj.sample.beans.stock.ProductBean;
 
@@ -45,7 +45,7 @@ import org.talframework.objexj.sample.beans.stock.ProductBean;
 @XmlType(name="Product")
 @XmlAccessorType(XmlAccessType.NONE)
 public class ProductImpl extends BaseObjexObj implements Product { 
-    public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Product", ProductImpl.class, ProductBean.class);
+    public static final ObjectStrategy STRATEGY = new DefaultObjectStrategy("Product", ProductImpl.class, ProductBean.class);
     
     private final ProductBean bean;
     

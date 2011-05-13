@@ -16,8 +16,8 @@
 
 package org.talframework.objexj.sample.beans.order;
 
-import org.talframework.objexj.annotations.ObjexRefProp;
-import org.talframework.objexj.annotations.ObjexStateBean;
+import org.talframework.objexj.annotations.source.ObjexRefProp;
+import org.talframework.objexj.annotations.source.ObjexStateBean;
 import org.talframework.objexj.sample.api.stock.Product;
 
 /**

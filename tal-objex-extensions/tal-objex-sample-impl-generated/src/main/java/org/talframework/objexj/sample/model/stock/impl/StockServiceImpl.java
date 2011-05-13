@@ -23,7 +23,7 @@ import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.container.impl.SimpleContainerStrategy;
 import org.talframework.objexj.locator.ContainerFactory;
 import org.talframework.objexj.locator.SimpleContainerFactory;
-import org.talframework.objexj.object.SimpleObjectStrategy;
+import org.talframework.objexj.object.DefaultObjectStrategy;
 import org.talframework.objexj.sample.api.repository.StockRepository;
 import org.talframework.objexj.sample.api.repository.StockService;
 import org.talframework.objexj.sample.api.stock.Category;
@@ -31,8 +31,8 @@ import org.talframework.objexj.sample.beans.stock.CategoryBean;
 import org.talframework.objexj.sample.beans.stock.ProductBean;
 
 public class StockServiceImpl implements StockService {
-    public static final ObjectStrategy CATEGORY_STRATEGY = new SimpleObjectStrategy("Category", CategoryImpl.class, CategoryBean.class);
-    public static final ObjectStrategy PRODUCT_STRATEGY = new SimpleObjectStrategy("Product", ProductImpl.class, ProductBean.class);
+    public static final ObjectStrategy CATEGORY_STRATEGY = new DefaultObjectStrategy("Category", CategoryImpl.class, CategoryBean.class);
+    public static final ObjectStrategy PRODUCT_STRATEGY = new DefaultObjectStrategy("Product", ProductImpl.class, ProductBean.class);
     
     /** Holds the Objex factory for the order container type */
     private final ContainerFactory locator;

@@ -18,8 +18,8 @@ package org.talframework.objexj.sample.beans.stock;
 
 import java.util.List;
 
-import org.talframework.objexj.annotations.ObjexRefProp;
-import org.talframework.objexj.annotations.ObjexStateBean;
+import org.talframework.objexj.annotations.source.ObjexRefProp;
+import org.talframework.objexj.annotations.source.ObjexStateBean;
 import org.talframework.objexj.sample.api.stock.Category;
 import org.talframework.objexj.sample.api.stock.Product;
 

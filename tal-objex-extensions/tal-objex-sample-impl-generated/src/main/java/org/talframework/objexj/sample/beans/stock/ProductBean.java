@@ -18,7 +18,7 @@ package org.talframework.objexj.sample.beans.stock;
 
 import java.util.Date;
 
-import org.talframework.objexj.annotations.ObjexStateBean;
+import org.talframework.objexj.annotations.source.ObjexStateBean;
 
 /**
  * Represents a product in our companies stock list

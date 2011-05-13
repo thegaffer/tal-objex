@@ -22,7 +22,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.model.JavaType;
-import org.talframework.objexj.annotations.ObjexRefProp;
+import org.talframework.objexj.annotations.source.ObjexRefProp;
 import org.talframework.objexj.generator.roo.utils.TypeConstants;
 import org.talframework.objexj.generator.roo.utils.TypeDetailsUtil;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.annotations;
+package org.talframework.objexj.annotations.source;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,15 +22,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation indicates the class is an Objex behaviour
- * bean and includes as its value the state bean. The Objex
- * generators then ensures there are appropriate accessor
- * methods around all the members.
+ * This annotation indicates that the method will update
+ * the object. The generators ensure that the object is
+ * in a transaction before allowing the method to proceed.
+ * There is no need to mark a method prefixed 'set' with
+ * this annotation.
  * 
  * @author Tom Spencer
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface ObjexObj {
-    Class<?> value();
+public @interface ObjexUpdateMethod {
+
 }

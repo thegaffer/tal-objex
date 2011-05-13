@@ -20,5 +20,7 @@
   	<module>tal-objex-gae-testapp</module>
   	<module>tal-objex-runtime-webservice</module>
   	<module>tal-objex-runtime-globals</module>
+  	<module>tal-objex-runtime-gae</module>
+  	<module>tal-objex-runtime-sql</module>
   </modules>
 </project>

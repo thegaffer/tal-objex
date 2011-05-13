@@ -9,7 +9,7 @@
   
   <artifactId>tal-objex-runtime-globals</artifactId>
   <name>Objex Runtime Globals</name>
-  <description>Objex Runtime engine using the GlobalsDB.org Database</description>
+  <description>An Objex runtime persistence engine using the GlobalsDB.org Database</description>
   
   <properties>
   	<globalsdb.version>1.0</globalsdb.version>

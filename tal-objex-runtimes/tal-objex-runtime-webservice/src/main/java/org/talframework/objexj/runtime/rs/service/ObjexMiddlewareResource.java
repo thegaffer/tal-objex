@@ -40,7 +40,7 @@ import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.exceptions.ContainerInvalidException;
 import org.talframework.objexj.locator.InterceptingContainerFactory;
 import org.talframework.objexj.object.RecursiveObjectCompiler;
-import org.talframework.objexj.object.writer.BeanReader;
+import org.talframework.objexj.object.writer.BeanObjectReader;
 import org.talframework.objexj.runtime.rs.MiddlewareRequest;
 import org.talframework.objexj.runtime.rs.MiddlewareResult;
 import org.talframework.tal.aspects.annotations.Profile;
@@ -196,7 +196,7 @@ public abstract class ObjexMiddlewareResource {
         }
         
         // Read in each new and updated object
-        BeanReader reader = new BeanReader();
+        BeanObjectReader reader = new BeanObjectReader();
         if( beans != null ) beans.addAll(request.getObjects());
         else beans = request.getObjects();
         if( beans != null ) {

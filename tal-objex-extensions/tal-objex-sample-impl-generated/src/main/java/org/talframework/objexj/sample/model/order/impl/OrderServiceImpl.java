@@ -23,7 +23,7 @@ import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.container.impl.SimpleContainerStrategy;
 import org.talframework.objexj.locator.ContainerFactory;
 import org.talframework.objexj.locator.SimpleContainerFactory;
-import org.talframework.objexj.object.SimpleObjectStrategy;
+import org.talframework.objexj.object.DefaultObjectStrategy;
 import org.talframework.objexj.sample.api.order.OrderSummary;
 import org.talframework.objexj.sample.api.repository.OrderRepository;
 import org.talframework.objexj.sample.api.repository.OrderService;
@@ -36,8 +36,8 @@ import org.talframework.objexj.sample.beans.order.OrderItemBean;
  * @author Tom Spencer
  */
 public class OrderServiceImpl implements OrderService {
-    public static final ObjectStrategy ORDER_STRATEGY = new SimpleObjectStrategy("Order", OrderImpl.class, OrderBean.class);
-    public static final ObjectStrategy ITEM_STRATEGY = new SimpleObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class);
+    public static final ObjectStrategy ORDER_STRATEGY = new DefaultObjectStrategy("Order", OrderImpl.class, OrderBean.class);
+    public static final ObjectStrategy ITEM_STRATEGY = new DefaultObjectStrategy("OrderItem", OrderItemImpl.class, OrderItemBean.class);
     
     /** Holds the Objex factory for the order container type */
 	private ContainerFactory locator;

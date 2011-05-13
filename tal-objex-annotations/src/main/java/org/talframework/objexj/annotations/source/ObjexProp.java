@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.annotations;
+package org.talframework.objexj.annotations.source;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,29 +22,29 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation represents an ObjexProperty. All
- * fields of the state bean are treated as Objex
- * properties, but using this allows finer control
- * over the publically exposed property including
- * changing it's name and type.
+ * This annotation marks a property that should be exposed on
+ * the bean and any natural interface linked to this type. Note
+ * that all properties of a class marked with {@link ObjexObj}
+ * are considered object properties, but this allows finer
+ * control. 
  * 
  * @author Tom Spencer
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface ObjexProp {
-    /** Holds the optional name of the external property */
-    String externalName() default "";
-    /** Holds the type to expose the property as (if Object then ignored) */
-    Class<?> exposeAs() default Object.class;
-    /** Optional class to perform transformation on, can be the same as the exposeAs if it natively support it */
-    Class<?> transformerClass() default Object.class;
-    /** Name of a function on static class or inside the object that performs get transformation */
-    String transformerGetFunction() default "";
-    /** Name of a function on transformer or target object that performs set transformation */
-    String transformerSetFunction() default "";
     /** Determines if the field is gettable externally */
     boolean gettable() default true;
     /** Determines if the field is settable externally */
     boolean settable() default true;
+    /** Holds the optional name of the external property, i.e. the getter/setter */
+    String externalName() default "";
+    /** Holds the type to expose the property as (if Object then the type of the property is used) */
+    Class<?> exposeAs() default Object.class;
+    /** Optional class with static methods that we can perform the transformations with */
+    Class<?> transformerClass() default Object.class;
+    /** Name of a function on transformer class or non-static inside this object that performs get transformation */
+    String transformerGetFunction() default "";
+    /** Name of a function on transformer class or non-static inside this object that performs set transformation */
+    String transformerSetFunction() default "";
 }

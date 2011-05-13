@@ -11,6 +11,10 @@
   <name>Objex GAE</name>
   <description>An implemenation of the containers and glue logic for running in Googles App Engine environment</description>
   
+  <properties>
+  	<version.gae>1.3.2</version.gae>
+  </properties>
+  
   <dependencies>
   	<dependency>
   		<groupId>org.talframework.objex</groupId>

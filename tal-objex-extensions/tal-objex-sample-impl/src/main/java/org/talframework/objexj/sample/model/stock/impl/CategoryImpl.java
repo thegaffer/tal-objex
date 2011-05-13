@@ -33,7 +33,7 @@ import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.SimpleObjectStrategy;
+import org.talframework.objexj.object.DefaultObjectStrategy;
 import org.talframework.objexj.object.xml.XmlObjexObj;
 import org.talframework.objexj.sample.api.stock.Category;
 import org.talframework.objexj.sample.api.stock.Product;
@@ -50,7 +50,7 @@ import org.talframework.objexj.sample.beans.stock.CategoryBean;
 @XmlType(name="Category")
 @XmlAccessorType(XmlAccessType.NONE)
 public class CategoryImpl extends BaseObjexObj implements Category {
-    public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Category", CategoryImpl.class, CategoryBean.class);
+    public static final ObjectStrategy STRATEGY = new DefaultObjectStrategy("Category", CategoryImpl.class, CategoryBean.class);
     
     private final CategoryBean bean;
     

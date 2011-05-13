@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.annotations;
+package org.talframework.objexj.annotations.source;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,14 +22,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation indicates that the class represents the
- * persistable state of an Objex object.
+ * This annotation marks the object as being an Objex object.
+ * A behaviour domain object. When the generators see this they
+ * generate out the appropriate code to make this an actual
+ * Objex object.
  * 
  * @author Tom Spencer
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface ObjexStateBean {
-    long version() default 1;
-    String name();
+public @interface ObjexObj {
 }

@@ -32,7 +32,7 @@ import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 import org.talframework.objexj.container.ObjectStrategy;
 import org.talframework.objexj.object.BaseObjexObj;
-import org.talframework.objexj.object.SimpleObjectStrategy;
+import org.talframework.objexj.object.DefaultObjectStrategy;
 import org.talframework.objexj.sample.api.order.Order;
 import org.talframework.objexj.sample.api.order.OrderItem;
 import org.talframework.objexj.sample.beans.order.OrderBean;
@@ -48,7 +48,7 @@ import org.talframework.objexj.sample.beans.order.OrderBean;
 @XmlType(name="Order")
 @XmlAccessorType(XmlAccessType.NONE)
 public class OrderImpl extends BaseObjexObj implements Order {
-    public static final ObjectStrategy STRATEGY = new SimpleObjectStrategy("Order", OrderImpl.class, OrderBean.class);
+    public static final ObjectStrategy STRATEGY = new DefaultObjectStrategy("Order", OrderImpl.class, OrderBean.class);
     
     private final OrderBean bean;
     

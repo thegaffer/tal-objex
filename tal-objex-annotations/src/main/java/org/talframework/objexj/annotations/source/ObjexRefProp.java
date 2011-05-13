@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-package org.talframework.objexj.annotations;
+package org.talframework.objexj.annotations.source;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * 
+ * This annotation marks the property as a reference property.
+ * The property must either be a reference to an interface or
+ * a list, set or map holding elements of an interface. The
+ * list, set or map must be the interface versions only, i.e.
+ * {@link List}, {@link Set} or {@link Map} - these will be
+ * set by Objex in runtime instances.
  * 
  * @author Tom Spencer
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface ObjexRefProp {
-    /** Holds the optional name of the external property */
-    String externalName() default "";
     /** Indicates if the property is considered owned */
     boolean owned() default true;
-    /** The type to expose the references as */
-    Class<?> type();
-    /** The type of object to create against this property if fixed */
-    String newType() default "";
+    /** Holds the optional name of the external property */
+    String externalName() default "";
     /** Determines if the field is gettable externally */
     boolean gettable() default true;
     /** Determines if the field is settable externally */

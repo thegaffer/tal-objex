@@ -45,7 +45,7 @@ import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest.ValidationType;
 import org.talframework.objexj.exceptions.ContainerInvalidException;
 import org.talframework.objexj.locator.InterceptingContainerFactory;
-import org.talframework.objexj.object.writer.BeanReader;
+import org.talframework.objexj.object.writer.BeanObjectReader;
 import org.talframework.objexj.query.DefaultQueryRequest;
 import org.talframework.objexj.runtime.rs.ContainerResult;
 import org.talframework.objexj.validation.CurrentValidationRequest;
@@ -228,7 +228,7 @@ public abstract class ObjexContainerResource {
         try {
             CurrentValidationRequest.start(request);
             
-            BeanReader reader = new BeanReader(true, true, true);
+            BeanObjectReader reader = new BeanObjectReader(true, true, true);
             reader.readObject(bean, obj);
             
             request.setType(ValidationType.INTRA_OBJECT);
@@ -277,7 +277,7 @@ public abstract class ObjexContainerResource {
             try {
                 CurrentValidationRequest.start(request);
                 
-                BeanReader reader = new BeanReader(true, true, true);
+                BeanObjectReader reader = new BeanObjectReader(true, true, true);
                 reader.readObject(bean, newObj);
                 
                 request.setType(ValidationType.INTRA_OBJECT);

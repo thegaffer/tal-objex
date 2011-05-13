@@ -32,7 +32,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.talframework.objexj.annotations.ObjexStateBean;
+import org.talframework.objexj.annotations.source.ObjexStateBean;
 import org.talframework.objexj.generator.roo.annotations.ObjexObjStateBeanAnnotation;
 import org.talframework.objexj.generator.roo.compiler.PropertyCompiler;
 import org.talframework.objexj.generator.roo.fields.ObjexField;
