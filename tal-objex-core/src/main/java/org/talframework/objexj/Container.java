@@ -47,6 +47,18 @@ public interface Container {
 	public ObjexObj getRootObject();
 	
 	/**
+	 * This convienience method allows you to get the ID of object when
+	 * you are not sure if you have an ObjexObj or not. As containers
+	 * understand the business types of objects they can also inspect
+	 * non-ObjexObj objects to see if it holds values where the ID is
+	 * held.
+     * 
+     * @param obj
+     * @return
+     */
+    public ObjexID getIdOfObject(Object obj);
+    
+    /**
 	 * Get an object given its ID
 	 * 
 	 * @param id The ID of the object (may be an ObjexID, may be a string)

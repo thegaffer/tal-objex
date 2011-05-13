@@ -16,14 +16,13 @@
 
 package org.talframework.objexj.object;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
+import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -34,19 +33,29 @@ import org.talframework.objexj.Container;
 import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.ObjexStateWriter;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.container.ObjectStrategy;
+import org.talframework.objexj.container.ObjectStrategy.PropertyCharacteristic;
+import org.talframework.objexj.container.ObjectStrategy.PropertyStrategy;
+import org.talframework.objexj.container.ObjectStrategy.PropertyTypeEnum;
+import org.talframework.objexj.exceptions.ObjectErrorException;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
+import org.talframework.objexj.exceptions.ObjectInvalidException;
+import org.talframework.objexj.validation.CurrentValidationRequest;
 import org.talframework.objexj.validation.SimpleValidationRequest;
 import org.talframework.objexj.validation.groups.ChildGroup;
+import org.talframework.objexj.validation.groups.FieldChangeGroup;
 import org.talframework.objexj.validation.groups.FieldGroup;
 import org.talframework.objexj.validation.groups.InterObjectEnrichmentGroup;
 import org.talframework.objexj.validation.groups.InterObjectGroup;
 import org.talframework.objexj.validation.groups.IntraObjectEnrichmentGroup;
 import org.talframework.objexj.validation.groups.IntraObjectGroup;
+import org.talframework.util.beans.BeanDefinition;
+import org.talframework.util.beans.definition.BeanDefinitionsSingleton;
 
 /**
  * Base class for an ObjexObj. Most basic methods are implemented
@@ -89,13 +98,32 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	}
 	
 	/**
-	 * Called to get the state bean. This is mainly present so
-	 * we can mark the state bean for validation.
+	 * Called to get the object that represents the real business
+	 * object which holds the properties.
 	 * 
-	 * @return
+	 * <p>The default implementation simply returns this and so
+	 * gets all the properties etc from itself.</p> 
+	 * 
+	 * @return The state bean
 	 */
-	@Valid
-	protected abstract ObjexObjStateBean getStateBean();
+	protected Object getStateBean() {
+	    return this;
+	}
+	
+	/**
+	 * This is called during the base classes implementation of the
+	 * acceptReader/Writer and setProperty methods. These methods are
+	 * implemented against the state bean using the Object Strategy
+	 * for guidance. There may be better ways to implement these methods,
+	 * particularly when the business object derives from this class
+	 * directly. Otherwise, simply return the ObjectStrategy object
+	 * to get this behaviour.
+	 * 
+	 * @return The object strategy for the object if known
+	 */
+	protected ObjectStrategy getStrategy() {
+	    return null;
+	}
 	
 	////////////////////////////////////////////
     // ObjexObj Methods
@@ -112,7 +140,8 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	}
 	
 	/**
-	 * Default is simple name of outer class
+	 * Default is simple name of this class (the most derived class).
+	 * Typically overridden in derived classes.
 	 */
 	public String getType() {
 	    checkInitialised();
@@ -125,6 +154,17 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	public ObjexID getParentId() {
 	    checkInitialised();
 		return parentId;
+	}
+	
+	/**
+	 * Exposed as a protected method to allow derived class to implement the
+	 * acceptReader method and read this in.
+	 * 
+	 * @param parentId The parent ID to set to
+	 */
+	protected void setParentId(ObjexID parentId) {
+	    this.parentId = parentId;
+	    this.parent = null;
 	}
 	
 	/**
@@ -183,14 +223,6 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	}
 	
 	/**
-	 * Passes the writer to the state bean. The derived class should
-	 * override if it has non-persistent fields.
-	 */
-	public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
-	    getStateBean().acceptWriter(writer, includeNonPersistent);
-	}
-	
-	/**
 	 * Simply checks if we are in an Editable Container
 	 */
 	public boolean isUpdateable() {
@@ -205,17 +237,27 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	public Object getProperty(String name) {
 	    checkInitialised();
 	    
-	    try {
-	        PropertyDescriptor prop = getPropertyDescriptor(name);
-	        if( prop.getReadMethod() == null ) throw new ObjectFieldInvalidException(name, "No read method available");
-	        return prop.getReadMethod().invoke(this, (Object[])null);
-	    }
-	    catch( RuntimeException e ) {
-	        throw e;
-	    }
-	    catch( Exception e ) {
-	        throw new ObjectFieldInvalidException(name, e.getMessage(), e);
-	    }
+	    Object ret = null;
+	    
+	    // See if property on the state bean
+	    Object state = getStateBean();
+	    BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
+        if( def.hasProperty(name) ) {
+            if( def.canRead(name) ) ret = def.read(state, name);
+            else throw new ObjectFieldInvalidException(name, "Field not readable");
+        }
+        
+        // Test for common attributes
+        else {
+            if( "id".equals(name) ) ret = getId();
+            else if( "parent".equals(name) ) ret = getParent();
+            else if( "parentId".equals(name) ) ret = getParentId();
+            else if( "type".equals(name) ) ret = getType();
+            else if( "container".equals(name) ) ret = getContainer();
+            else throw new ObjectFieldInvalidException(name, "Unknown field");
+        }
+        
+        return ret;
 	}
 	
 	/**
@@ -245,78 +287,39 @@ public abstract class BaseObjexObj implements InternalObjexObj {
 	public void setProperty(String name, Object val) {
 	    checkUpdateable();
 	    
-	    try {
-            PropertyDescriptor prop = getPropertyDescriptor(name);
-            if( prop.getWriteMethod() == null ) throw new ObjectFieldInvalidException(name, "No write method available");
-            prop.getWriteMethod().invoke(this, val);
+	    Object state = getStateBean();
+	    ObjectStrategy strategy = getStrategy();
+	    if( strategy == null ) throw new UnsupportedOperationException("Generic setProperty not supported unless derived class provides a strategy: " + this.getClass());
+	    
+	    BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
+        if( !def.hasProperty(name) ) throw new ObjectFieldInvalidException(name, "field does not exist");
+        if( !def.canWrite(name) ) throw new ObjectFieldInvalidException(name, "No write method available");
+        if( !def.getPropertyType(name).isAssignableFrom(val.getClass()) ) throw new ObjectFieldInvalidException(name, "Incompatible types: " + val);
+        
+        PropertyStrategy prop = strategy.getProperty(name);
+        
+        // If owned reference, ensure seed is un-initialised ObjexObj (or not an ObjexObj) (this is done in collections)
+        if( prop != null && 
+                prop.isObjexType(ObjexFieldType.OWNED_REFERENCE) && 
+                prop.isType(PropertyTypeEnum.OBJECT) ) {
+            if( val instanceof ObjexObj && ((ObjexObj)val).getContainer() != null ) {
+                throw new ObjectInvalidException("Cannot add initialised ObjexObj as child");
+            }
+            
+            val = getInternalContainer().createObject(this, val);
         }
-        catch( RuntimeException e ) {
-            throw e;
+        
+        // If un-owned reference, ensure seed is an ObjexObj (this is done in collections)
+        else if( prop != null && 
+                prop.isObjexType(ObjexFieldType.REFERENCE) && 
+                prop.isType(PropertyTypeEnum.OBJECT) ) {
+            if( !(val instanceof ObjexObj) ) throw new ObjectInvalidException("Adding non-ObjexObj as a reference");
         }
-        catch( Exception e ) {
-            throw new ObjectFieldInvalidException(name, e.getMessage(), e);
-        }
-	}
+        
+        def.write(state, name, val);
+    }
 	
 	/**
-     * Attempts to find a create'Name' method on this class
-     * and invoke it. The method may or may not have a type
-     * parameter - it is passed if it doesn't.
-     * 
-     * <p><b>Note: </b>If type is passed, but the create
-     * method is found but does not support passing in a 
-     * type then the parameter is ignored.</p>
-     * 
-     * @param name The name of the reference property
-     * @param type The type of object to create
-     * @return The newly constructed object
-     */
-    public ObjexObj createReference(String name, String type) {
-        String createMethod = "create";
-        if( Character.isLowerCase(name.charAt(0)) ) {
-            createMethod += name.substring(0, 1).toUpperCase();
-            if( name.length() > 1 ) createMethod += name.substring(1);
-        }
-        else {
-            createMethod += name;
-        }
-        
-        // Try non-plural
-        String altCreateMethod = null;
-        if( createMethod.endsWith("ies") ) altCreateMethod = createMethod.substring(0, createMethod.length() - 3) + "y";
-        else if( createMethod.endsWith("s") ) altCreateMethod = createMethod.substring(0, createMethod.length() - 1);
-        
-        // Find the method
-        boolean includeType = false;
-        Method method = findMethod(createMethod, String.class);
-        if( method != null ) includeType = true;
-        
-        if( method == null ) method = findMethod(altCreateMethod, String.class);
-        if( method != null ) includeType = true;
-        
-        if( method == null ) method = findMethod(createMethod, (Class<?>[])null);
-        if( method == null ) method = findMethod(altCreateMethod, (Class<?>[])null);
-        
-        // Invoke if found
-        if( method != null ) {
-            try {
-                Object[] args = null;
-                if( includeType ) args = new Object[]{type};
-                return (ObjexObj)method.invoke(this, args);
-            }
-            catch( RuntimeException e ) {
-                throw e;
-            }
-            catch( Exception e ) {
-                throw new UnsupportedOperationException("Creation failed", e);
-            }
-        }
-        else {
-            throw new UnsupportedOperationException("Creation not supported on property: " + name);
-        }
-    }
-    
-    /**
      * Standard validation implementation
      */
     public void validate(ValidationRequest request) {
@@ -359,6 +362,150 @@ public abstract class BaseObjexObj implements InternalObjexObj {
             }
         }
     }
+    
+    /**
+     * This is a helper method that can be called to validate a value before
+     * it is set.
+     * 
+     * @param state The state bean of the object
+     * @param propertyName The name of the property
+     * @param val The value
+     * @return True if all is ok with the value
+     */
+    protected boolean validateValue(Object state, String propertyName, Object val) {
+        ValidationRequest request = CurrentValidationRequest.getCurrent();
+        
+        Validator validator = null;
+        if( request != null ) request.getValidator();
+        else validator = Validation.buildDefaultValidatorFactory().getValidator();
+        
+        Set<?> violations = validator.validateValue(state.getClass(), propertyName, val, FieldChangeGroup.class, FieldGroup.class, Default.class);
+        
+        boolean ret = true;
+        if( violations != null ) {
+            Iterator<?> it = violations.iterator();
+            while( it.hasNext() ) {
+                Object v = it.next();
+                if( !(v instanceof ConstraintViolation<?>) ) continue;
+                
+                ConstraintViolation<?> violation = (ConstraintViolation<?>)v;
+                
+                // TODO: Need to test no prop path = non-field error
+                String prop = violation.getPropertyPath().toString();
+                if( prop != null && prop.length() == 0 ) prop = null;
+                
+                Object[] params = violation.getInvalidValue() != null ? new Object[]{violation.getInvalidValue()} : null;
+                
+                // Add to errors
+                if( request != null ) {
+                    ValidationError error = new SimpleValidationRequest.SimpleValidationError(id, violation.getMessageTemplate(), prop, params);
+                    request.addError(error);
+                    ret = false;
+                }
+                
+                // Otherwise fail
+                else {
+                    throw new ObjectErrorException(violation.getMessageTemplate(), params);
+                }
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Sets every value of an property of the realObject that is known to
+     * also be an ObjexObj property from the strategy object.
+     */
+    @SuppressWarnings("unchecked")
+    public void acceptReader(ObjexStateReader reader) {
+        setParentId(reader.read("parentId", parentId, ObjexID.class, ObjexFieldType.PARENT_ID, true));
+        
+        Object state = getStateBean();
+        ObjectStrategy strategy = getStrategy();
+        if( strategy == null ) throw new UnsupportedOperationException("Reading/writing not supported unless derived class provides a strategy: " + this.getClass());
+        
+        BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
+        for( String prop : def.getProperties() ) {
+            PropertyStrategy propStrategy = strategy.getProperty(prop);
+            if( propStrategy == null ) continue;
+            if( !def.canWrite(prop) ) continue;
+            
+            Object val = def.canRead(prop) ? def.read(state, prop) : null;
+            boolean persistent = propStrategy.isCharacteristic(PropertyCharacteristic.PERSISTENT);
+            
+            ObjexFieldType type = propStrategy.getObjexType();
+            switch(type) {
+            case STRING:
+            case MEMO:
+            case NUMBER:
+            case BOOL:
+            case DATE:
+            case SHORT_BLOB:
+            case BLOB:
+            case BLOB_REFERENCE:
+            case USER:
+            case OBJECT:
+                def.write(state, prop, reader.read(prop, val, def.getPropertyType(prop), type, persistent));
+                break;
+                
+            case REFERENCE:
+            case OWNED_REFERENCE:
+                if( propStrategy.isType(PropertyTypeEnum.LIST) ) def.write(state, prop, reader.readReferenceList(prop, (List<?>)val, propStrategy.getElementType(), type, persistent));
+                else if( propStrategy.isType(PropertyTypeEnum.SET) ) def.write(state, prop, reader.readReferenceSet(prop, (Set<?>)val, propStrategy.getElementType(), type, persistent));
+                else if( propStrategy.isType(PropertyTypeEnum.MAP) ) def.write(state, prop, reader.readReferenceMap(prop, (Map<String, ?>)val, propStrategy.getElementType(), type, persistent));
+                else def.write(state, prop, reader.readReference(prop, val, propStrategy.getElementType(), type, persistent));
+                break;
+            }
+        }
+    }
+    
+    /**
+     * Writes out every property of the real object if that is known to be
+     * a ObjexObj property from the strategy object.
+     */
+    @SuppressWarnings("unchecked")
+    public void acceptWriter(ObjexStateWriter writer, boolean includeNonPersistent) {
+        Object state = getStateBean();
+        ObjectStrategy strategy = getStrategy();
+        if( strategy == null ) throw new UnsupportedOperationException("Reading/writing not supported unless derived class provides a strategy: " + this.getClass());
+        
+        BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
+        for( String prop : def.getProperties() ) {
+            PropertyStrategy propStrategy = strategy.getProperty(prop);
+            if( propStrategy == null ) continue;
+            if( !def.canRead(prop) ) continue;
+            
+            boolean persistent = propStrategy.isCharacteristic(PropertyCharacteristic.PERSISTENT);
+            if( !persistent && !includeNonPersistent ) continue;
+            
+            Object val = def.read(state, prop);
+            
+            ObjexFieldType type = propStrategy.getObjexType();
+            switch(type) {
+            case STRING:
+            case MEMO:
+            case NUMBER:
+            case BOOL:
+            case DATE:
+            case SHORT_BLOB:
+            case BLOB:
+            case BLOB_REFERENCE:
+            case USER:
+            case OBJECT:
+                writer.write(prop, val, type, persistent);
+                break;
+                
+            case REFERENCE:
+            case OWNED_REFERENCE:
+                if( propStrategy.isType(PropertyTypeEnum.LIST) ) writer.writeReferenceList(prop, (List<?>)val, type, persistent);
+                else if( propStrategy.isType(PropertyTypeEnum.SET) ) writer.writeReferenceSet(prop, (Set<?>)val, type, persistent);
+                else if( propStrategy.isType(PropertyTypeEnum.MAP) ) writer.writeReferenceMap(prop, (Map<String, ?>)val, type, persistent);
+                else writer.writeReference(prop, val, type, persistent);
+                break;
+            }
+        }
+    }
 
     //////////////////////////////////////////////////
 	// Internal
@@ -381,94 +528,5 @@ public abstract class BaseObjexObj implements InternalObjexObj {
     protected void checkUpdateable() {
         checkInitialised();
         if( !isUpdateable() ) throw new IllegalStateException("Cannot update an object that is not inside a transaction: " + this);
-    }
-    
-    /**
-     * Helper to ensure an object is updateable before it
-     * is updated. This method checks the container is open
-     * and adds this object to the transaction if 
-     * neccessary.
-     * 
-     * @param state The state bean
-     */
-    protected void ensureUpdateable(ObjexObjStateBean state) {
-        checkUpdateable();
-        if( !state.isEditable() ) container.addObjectToTransaction(this, state);
-    }
-    
-    /**
-     * Helper to get a property descriptor on this class for
-     * the given property. The default creates the descriptor
-     * using full introspection, but can be overridden if
-     * there is some unusable behaviour - for instance the
-     * getter and/or setter is not named normally.
-     * 
-     * @param name The name of the property
-     * @return The property descriptor
-     * @throws 
-     */
-    protected PropertyDescriptor getPropertyDescriptor(String name) {
-        try {
-            return new PropertyDescriptor(name, this.getClass());
-        }
-        catch( RuntimeException e ) {
-            throw e;
-        }
-        catch( Exception e ) {
-            throw new ObjectFieldInvalidException(name, e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * Helper to find a method. Used from createReference as we test
-     * for a number of different names and parameters
-     * 
-     * @param name The name of the method
-     * @param params The parameters we want
-     * @return The method if found
-     */
-    private Method findMethod(String name, Class<?>... params) {
-        Method ret = null;
-        try {
-            ret = this.getClass().getMethod(name, params);
-        }
-        catch( NoSuchMethodException e ) {}
-        
-        return ret;
-    }
-    
-    /**
-     * This method will attempt to clone the basic value
-     * if it is possible. Obviously this is not needed
-     * for Strings and other immutable objects because 
-     * they cannot be changed. It is also not needed for
-     * primitives. However, any {@link Cloneable} object
-     * is cloned and an array is copied into a new 
-     * instance.
-     * 
-     * <p>Note that the clone, if one occurs, is a 
-     * typically a shallow copy.</p>
-     * 
-     * @param val
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    protected <T> T cloneValue(T val) {
-        if( val == null ) return null;
-        
-        // Most basic types are immutable (primitives, Number, String etc) 
-        T ret = val;
-        
-        // Others should cloneable
-        if( val instanceof Cloneable ) {
-            try {
-                Method clone = val.getClass().getMethod("clone", (Class<?>[])null);
-                if( Modifier.isPublic(clone.getModifiers()) ) ret = (T)clone.invoke(val, (Object[])null);
-            }
-            catch( RuntimeException e ) { throw e; }
-            catch( Exception e ) {}
-        }
-        
-        return ret;
     }
 }

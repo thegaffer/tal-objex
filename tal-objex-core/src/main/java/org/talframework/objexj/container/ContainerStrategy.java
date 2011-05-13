@@ -68,18 +68,18 @@ public interface ContainerStrategy {
 	public ObjectStrategy getObjectStrategy(String type);
 	
 	/**
-     * Call to get the object strategy for a type of object 
-     * given its state class type.
-     * 
-     * FUTURE: This is not currently needed, leaving for now, but we may want to remove
-     * 
-     * @param stateType The type of state object we want the strategy for
-     * @return The strategy for the given object
-     * @throws ObjectTypeNotFoundException If the type if not known
-     */
-    public ObjectStrategy getObjectStrategyForState(String stateType);
-    
-    /**
+	 * Call to see if we have an {@link ObjectStrategy} for the
+	 * given object. This is typically done to see if we can deduce
+	 * an ID from the object.
+	 * 
+	 * <p>Note: No exception thrown here if not found.</p>
+	 * 
+	 * @param object The object to get strategy for
+	 * @return The {@link ObjectStrategy} or null if none is found
+	 */
+	public ObjectStrategy getObjectStrategyForObject(Object object);
+	
+	/**
      * Call to get a named query for the container.
      * 
      * @param name The name of the query

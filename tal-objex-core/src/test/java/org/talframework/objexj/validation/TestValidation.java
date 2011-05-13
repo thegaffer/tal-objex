@@ -13,10 +13,8 @@ import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.ValidationRequest.ValidationType;
 import org.talframework.objexj.exceptions.ObjectErrorException;
-import org.talframework.objexj.object.testbeans.ProductBean;
-import org.talframework.objexj.object.testbeans.StockBean;
-import org.talframework.objexj.object.testmodel.ProductImpl;
-import org.talframework.objexj.object.testmodel.StockImpl;
+import org.talframework.objexj.object.testmodel.objex.Product;
+import org.talframework.objexj.object.testmodel.objex.Stock;
 import org.talframework.objexj.validation.groups.ChildGroup;
 import org.talframework.objexj.validation.groups.FieldGroup;
 import org.talframework.objexj.validation.groups.InterObjectEnrichmentGroup;
@@ -42,7 +40,7 @@ public class TestValidation {
     public void basic() {
         final ValidationRequest request = context.mock(ValidationRequest.class);
         final Validator validator = context.mock(Validator.class);
-        final StockImpl obj = new StockImpl(new StockBean());
+        final Stock obj = new Stock();
         
         context.checking(new Expectations() {{
             allowing(request).getValidator(); will(returnValue(validator));
@@ -70,12 +68,13 @@ public class TestValidation {
     }
     
     /**
-     * This tests that we validate correctly when setting a method
+     * This tests that we validate correctly when setting a method. Note
+     * that there is a dependency here on the class checking values as
+     * we set them.
      */
     @Test(expected=ObjectErrorException.class)
     public void onSet() {
-        ProductBean bean = new ProductBean("Product1", "Product1", 1, 10);
-        ProductImpl obj = new ProductImpl(bean);
+        Product obj = new Product("Product1", "Product1", 1, 10);
         
         obj.setName(null);
     }
@@ -85,8 +84,7 @@ public class TestValidation {
      */
     @Test
     public void selfIntraObjectChecks() {
-        ProductBean bean = new ProductBean("Product1", "Product1", 1, 10);
-        ProductImpl obj = new ProductImpl(bean);
+        Product obj = new Product("Product1", "Product1", 1, 10);
         
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         final javax.validation.Validator validator = factory.getValidator();

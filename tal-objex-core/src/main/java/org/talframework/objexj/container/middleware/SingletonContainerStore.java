@@ -17,10 +17,9 @@
 package org.talframework.objexj.container.middleware;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexID;
 
 /**
  * This class acts as the source for the containers in an
@@ -32,7 +31,7 @@ public class SingletonContainerStore {
     private static final SingletonContainerStore INSTANCE = new SingletonContainerStore();
     
     /** Holds each and every container */
-    private Map<String, List<ObjexObjStateBean>> containers;
+    private Map<String, Map<ObjexID, Map<String, Object>>> containers;
     
     /** Hidden Constructor */
     private SingletonContainerStore() {}
@@ -51,7 +50,7 @@ public class SingletonContainerStore {
      * @param container The ID of the container
      * @return The list of objects (or null)
      */
-    public List<ObjexObjStateBean> getObjects(String container) {
+    public Map<ObjexID, Map<String, Object>> getObjects(String container) {
         if( container == null ) throw new IllegalArgumentException("Cannot get objects from the container store for a null container");
         
         return containers != null ? containers.get(container) : null;
@@ -64,10 +63,10 @@ public class SingletonContainerStore {
      * @param container The ID of the container (cannot be null)
      * @param objs The objects that constitute that container
      */
-    public void setObjects(String container, List<ObjexObjStateBean> objs) {
+    public void setObjects(String container, Map<ObjexID, Map<String, Object>> objs) {
         if( container == null ) throw new IllegalArgumentException("Cannot set objects in the container store for a null container");
         
-        if( containers == null ) containers = new HashMap<String, List<ObjexObjStateBean>>();
+        if( containers == null ) containers = new HashMap<String, Map<ObjexID,Map<String,Object>>>();
         if( objs != null ) containers.put(container, objs);
         else containers.remove(container);
     }

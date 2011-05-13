@@ -23,8 +23,8 @@ import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Test;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
-import org.talframework.objexj.object.testbeans.ProductBean;
+import org.talframework.objexj.ObjexObj.ObjexFieldType;
+import org.talframework.objexj.object.testmodel.objex.Product;
 
 /**
  * This class tests the bean reader
@@ -37,10 +37,10 @@ public class TestBeanReader {
 
     @Test
     public void basic() {
-        ProductBean bean = new ProductBean("Name", "Description", 20, 50);
+        Product bean = new Product("Name", "Description", 20, 50);
         
         final ObjexObj obj = context.mock(ObjexObj.class);
-        final BeanReader underTest = new BeanReader();
+        final BeanObjectReader underTest = new BeanObjectReader();
         
         context.checking(new Expectations() {{
             oneOf(obj).acceptReader(underTest);

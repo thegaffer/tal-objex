@@ -17,14 +17,14 @@
 package org.talframework.objexj.object;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.ObjexObj.ObjexFieldType;
 import org.talframework.objexj.ObjexStateWriter;
-import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
 
 /**
  * This class produces a list of navigable objects starting with
@@ -141,13 +141,16 @@ public final class RecursiveObjectCompiler implements ObjexStateWriter {
     /**
      * Ensures referenced object is in map of objects if configured to be there
      */
-    public void writeReference(String name, String ref, ObjexFieldType type, boolean persisted) {
+    public void writeReference(String name, Object ref, ObjexFieldType type, boolean persistent) {
         if( !includeOwned && type == ObjexFieldType.OWNED_REFERENCE ) return;
         if( !includeReferenced && type == ObjexFieldType.REFERENCE ) return;
         if( ref == null ) return;
         if( recurseDepth == 0 ) return;
         
-        ObjexObj innerObj = container.getObject(ref);
+        ObjexObj innerObj = null;
+        if( ref instanceof ObjexObj ) innerObj = (ObjexObj)ref;
+        else innerObj = container.getObject(ref);
+        
         if( innerObj != null && !referencedObjects.containsKey(innerObj.getId()) ) {
             writeNavigableObject(innerObj);
         }
@@ -156,14 +159,35 @@ public final class RecursiveObjectCompiler implements ObjexStateWriter {
     /**
      * Ensures referenced objects are in map of objects if configured to be there
      */
-    public void writeReferenceList(String name, List<String> refs, ObjexFieldType type, boolean persisted) {
+    public void writeReferenceList(String name, java.util.List<?> refs, ObjexFieldType type, boolean persistent) {
         if( !includeOwned && type == ObjexFieldType.OWNED_REFERENCE ) return;
         if( !includeReferenced && type == ObjexFieldType.REFERENCE ) return;
         if( refs == null || refs.size() == 0 ) return;
         if( recurseDepth == 0 ) return;
         
-        for( String ref : refs ) {
-            ObjexObj innerObj = container.getObject(ref);
+        for( Object ref : refs ) {
+            ObjexObj innerObj = null;
+            if( ref instanceof ObjexObj ) innerObj = (ObjexObj)ref;
+            else innerObj = container.getObject(ref);
+            
+            if( innerObj != null && !referencedObjects.containsKey(innerObj.getId()) ) {
+                writeNavigableObject(innerObj);
+            }
+        }
+    }
+    
+    @Override
+    public void writeReferenceSet(String name, Set<?> refs, ObjexFieldType type, boolean persistent) {
+        if( !includeOwned && type == ObjexFieldType.OWNED_REFERENCE ) return;
+        if( !includeReferenced && type == ObjexFieldType.REFERENCE ) return;
+        if( refs == null || refs.size() == 0 ) return;
+        if( recurseDepth == 0 ) return;
+        
+        for( Object ref : refs ) {
+            ObjexObj innerObj = null;
+            if( ref instanceof ObjexObj ) innerObj = (ObjexObj)ref;
+            else innerObj = container.getObject(ref);
+            
             if( innerObj != null && !referencedObjects.containsKey(innerObj.getId()) ) {
                 writeNavigableObject(innerObj);
             }
@@ -173,14 +197,18 @@ public final class RecursiveObjectCompiler implements ObjexStateWriter {
     /**
      * Ensures referenced objects are in map of objects if configured to be there
      */
-    public void writeReferenceMap(String name, Map<String, String> refs, ObjexFieldType type, boolean persisted) {
+    public void writeReferenceMap(String name, java.util.Map<String,?> refs, ObjexFieldType type, boolean persistent) {
         if( !includeOwned && type == ObjexFieldType.OWNED_REFERENCE ) return;
         if( !includeReferenced && type == ObjexFieldType.REFERENCE ) return;
         if( refs == null || refs.size() == 0 ) return;
         if( recurseDepth == 0 ) return;
         
         for( String ref : refs.keySet() ) {
-            ObjexObj innerObj = container.getObject(refs.get(ref));
+            ObjexObj innerObj = null;
+            Object refValue = refs.get(ref);
+            if( refValue instanceof ObjexObj ) innerObj = (ObjexObj)refValue;
+            else innerObj = container.getObject(refValue);
+            
             if( innerObj != null && !referencedObjects.containsKey(innerObj.getId()) ) {
                 writeNavigableObject(innerObj);
             }

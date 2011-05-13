@@ -17,10 +17,7 @@
 package org.talframework.objexj.container;
 
 import org.talframework.objexj.Container;
-import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.container.TransactionCache.ObjectRole;
 
 /**
  * This interface represents the container internally.
@@ -33,36 +30,19 @@ import org.talframework.objexj.container.TransactionCache.ObjectRole;
 public interface InternalContainer extends Container {
     
     /**
-     * Gets the role of the object in the transaction if
-     * it has one.
+     * Called to create a new object in this container and
+     * return it. This is typically called from internal objects
+     * when they are creating new children. 
      * 
-     * @param id The ID of the object to check
-     * @return The {@link ObjectRole}
+     * @param parentObj The object that will serve as the parent
+     * @param source The source object, which contains the type of object and any seed values to use
      */
-    public ObjectRole getObjectRole(ObjexID id);
-    
-    /**
-     * Called to add an object to the container 
-     * 
-     * @param obj The object that will serve as the parent
-     * @param state The state bean of the parent object (for audit)
-     * @param type The type of the new object
-     */
-    public ObjexObj newObject(ObjexObj obj, ObjexObjStateBean state, String type);
-    
-    /**
-     * Call to add the given object to the transaction. The container
-     * is now free to clone the state object so it can know the 
-     * changes that have occurred. This is done only from within the
-     * object that is changing.
-     * 
-     * @param obj The object about to be updated
-     * @param state The current state of the object
-     */
-    public void addObjectToTransaction(ObjexObj obj, ObjexObjStateBean state);
+    public ObjexObj createObject(ObjexObj parentObj, Object source);
     
     /**
      * Called to remove an object from the container.
+     * 
+     * TODO: Do we intend this to be called by parent, or from object itself?!?
      * 
      * @param obj The object to be removed
      */

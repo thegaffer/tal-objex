@@ -17,12 +17,13 @@ import org.talframework.objexj.ValidationRequest;
  * it is loaded.
  * 
  * <p>Authors note: This class somewhat goes against my sensibilities.
- * Basically we are wasting memory by holding additional references
+ * Basically we are "wasting" memory by holding additional references
  * to the container and realobject. However, this is to allow us to
  * create business objects that are infrastructure independent (a 
- * good thing) and as the objects/references are only held transitively
- * this should not matter too much. The extension project using 
- * Spring Roo and ITDs will help if this does become an issue.</p>
+ * good thing). So given that a) these references are only held
+ * transitively (not serialised), and b) that by using the Roo ITD we 
+ * can minimize further this kind of usage I have come to accept 
+ * this</p>
  * 
  * @author Tom Spencer
  */
@@ -48,7 +49,8 @@ public class ProxyReference implements InvocationHandler, ObjexObj {
             ret = method.invoke(this, args);
         }
         else {
-            ret = method.invoke(getRealObject(), args);
+            getRealObject();
+            ret = method.invoke(realObject, args);
         }
         
         return ret;
@@ -126,11 +128,6 @@ public class ProxyReference implements InvocationHandler, ObjexObj {
     @Override
     public void setProperty(String name, Object newValue) {
         getRealObject().setProperty(name, newValue);
-    }
-    
-    @Override
-    public ObjexObj createReference(String name, String type) {
-        return getRealObject().createReference(name, type);
     }
     
     @Override

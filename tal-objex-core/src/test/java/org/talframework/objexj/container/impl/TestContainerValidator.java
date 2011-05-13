@@ -16,117 +16,30 @@
 
 package org.talframework.objexj.container.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.talframework.objexj.Container;
 import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
-import org.talframework.objexj.container.TransactionCache;
-import org.talframework.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.container.ContainerObjectCache;
+import org.talframework.objexj.container.ContainerObjectCache.CacheState;
 
 public class TestContainerValidator {
     
-    private Mockery context = new JUnit4Mockery();
-    
-    private Container container = null;
-    private TransactionCache cache = null;
-    
-    private ObjexObj root = null;
-    private ObjexObj child1 = null;
-    private ObjexObj child2 = null;
-    private ObjexObj parent1 = null;
-    private ObjexObj child11 = null;
-    private ObjexObj child12 = null;
-    private ObjexObj parent2 = null;
-    private ObjexObj child21 = null;
-    private ObjexObj child22 = null;
-    private ObjexObj child23 = null;
-    
-    /** Empty map for new objects in the test */
-    private Map<ObjexID, ObjexObjStateBean> newObjects;
-    /** Empty map for updated objects in the test */
-    private Map<ObjexID, ObjexObjStateBean> updatedObjects;
-    /** Empty map for removed objects in the test */
-    private Map<ObjexID, ObjexObjStateBean> removedObjects;
-    
-    @Before
-    public void setup() {
-        container = context.mock(Container.class);
-        cache = context.mock(TransactionCache.class);
-        
-        final ObjexID rootId = new DefaultObjexID("Root/1");
-        final ObjexID child1Id = new DefaultObjexID("Child/1");
-        final ObjexID child2Id = new DefaultObjexID("Child/2");
-        final ObjexID parent1Id = new DefaultObjexID("Parent/1");
-        final ObjexID child11Id = new DefaultObjexID("Child/11");
-        final ObjexID child12Id = new DefaultObjexID("Child/12");
-        final ObjexID parent2Id = new DefaultObjexID("Parent/2");
-        final ObjexID child21Id = new DefaultObjexID("Child/21");
-        final ObjexID child22Id = new DefaultObjexID("Child/22");
-        final ObjexID child23Id = new DefaultObjexID("Child/23");
-        
-        root = context.mock(ObjexObj.class, "root");
-        child1 = context.mock(ObjexObj.class, "child1");
-        child2 = context.mock(ObjexObj.class, "child2");
-        parent1 = context.mock(ObjexObj.class, "parent1");
-        child11 = context.mock(ObjexObj.class, "child11");
-        child12 = context.mock(ObjexObj.class, "child12");
-        parent2 = context.mock(ObjexObj.class, "parent2");
-        child21 = context.mock(ObjexObj.class, "child21");
-        child22 = context.mock(ObjexObj.class, "child22");
-        child23 = context.mock(ObjexObj.class, "child23");
-        
-        context.checking(new Expectations() {{
-            allowing(container).getObject(rootId); will(returnValue(root));
-            allowing(container).getObject(parent1Id); will(returnValue(parent1));
-            allowing(container).getObject(parent2Id); will(returnValue(parent2));
-            allowing(container).getObject(child1Id); will(returnValue(child1));
-            allowing(container).getObject(child2Id); will(returnValue(child2));
-            allowing(container).getObject(child11Id); will(returnValue(child11));
-            allowing(container).getObject(child12Id); will(returnValue(child12));
-            allowing(container).getObject(child21Id); will(returnValue(child21));
-            allowing(container).getObject(child22Id); will(returnValue(child22));
-            allowing(container).getObject(child23Id); will(returnValue(child23));
-            
-            allowing(root).getId(); will(returnValue(rootId));
-            allowing(root).getParent(); will(returnValue(null));
-            allowing(parent1).getId(); will(returnValue(parent1Id));
-            allowing(parent1).getParent(); will(returnValue(root));
-            allowing(parent2).getId(); will(returnValue(parent2Id));
-            allowing(parent2).getParent(); will(returnValue(root));
-            allowing(child1).getId(); will(returnValue(child1Id));
-            allowing(child1).getParent(); will(returnValue(root));
-            allowing(child2).getId(); will(returnValue(child2Id));
-            allowing(child2).getParent(); will(returnValue(root));
-            allowing(child11).getId(); will(returnValue(child11Id));
-            allowing(child11).getParent(); will(returnValue(parent1));
-            allowing(child12).getId(); will(returnValue(child12Id));
-            allowing(child12).getParent(); will(returnValue(parent1));
-            allowing(child21).getId(); will(returnValue(child21Id));
-            allowing(child21).getParent(); will(returnValue(parent2));
-            allowing(child22).getId(); will(returnValue(child22Id));
-            allowing(child22).getParent(); will(returnValue(parent2));
-            allowing(child23).getId(); will(returnValue(child23Id));
-            allowing(child23).getParent(); will(returnValue(parent2));
-        }});
-        
-        newObjects = new HashMap<ObjexID, ObjexObjStateBean>();
-        updatedObjects  = new HashMap<ObjexID, ObjexObjStateBean>();
-        removedObjects  = new HashMap<ObjexID, ObjexObjStateBean>();
-    }
-
     /**
      * This basic test ensures we validate both objects
      * inside that need to be validated (1 new and 1 old)
@@ -135,24 +48,26 @@ public class TestContainerValidator {
      */
     @Test
     public void basic() {
-        newObjects.put(child1.getId(), null);
-        updatedObjects.put(child2.getId(), null);
+        ContainerObjectCache cache = mock(ContainerObjectCache.class);
+        ObjexObj root = mock(ObjexObj.class);
+        ObjexObj child1 = mock(ObjexObj.class);
+        ObjexObj child2 = mock(ObjexObj.class);
         
-        context.checking(new Expectations() {{
-            oneOf(cache).getObjects(ObjectRole.NEW); will(returnValue(newObjects));
-            oneOf(cache).getObjects(ObjectRole.UPDATED); will(returnValue(updatedObjects));
-            
-            oneOf(child1).validate(with(any(ValidationRequest.class)));
-            oneOf(child2).validate(with(any(ValidationRequest.class)));
-            oneOf(child1).validate(with(any(ValidationRequest.class)));
-            oneOf(child2).validate(with(any(ValidationRequest.class)));
-            oneOf(root).validate(with(any(ValidationRequest.class)));
-        }});
+        Set<ObjexObj> changedOrNew = new HashSet<ObjexObj>();
+        changedOrNew.add(child1);
+        changedOrNew.add(child2);
         
-        ContainerValidator validator = new ContainerValidator(container, cache);
+        when(child1.getParent()).thenReturn(root);
+        when(child2.getParent()).thenReturn(root);
+        when(root.getId()).thenReturn(new DefaultObjexID("Root", 1));
+        when(cache.getObjects(CacheState.NEWORCHANGED)).thenReturn(changedOrNew);
+        
+        ContainerValidator validator = new ContainerValidator(cache);
         validator.validate(null);
         
-        context.assertIsSatisfied();
+        verify(child1, times(2)).validate(any(ValidationRequest.class));
+        verify(child2, times(2)).validate(any(ValidationRequest.class));
+        verify(root, times(1)).validate(any(ValidationRequest.class));
     }
     
     /**
@@ -161,24 +76,23 @@ public class TestContainerValidator {
      */
     @Test
     public void parentAndChild() {
-        updatedObjects.put(root.getId(), null);
-        updatedObjects.put(child2.getId(), null);
+        ContainerObjectCache cache = mock(ContainerObjectCache.class);
+        ObjexObj root = mock(ObjexObj.class);
+        ObjexObj child2 = mock(ObjexObj.class);
         
-        context.checking(new Expectations() {{
-            oneOf(cache).getObjects(ObjectRole.NEW); will(returnValue(null));
-            oneOf(cache).getObjects(ObjectRole.UPDATED); will(returnValue(updatedObjects));
-            
-            oneOf(child2).validate(with(any(ValidationRequest.class)));
-            oneOf(child2).validate(with(any(ValidationRequest.class)));
-            oneOf(root).validate(with(any(ValidationRequest.class)));
-            oneOf(root).validate(with(any(ValidationRequest.class)));
-            oneOf(root).validate(with(any(ValidationRequest.class)));
-        }});
+        Set<ObjexObj> changedOrNew = new HashSet<ObjexObj>();
+        changedOrNew.add(root);
+        changedOrNew.add(child2);
         
-        ContainerValidator validator = new ContainerValidator(container, cache);
+        when(child2.getParent()).thenReturn(root);
+        when(root.getId()).thenReturn(new DefaultObjexID("Root", 1));
+        when(cache.getObjects(CacheState.NEWORCHANGED)).thenReturn(changedOrNew);
+        
+        ContainerValidator validator = new ContainerValidator(cache);
         validator.validate(null);
         
-        context.assertIsSatisfied();
+        verify(child2, times(2)).validate(any(ValidationRequest.class));
+        verify(root, times(3)).validate(any(ValidationRequest.class));
     }
     
     /**
@@ -187,25 +101,34 @@ public class TestContainerValidator {
      */
     @Test
     public void multiParent() {
-        updatedObjects.put(child11.getId(), null);
-        updatedObjects.put(child21.getId(), null);
+        ContainerObjectCache cache = mock(ContainerObjectCache.class);
+        ObjexObj root = mock(ObjexObj.class);
+        ObjexObj parent1 = mock(ObjexObj.class);
+        ObjexObj parent2 = mock(ObjexObj.class);
+        ObjexObj child11 = mock(ObjexObj.class);
+        ObjexObj child21 = mock(ObjexObj.class);
         
-        context.checking(new Expectations() {{
-            oneOf(cache).getObjects(ObjectRole.NEW); will(returnValue(null));
-            oneOf(cache).getObjects(ObjectRole.UPDATED); will(returnValue(updatedObjects));
-            
-            oneOf(child11).validate(with(any(ValidationRequest.class)));
-            oneOf(child11).validate(with(any(ValidationRequest.class)));
-            oneOf(child21).validate(with(any(ValidationRequest.class)));
-            oneOf(child21).validate(with(any(ValidationRequest.class)));
-            oneOf(parent2).validate(with(any(ValidationRequest.class)));
-            oneOf(parent1).validate(with(any(ValidationRequest.class)));
-            oneOf(root).validate(with(any(ValidationRequest.class)));
-        }});
+        Set<ObjexObj> changedOrNew = new HashSet<ObjexObj>();
+        changedOrNew.add(child11);
+        changedOrNew.add(child21);
         
-        ContainerValidator.validate(container, cache, null);
+        when(parent1.getParent()).thenReturn(root);
+        when(child11.getParent()).thenReturn(parent1);
+        when(parent2.getParent()).thenReturn(root);
+        when(child21.getParent()).thenReturn(parent2);
+        when(root.getId()).thenReturn(new DefaultObjexID("Root", 1));
+        when(parent1.getId()).thenReturn(new DefaultObjexID("Parent", 1));
+        when(parent2.getId()).thenReturn(new DefaultObjexID("Parent", 2));
+        when(cache.getObjects(CacheState.NEWORCHANGED)).thenReturn(changedOrNew);
         
-        context.assertIsSatisfied();
+        ContainerValidator validator = new ContainerValidator(cache);
+        validator.validate(null);
+        
+        verify(child11, times(2)).validate(any(ValidationRequest.class));
+        verify(child21, times(2)).validate(any(ValidationRequest.class));
+        verify(parent1, times(1)).validate(any(ValidationRequest.class));
+        verify(parent2, times(1)).validate(any(ValidationRequest.class));
+        verify(root, times(1)).validate(any(ValidationRequest.class));
     }
     
     /**
@@ -214,34 +137,53 @@ public class TestContainerValidator {
      */
     @Test
     public void testAllChildren() {
-        newObjects.put(child2.getId(), null);
-        newObjects.put(child23.getId(), null);
-        updatedObjects.put(child1.getId(), null);
-        updatedObjects.put(child11.getId(), null);
-        updatedObjects.put(child12.getId(), null);
-        updatedObjects.put(child21.getId(), null);
-        updatedObjects.put(child22.getId(), null);
-        updatedObjects.put(parent2.getId(), null);
+        ContainerObjectCache cache = mock(ContainerObjectCache.class);
+        ObjexObj root = mock(ObjexObj.class);
+        ObjexObj child1 = mock(ObjexObj.class);
+        ObjexObj child2 = mock(ObjexObj.class);
+        ObjexObj parent1 = mock(ObjexObj.class);
+        ObjexObj parent2 = mock(ObjexObj.class);
+        ObjexObj child11 = mock(ObjexObj.class);
+        ObjexObj child12 = mock(ObjexObj.class);
+        ObjexObj child21 = mock(ObjexObj.class);
+        ObjexObj child22 = mock(ObjexObj.class);
+        ObjexObj child23 = mock(ObjexObj.class);
         
-        context.checking(new Expectations() {{
-            oneOf(cache).getObjects(ObjectRole.NEW); will(returnValue(newObjects));
-            oneOf(cache).getObjects(ObjectRole.UPDATED); will(returnValue(updatedObjects));
-            
-            exactly(2).of(child1).validate(with(any(ValidationRequest.class)));
-            exactly(2).of(child2).validate(with(any(ValidationRequest.class)));
-            exactly(2).of(child11).validate(with(any(ValidationRequest.class)));
-            exactly(2).of(child12).validate(with(any(ValidationRequest.class)));
-            exactly(2).of(child21).validate(with(any(ValidationRequest.class)));
-            exactly(2).of(child22).validate(with(any(ValidationRequest.class)));
-            exactly(2).of(child23).validate(with(any(ValidationRequest.class)));
-            exactly(3).of(parent2).validate(with(any(ValidationRequest.class)));
-            oneOf(parent1).validate(with(any(ValidationRequest.class)));
-            oneOf(root).validate(with(any(ValidationRequest.class)));
-        }});
+        Set<ObjexObj> changedOrNew = new HashSet<ObjexObj>();
+        changedOrNew.add(parent2);
+        changedOrNew.add(child1);
+        changedOrNew.add(child11);
+        changedOrNew.add(child12);
+        changedOrNew.add(child2);
+        changedOrNew.add(child21);
+        changedOrNew.add(child22);
+        changedOrNew.add(child23);
         
-        ContainerValidator.validate(container, cache, null);
+        when(child1.getParent()).thenReturn(root);
+        when(child11.getParent()).thenReturn(parent1);
+        when(child12.getParent()).thenReturn(parent1);
+        when(child2.getParent()).thenReturn(root);
+        when(child21.getParent()).thenReturn(parent2);
+        when(child22.getParent()).thenReturn(parent2);
+        when(child23.getParent()).thenReturn(parent2);
+        when(root.getId()).thenReturn(new DefaultObjexID("Root", 1));
+        when(parent1.getId()).thenReturn(new DefaultObjexID("Parent", 1));
+        when(parent2.getId()).thenReturn(new DefaultObjexID("Parent", 2));
+        when(cache.getObjects(CacheState.NEWORCHANGED)).thenReturn(changedOrNew);
         
-        context.assertIsSatisfied();
+        ContainerValidator validator = new ContainerValidator(cache);
+        validator.validate(null);
+        
+        verify(child11, times(2)).validate(any(ValidationRequest.class));
+        verify(child12, times(2)).validate(any(ValidationRequest.class));
+        verify(child21, times(2)).validate(any(ValidationRequest.class));
+        verify(child22, times(2)).validate(any(ValidationRequest.class));
+        verify(child23, times(2)).validate(any(ValidationRequest.class));
+        verify(child1, times(2)).validate(any(ValidationRequest.class));
+        verify(child2, times(2)).validate(any(ValidationRequest.class));
+        verify(parent1, times(1)).validate(any(ValidationRequest.class));
+        verify(parent2, times(3)).validate(any(ValidationRequest.class));
+        verify(root, times(1)).validate(any(ValidationRequest.class));
     }
     
     /**
@@ -251,36 +193,45 @@ public class TestContainerValidator {
     @SuppressWarnings("unchecked")
     @Test
     public void testMerging() {
-        updatedObjects.put(child1.getId(), null);
-        removedObjects.put(child11.getId(), null);
+        ContainerObjectCache cache = mock(ContainerObjectCache.class);
+        ObjexObj root = mock(ObjexObj.class);
+        ObjexObj parent1 = mock(ObjexObj.class);
+        ObjexObj child1 = mock(ObjexObj.class);
+        ObjexObj child2 = mock(ObjexObj.class);
+        ObjexObj child11 = mock(ObjexObj.class);
         
-        final ValidationRequest oldRequest = context.mock(ValidationRequest.class);
-        final List<ValidationError> child1Errors = context.mock(List.class, "child1Errors");
-        final List<ValidationError> child2Errors = context.mock(List.class, "child2Errors");
+        Set<ObjexObj> changedOrNew = new HashSet<ObjexObj>();
+        changedOrNew.add(child11);
+        changedOrNew.add(child1);
+        
+        when(parent1.getParent()).thenReturn(root);
+        when(child1.getParent()).thenReturn(root);
+        when(child11.getParent()).thenReturn(parent1);
+        when(root.getId()).thenReturn(new DefaultObjexID("Root", 1));
+        when(parent1.getId()).thenReturn(new DefaultObjexID("Parent", 1));
+        when(child1.getId()).thenReturn(new DefaultObjexID("Child", 1));
+        when(child2.getId()).thenReturn(new DefaultObjexID("Child", 2));
+        when(cache.getObjects(CacheState.NEWORCHANGED)).thenReturn(changedOrNew);
+        
+        // Old errors
+        ValidationRequest oldRequest = mock(ValidationRequest.class);
+        final List<ValidationError> child1Errors = mock(List.class, "child1Errors");
+        final List<ValidationError> child2Errors = mock(List.class, "child2Errors");
         final Map<ObjexID, List<ValidationError>> oldErrors = new HashMap<ObjexID, List<ValidationError>>();
         oldErrors.put(child1.getId(), child1Errors);
         oldErrors.put(child2.getId(), child2Errors);
+        when(oldRequest.getErrorMap()).thenReturn(oldErrors);
+        when(child2Errors.size()).thenReturn(1);
         
-        context.checking(new Expectations() {{
-            oneOf(cache).getObjects(ObjectRole.NEW); will(returnValue(null));
-            oneOf(cache).getObjects(ObjectRole.UPDATED); will(returnValue(updatedObjects));
-            oneOf(cache).findObject(child2.getId(), ObjectRole.REMOVED); will(returnValue(null));
-            
-            oneOf(oldRequest).getErrorMap(); will(returnValue(oldErrors));
-            
-            exactly(2).of(child1).validate(with(any(ValidationRequest.class)));
-            oneOf(root).validate(with(any(ValidationRequest.class)));
-            
-            oneOf(child2Errors).size(); will(returnValue(1));
-        }});
+        ContainerValidator validator = new ContainerValidator(cache);
+        ValidationRequest result = validator.validate(oldRequest);
+        assertNotNull(result);
+        assertTrue(result.hasErrors(child2.getId()));
+        assertFalse(result.hasErrors(child1.getId()));
         
-        ValidationRequest result = ContainerValidator.validate(container, cache, oldRequest);
-        
-        // Test the errors remoain for child2, but not for child1
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.hasErrors(child2.getId()));
-        Assert.assertFalse(result.hasErrors(child1.getId()));
-        
-        context.assertIsSatisfied();
+        verify(child1, times(2)).validate(any(ValidationRequest.class));
+        verify(child11, times(2)).validate(any(ValidationRequest.class));
+        verify(parent1, times(1)).validate(any(ValidationRequest.class));
+        verify(root, times(1)).validate(any(ValidationRequest.class));
     }
 }

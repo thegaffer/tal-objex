@@ -16,23 +16,23 @@
 
 package org.talframework.objexj.container.middleware;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.ContainerMiddleware;
-import org.talframework.objexj.container.ObjexIDStrategy;
-import org.talframework.objexj.container.TransactionCache;
-import org.talframework.objexj.container.TransactionCache.ObjectRole;
-import org.talframework.objexj.container.impl.SimpleTransactionCache;
+import org.talframework.objexj.container.ContainerObjectCache;
+import org.talframework.objexj.container.ContainerObjectCache.CacheState;
+import org.talframework.objexj.container.impl.DefaultContainerObjectCache;
 import org.talframework.objexj.events.EventListener;
-import org.talframework.objexj.exceptions.ObjectIDInvalidException;
+import org.talframework.objexj.object.writer.BaseObjectReader.ObjectReaderBehaviour;
+import org.talframework.objexj.object.writer.BaseObjectWriter.ObjectWriterBehaviour;
+import org.talframework.objexj.object.writer.MapObjectReader;
+import org.talframework.objexj.object.writer.MapObjectWriter;
 
 /**
  * This class provides an implementation of the middleware that
@@ -49,12 +49,15 @@ public class InMemoryMiddleware implements ContainerMiddleware {
     private String id;
     /** Holds the container post-init */
     private Container container;
-    /** Holds the cache if we are open */
-    private TransactionCache cache;
-    /** Holds the ID strategy */
-    private ObjexIDStrategy idStrategy;
+    /** Determines if we are open or not */
+    private boolean open;
+    
     /** Holds the objects - if null its a new container */
-    List<ObjexObjStateBean> objects = null; 
+    private Map<ObjexID, Map<String, Object>> objects = null;
+    /** Holds the transaction */
+    private Map<ObjexID, Map<String, Object>> transaction = null;
+    /** Holds the last ID of an object */
+    private long lastId = 1;
     
     /**
      * Constructs a new {@link InMemoryMiddleware} instance.
@@ -63,146 +66,248 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * @param open Determines if the middleware should be open at the start
      */
     public InMemoryMiddleware(String id, boolean open) {
-        if( id == null ) {
-            this.id = null;
-            this.cache = new SimpleTransactionCache();
-            this.objects = null;
-            this.idStrategy = new InMemoryIDStrategy();
+        this.id = id;
+        this.open = open;
+        if( this.id != null && this.id.endsWith(":trans") ) this.id = id.substring(0, id.length() - 6);
+        
+        this.objects = this.id != null ? SingletonContainerStore.getInstance().getObjects(this.id) : null;
+        
+        // Determine highest ID if in transaction
+        if( open ) {
+            this.transaction = id != null ? SingletonContainerCache.getInstance().getCache(this.id) : null;
             
+            if( this.objects != null ) {
+                for( ObjexID objId : this.objects.keySet() ) updateLastId(objId);
+            }
+            if( this.transaction != null ) {
+                for( ObjexID objId : this.transaction.keySet() ) updateLastId(objId);
+            }
+            else {
+                this.transaction = new HashMap<ObjexID, Map<String,Object>>();
+            }
         }
-        else if( id.endsWith(":trans") ) {
-            this.id = id.substring(0, id.length() - 6);
-            this.cache = SingletonContainerCache.getInstance().getCache(id);
-            this.objects = SingletonContainerStore.getInstance().getObjects(this.id);
-            this.idStrategy = new InMemoryIDStrategy();
-        }
-        else {
-            this.id = id;
-            this.cache = open ? new SimpleTransactionCache() : null;
-            this.objects = SingletonContainerStore.getInstance().getObjects(this.id);
-            this.idStrategy = new InMemoryIDStrategy();
-        }
-    }
-
-    public void init(Container container) {
-        this.container = container;
     }
     
+    /**
+     * Helper to update the last ID if the ID is a numeric ID.
+     * Called from constructor
+     * 
+     * @param id The ID to test
+     */
+    private void updateLastId(ObjexID id) {
+        try {
+            long val = lastId;
+            if( id.getId() instanceof Long ) lastId = (Long)id.getId();
+            else val = Long.parseLong(id.getId().toString());
+            
+            if( val > lastId ) lastId = val;
+        }
+        catch( NumberFormatException e ) {}
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * FUTURE: This is wrong, we should return full set of ObjexObjects in the cache
+     */
+    @Override
+    public ContainerObjectCache init(Container container) {
+        this.container = container;
+        return new DefaultContainerObjectCache(1);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getContainerId() {
         return id;
     }
     
-    public ObjexIDStrategy getIdStrategy() {
-        return idStrategy;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean exists(ObjexID id, boolean accurate) {
+        return objects.containsKey(id);
     }
     
-    public TransactionCache getCache() {
-        return cache;
-    }
-    
-    public ObjexObjStateBean loadObject(Class<? extends ObjexObjStateBean> type, ObjexID id) {
-        ObjexObjStateBean ret = null;
+    /**
+     * {@inheritDoc}
+     * 
+     * FUTURE: This is wrong, the transaction objects should already be in the cache
+     */
+    @Override
+    public ObjexObj loadObject(ObjexObj obj) {
+        Map<String, Object> source = null;
+        if( this.transaction != null ) source = this.transaction.get(obj.getId());
+        if( source == null && this.objects != null ) source = this.objects.get(obj.getId());
         
-        // a. Try the cache first
-        if( cache != null ) {
-            ret = cache.findObject(id, null);
+        if( source == null ) return null;
+        
+        MapObjectReader reader = new MapObjectReader(ObjectReaderBehaviour.INCLUDE_OWNED, ObjectReaderBehaviour.INCLUDE_REFERENCES);
+        reader.readObject(source, obj);
+        return obj;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * In this container simply iterates around and loads them one by one.
+     * If using this class as a basis for your own container I suggest thinking
+     * whether you can batch load more efficiently here.
+     */
+    @Override
+    public Map<ObjexID, ObjexObj> loadObjects(ObjexObj... objs) {
+        Map<ObjexID, ObjexObj> ret = new HashMap<ObjexID, ObjexObj>();
+        for( ObjexObj obj : objs ) {
+            obj = loadObject(obj);
+            if( obj != null ) ret.put(obj.getId(), obj);
+        }
+        return ret;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isNew() {
+        return this.objects == null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isOpen() {
+        return open;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void open() {
+        if( open ) throw new IllegalStateException("Container is already open");
+        if( SingletonContainerCache.getInstance().getCache(getOrGenerateContainerId()) != null ) throw new IllegalStateException("There is already another transaction on this container, cannot open");
+        
+        // Find the highest ID
+        open = true;
+        if( this.objects != null ) {
+            for( ObjexID objId : this.objects.keySet() ) {
+                try {
+                    long val = Long.parseLong(objId.getId().toString()); 
+                    if( val > lastId ) lastId = val;
+                }
+                catch( NumberFormatException e ) {}
+            }
         }
         
-        // b. Otherwise load if we are a real container
-        if( ret == null ) {
-            int realId = getObjectId(id);
-            
-            ObjexObjStateBean current = null;
-            if( this.objects != null && realId >= 0 && realId < this.objects.size() ) {
-                current = this.objects.get(realId);
-            }
-            
-            if( current != null ) ret = current.cloneState();
+        this.transaction = new HashMap<ObjexID, Map<String,Object>>();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * In this simple middleware we simply increment a last index used
+     */
+    @Override
+    public ObjexID getNextObjectId(String type) {
+        if( !open ) throw new IllegalStateException("Middleware is not open so cannot generate a new ID");
+        
+        ObjexID ret = null;
+        synchronized( this ) {
+            ++lastId;
+            ret = new DefaultObjexID(type, lastId);
         }
         
         return ret;
     }
     
-    public boolean isNew() {
-        return this.objects == null;
-    }
-    
-    public TransactionCache open() {
-        if( cache == null ) cache = new SimpleTransactionCache();
-        return cache;
-    }
-    
-    public String save(String status, Map<String, String> header) {
-        if( cache == null ) throw new IllegalStateException("Middleware is not in a transaction, so cannot save");
+    /**
+     * {@inheritDoc}
+     * 
+     * FUTURE: This is wrong, the transaction objects should be in cache. We should only consider passed in cache for objects!
+     */
+    @Override
+    public String save(ContainerObjectCache cache, String status, Map<String, String> header) {
+        if( !open || this.transaction == null ) throw new IllegalStateException("Container is not open, or not open correctly");
         
-        // Create container ID if it is null
-        getOrGenerateContainerId();
+        Map<ObjexID, Map<String,Object>> toSave = this.transaction;
         
-        List<ObjexObjStateBean> existingObjs = SingletonContainerStore.getInstance().getObjects(id);
-        Map<ObjexID, ObjexObjStateBean> newObjs = cache.getObjects(ObjectRole.NEW);
-        Map<ObjexID, ObjexObjStateBean> updatedObjs = cache.getObjects(ObjectRole.UPDATED);
-        
-        // Create a new list for container
-        int size = existingObjs != null ? existingObjs.size() : 0;
-        size += newObjs != null ? newObjs.size() : 0;
-        List<ObjexObjStateBean> objs = new ArrayList<ObjexObjStateBean>(size);
-        for( int i = 0 ; i < size ; i++ ) objs.add(null);
-        
-        // Add on new objects
-        Iterator<ObjexID> it = newObjs != null ? newObjs.keySet().iterator() : null;
-        while( it != null && it.hasNext() ) {
-            ObjexID id = it.next();
-            int realId = getObjectId(id);
-            if( realId < 0 || realId >= objs.size() ) throw new IllegalArgumentException("New object does not appear to have created via middleware ID strategy, in-memory middleware does not support custom IDs: " + id);
-            objs.set(realId, newObjs.get(id));
+        MapObjectWriter writer = new MapObjectWriter(ObjectWriterBehaviour.INCLUDE_OWNED, ObjectWriterBehaviour.INCLUDE_REFERENCES);
+        Set<ObjexObj> changed = cache.getObjects(CacheState.ACTIVE);
+        for( ObjexObj obj : changed ) {
+            Map<String, Object> props = toSave.get(obj.getId());
+            if( props == null ) props = new HashMap<String, Object>();
+            writer.writeObject(props, null, obj);
+            toSave.put(obj.getId(), props);
         }
         
-        // Add those that have changed
-        it = updatedObjs != null ? updatedObjs.keySet().iterator() : null;
-        while( it != null && it.hasNext() ) {
-            ObjexID id = it.next();
-            int realId = getObjectId(id);
-            if( realId < 0 || realId >= objs.size() ) throw new IllegalArgumentException("New object does not appear to have created via middleware ID strategy, in-memory middleware does not support custom IDs: " + id);
-            objs.set(realId, updatedObjs.get(id));
+        // Merge in those objects
+        if( this.objects == null ) this.objects = new HashMap<ObjexID, Map<String,Object>>();
+        for( ObjexID id : toSave.keySet() ) {
+            // TODO: Watch out for removed!!
+            this.objects.put(id, toSave.get(id));
         }
         
-        // Add all previous unless not null or removed
-        if( existingObjs != null && existingObjs.size() > 0 ) {
-            for( int i = 0 ; i < existingObjs.size() ; i++ ) {
-                if( objs.get(i) != null ) continue;
-                else if( cache.getObjectRole(new DefaultObjexID(existingObjs.get(i).getObjexObjType(), i)) == ObjectRole.NONE ) {
-                    objs.set(i, existingObjs.get(i));
-                }
-            }
-        }
+        // TODO: Remove removed objects
         
-        // Save
-        SingletonContainerStore.getInstance().setObjects(id, objs);
-        return id;
-    }
-    
-    public String suspend() {
-        String transId = getOrGenerateContainerId();
-        transId += ":trans";
+        String containerId = getOrGenerateContainerId();
+        SingletonContainerCache.getInstance().setCache(containerId, null);
+        SingletonContainerStore.getInstance().setObjects(containerId, this.objects);
         
-        SingletonContainerCache.getInstance().setCache(transId, cache);
-        
-        return transId;
-    }
-    
-    public void clear() {
-        cache = null;
+        return containerId;
     }
     
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String suspend(ContainerObjectCache cache) {
+        if( !open || this.transaction == null ) throw new IllegalStateException("Container is not open, or not open correctly");
+        
+        MapObjectWriter writer = new MapObjectWriter(ObjectWriterBehaviour.INCLUDE_OWNED, ObjectWriterBehaviour.INCLUDE_REFERENCES);
+        Set<ObjexObj> changed = cache.getObjects(CacheState.ACTIVE);
+        for( ObjexObj obj : changed ) {
+            Map<String, Object> props = this.transaction.get(obj.getId());
+            if( props == null ) props = new HashMap<String, Object>();
+            writer.writeObject(props, null, obj);
+            this.transaction.put(obj.getId(), props);
+        }
+        
+        // TODO: Special map holding removed objects with id _Removed/_removed
+        
+        String containerId = getOrGenerateContainerId();
+        SingletonContainerCache.getInstance().setCache(containerId, this.transaction);
+        return containerId + ":trans";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear(ContainerObjectCache cache) {
+        if( !open || this.transaction == null ) throw new IllegalStateException("Container is not open, or not open correctly");
+        
+        SingletonContainerCache.getInstance().setCache(getOrGenerateContainerId(), null);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
      * FUTURE: Support events via in-proc mechanism?
      */
+    @Override
     public void registerListener(EventListener listener) {
     }
     
     /**
+     * {@inheritDoc}
+     * 
      * FUTURE: Support events via in-proc mechanism?
      */
+    @Override
     public void registerListenerForTransaction(EventListener listener) {
     }
     
@@ -215,46 +320,5 @@ public class InMemoryMiddleware implements ContainerMiddleware {
     private String getOrGenerateContainerId() {
         if( this.id == null ) this.id = container.getType() + "/" + System.currentTimeMillis();
         return this.id;
-    }
-    
-    /**
-     * Internal helper to obtain the raw ID of the object.
-     * 
-     * @param id The full ID
-     * @return Its internal index in the container
-     */
-    private int getObjectId(ObjexID id) {
-        long realId = -1;
-        if( id.getId() instanceof Long ) realId = (Long)id.getId();
-        else realId = Long.parseLong(id.toString());
-        realId -= 1;
-        
-        if( realId < 0 ) throw new ObjectIDInvalidException(id);
-        return (int)realId;
-    }
-    
-    /**
-     * Simple ID generator that takes the size of the objects
-     * in container as the start of any new ones.
-     *
-     * @author Tom Spencer
-     */
-    class InMemoryIDStrategy implements ObjexIDStrategy {
-        
-        int lastId = 1;
-        
-        public InMemoryIDStrategy() {
-            lastId = objects != null ? objects.size() : 1;
-            
-            // Addjust for any in cache if we are a suspended transaction
-            if( cache != null ) {
-                Map<ObjexID, ObjexObjStateBean> newObjs = cache.getObjects(ObjectRole.NEW);
-                if( newObjs != null ) lastId += newObjs.size();
-            }
-        }
-        
-        public ObjexID createId(Container container, Class<? extends ObjexObjStateBean> stateType, String type, ObjexObj obj) {
-            return new DefaultObjexID(type, ++lastId);
-        }
     }
 }

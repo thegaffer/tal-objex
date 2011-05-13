@@ -20,6 +20,13 @@ import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.container.InternalContainer;
 
+/**
+ * This interface works over and above ObjexObj to allow {@link DefaultObjectStrategy}
+ * to create and initialise objects. There is no need to use this, but it is a concise
+ * way of initialising the objects without the need for a constructor.
+ *
+ * @author Tom Spencer
+ */
 public interface InternalObjexObj extends ObjexObj {
 
     /**

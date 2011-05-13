@@ -28,6 +28,8 @@ public interface ObjexExceptionVisitor {
     
     public <T> T visit(ObjectIDInvalidException e, Class<T> expected);
     
+    public <T> T visit(ObjectInvalidException e, Class<T> expected);
+    
     public <T> T visit(ObjectNotFoundException e, Class<T> expected);
     
     public <T> T visit(ObjectRemovedException e, Class<T> expected);

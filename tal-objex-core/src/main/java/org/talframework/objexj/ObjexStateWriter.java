@@ -2,8 +2,9 @@ package org.talframework.objexj;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
+import org.talframework.objexj.ObjexObj.ObjexFieldType;
 
 /**
  * This interface is intended to all a client to get the objects
@@ -36,7 +37,7 @@ public interface ObjexStateWriter {
      * @param type The field type
      * @param persistent Indicates the field is considered persistent
      */
-    public void writeReference(String name, String ref, ObjexFieldType type, boolean persistent);
+    public void writeReference(String name, Object ref, ObjexFieldType type, boolean persistent);
     
     /**
      * Writes out the given reference list property
@@ -46,7 +47,17 @@ public interface ObjexStateWriter {
      * @param type The field type
      * @param persistent Indicates the field is considered persistent
      */
-    public void writeReferenceList(String name, List<String> ref, ObjexFieldType type, boolean persistent);
+    public void writeReferenceList(String name, List<?> refs, ObjexFieldType type, boolean persistent);
+    
+    /**
+     * Writes out the given reference list property
+     * 
+     * @param name The name of the property
+     * @param ref The value
+     * @param type The field type
+     * @param persistent Indicates the field is considered persistent
+     */
+    public void writeReferenceSet(String name, Set<?> refs, ObjexFieldType type, boolean persistent);
     
     /**
      * Writes out the given reference map property
@@ -56,5 +67,5 @@ public interface ObjexStateWriter {
      * @param type The field type
      * @param persistent Indicates the field is considered persistent
      */
-    public void writeReferenceMap(String name, Map<String, String> ref, ObjexFieldType type, boolean persistent);
+    public void writeReferenceMap(String name, Map<String, ?> refs, ObjexFieldType type, boolean persistent);
 }

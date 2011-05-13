@@ -17,13 +17,9 @@
 package org.talframework.objexj.locator;
 
 import org.talframework.objexj.Container;
-import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.ContainerMiddleware;
 import org.talframework.objexj.container.ContainerMiddlewareFactory;
 import org.talframework.objexj.container.ContainerStrategy;
-import org.talframework.objexj.container.ObjectStrategy;
-import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.container.impl.SimpleContainer;
 import org.talframework.objexj.exceptions.ContainerNotFoundException;
 
@@ -35,7 +31,7 @@ import org.talframework.objexj.exceptions.ContainerNotFoundException;
  * 
  * @author Tom Spencer
  */
-public final class SimpleContainerFactory implements ContainerFactory, InterceptingContainerFactory {
+public final class SimpleContainerFactory implements ContainerFactory {
     
 	/** Describes the overall strategy for the container */
 	private ContainerStrategy strategy;
@@ -98,91 +94,46 @@ public final class SimpleContainerFactory implements ContainerFactory, Intercept
         this.middlewareFactory = middlewareFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Container create() {
         ContainerMiddleware middleware = middlewareFactory.createContainer(strategy);
-        
-        // Add in the root object
-        ObjexID rootId = strategy.getRootObjectID();
-        ObjexObjStateBean rootBean = createRootBean();
-        middleware.getCache().addObject(ObjectRole.NEW, rootId, rootBean);
-        
         return new SimpleContainer(null, strategy, middleware, true);
     }
     
-    public Container create(InterceptingMiddleware interceptor) {
-        ContainerMiddleware middleware = middlewareFactory.createContainer(strategy);
-        interceptor.setRealMiddleware(middleware);
-        
-        // Add in the root object
-        ObjexID rootId = strategy.getRootObjectID();
-        ObjexObjStateBean rootBean = createRootBean();
-        middleware.getCache().addObject(ObjectRole.NEW, rootId, rootBean);
-        
-        return new SimpleContainer(null, strategy, interceptor, true);
-    }
-
     /**
-     * Helper to create the state bean for the root object.
+     * {@inheritDoc}
      * 
-     * @return The state bean
-     */
-    private ObjexObjStateBean createRootBean() {
-        ObjectStrategy rootStrategy = strategy.getObjectStrategy(strategy.getRootObjectName());
-        ObjexObjStateBean rootBean;
-        try {
-            rootBean = rootStrategy.getStateClass().newInstance();
-        }
-        catch( RuntimeException e ) {
-            throw e;
-        }
-        catch( Exception e ) {
-            throw new IllegalArgumentException("Cannot create root bean: " + rootStrategy.getStateClass(), e);
-        }
-        return rootBean;
-    }
-    
-    /**
 	 * Simply constructs an instance of the standard container
 	 * with plugins configured.
 	 */
+    @Override
 	public Container get(String id) {
 	    ContainerMiddleware middleware = middlewareFactory.getMiddleware(strategy, id);
 	    return new SimpleContainer(middleware.getContainerId(), strategy, middleware, false);
 	}
 	
 	/**
-     * Simply constructs an instance of the standard container
-     * with plugins configured.
-     */
-    public Container get(InterceptingMiddleware interceptor, String id) {
-	    ContainerMiddleware middleware = middlewareFactory.getMiddleware(strategy, id);
-	    interceptor.setRealMiddleware(middleware);
-        return new SimpleContainer(middleware.getContainerId(), strategy, interceptor, false);
-	}
-	
-	/**
+	 * {@inheritDoc}
+	 * 
 	 * Simply constructs an instance of the basic editable 
 	 * container.
 	 */
+    @Override
 	public Container open(String id) {
 	    ContainerMiddleware middleware = middlewareFactory.getTransaction(strategy, id);
 	    return new SimpleContainer(middleware.getContainerId(), strategy, middleware, true);
 	}
 	
 	/**
-     * Simply constructs an instance of the basic editable 
-     * container.
-     */
-    public Container open(InterceptingMiddleware interceptor, String id) {
-	    ContainerMiddleware middleware = middlewareFactory.getTransaction(strategy, id);
-        interceptor.setRealMiddleware(middleware);
-        return new SimpleContainer(middleware.getContainerId(), strategy, interceptor, true);
-	}
-	
-	/**
+	 * {@inheritDoc}
+	 * 
 	 * Determines if the factory represents a store and if
 	 * so determines if it exists. If not it creates it.
 	 */
+    @Override
 	public void createStore() {
 	    if( strategy.getContainerId() != null ) {
 	        try {

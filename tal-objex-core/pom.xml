@@ -13,6 +13,12 @@
   
   <dependencies>
   	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-annotations</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	
+  	<dependency>
   		<groupId>org.talframework.tal</groupId>
 		<artifactId>tal-util-beans</artifactId>
   	</dependency>

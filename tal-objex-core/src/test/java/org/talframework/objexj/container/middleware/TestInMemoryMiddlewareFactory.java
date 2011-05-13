@@ -16,7 +16,8 @@
 
 package org.talframework.objexj.container.middleware;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -25,7 +26,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.exceptions.ContainerExistsException;
 
@@ -71,7 +72,7 @@ public class TestInMemoryMiddlewareFactory {
             oneOf(strategy).getContainerId(); will(returnValue("999"));
         }});
         
-        SingletonContainerStore.getInstance().setObjects("999", new ArrayList<ObjexObjStateBean>());
+        SingletonContainerStore.getInstance().setObjects("999", new HashMap<ObjexID, Map<String,Object>>());
         
         InMemoryMiddlewareFactory factory = new InMemoryMiddlewareFactory();
         factory.createContainer(strategy);

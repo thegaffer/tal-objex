@@ -37,7 +37,7 @@ public final class SimpleContainerStrategy implements ContainerStrategy {
 	private final String id;
 	private final String rootObject;
 	private final Map<String, ObjectStrategy> objectStrategies;
-	private final Map<String, ObjectStrategy> objectStrategiesByState;
+	private final Map<Class<?>, ObjectStrategy> classStrategies;
 	private Map<String, Query> namedQueries;
 	private Map<String, EventHandler> eventHandlers;
 	private List<EventListener> standardListeners;
@@ -54,11 +54,11 @@ public final class SimpleContainerStrategy implements ContainerStrategy {
 		this.id = null;
 		this.rootObject = rootObject;
 		this.objectStrategies = new HashMap<String, ObjectStrategy>();
-		this.objectStrategiesByState = new HashMap<String, ObjectStrategy>();
+		this.classStrategies = new HashMap<Class<?>, ObjectStrategy>();
 		
 		for( int i = 0 ; i < strategies.length ; i++ ) {
 			this.objectStrategies.put(strategies[i].getTypeName(), strategies[i]);
-			this.objectStrategiesByState.put(strategies[i].getStateClass().getSimpleName(), strategies[i]);
+			this.classStrategies.put(strategies[i].getMainClass(), strategies[i]);
 		}
 	}
 	
@@ -75,18 +75,18 @@ public final class SimpleContainerStrategy implements ContainerStrategy {
         this.id = id;
         this.rootObject = rootObject;
         this.objectStrategies = new HashMap<String, ObjectStrategy>();
-        this.objectStrategiesByState = new HashMap<String, ObjectStrategy>();
+        this.classStrategies = new HashMap<Class<?>, ObjectStrategy>();
         
         for( int i = 0 ; i < strategies.length ; i++ ) {
             this.objectStrategies.put(strategies[i].getTypeName(), strategies[i]);
-            this.objectStrategiesByState.put(strategies[i].getStateClass().getSimpleName(), strategies[i]);
+            this.classStrategies.put(strategies[i].getMainClass(), strategies[i]);
         }
     }
 	
 	/**
      * @return the namedQueries
      */
-    public Map<String, Query> getNamedQueries() {
+	public Map<String, Query> getNamedQueries() {
         return namedQueries;
     }
 
@@ -114,6 +114,7 @@ public final class SimpleContainerStrategy implements ContainerStrategy {
     /**
      * @return the standardListeners
      */
+    @Override
     public List<EventListener> getStandardListeners() {
         return standardListeners;
     }
@@ -125,40 +126,47 @@ public final class SimpleContainerStrategy implements ContainerStrategy {
         this.standardListeners = standardListeners;
     }
 
+    @Override
     public String getContainerName() {
 		return name;
 	}
 	
-	public String getContainerId() {
+    @Override
+    public String getContainerId() {
 	    return id;
 	}
 	
-	public String getRootObjectName() {
+    @Override
+    public String getRootObjectName() {
 	    return rootObject;
 	}
 	
-	public ObjexID getRootObjectID() {
+    @Override
+    public ObjexID getRootObjectID() {
 	    return new DefaultObjexID(rootObject, 1);
 	}
 	
-	public ObjectStrategy getObjectStrategy(String type) {
+	@Override
+    public ObjectStrategy getObjectStrategy(String type) {
 	    ObjectStrategy ret = objectStrategies.get(type);
 	    if( ret == null ) throw new ObjectTypeNotFoundException(type);
 	    return ret;
 	}
 	
-	public ObjectStrategy getObjectStrategyForState(String stateType) {
-	    ObjectStrategy ret = objectStrategiesByState.get(stateType);
-        if( ret == null ) throw new ObjectTypeNotFoundException(stateType);
+	@Override
+	public ObjectStrategy getObjectStrategyForObject(Object object) {
+	    ObjectStrategy ret = classStrategies.get(object.getClass());
         return ret;
 	}
 	
-	public Query getQuery(String name) {
+	@Override
+    public Query getQuery(String name) {
 	    if( namedQueries != null && namedQueries.containsKey(name) ) return namedQueries.get(name);
 	    else throw new QueryNotFoundException(name);
 	}
 	
-	public EventHandler getEventHandler(String name) {
+	@Override
+    public EventHandler getEventHandler(String name) {
 	    if( eventHandlers != null && eventHandlers.containsKey(name) ) return eventHandlers.get(name);
 	    else throw new EventHandlerNotFoundException(name);
 	}

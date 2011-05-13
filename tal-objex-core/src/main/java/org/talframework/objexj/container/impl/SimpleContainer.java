@@ -27,22 +27,19 @@ import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.Event;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.QueryRequest;
 import org.talframework.objexj.QueryResult;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ContainerMiddleware;
+import org.talframework.objexj.container.ContainerObjectCache;
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.container.ObjectStrategy;
-import org.talframework.objexj.container.ObjexIDStrategy;
-import org.talframework.objexj.container.TransactionCache;
-import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.events.EventHandler;
 import org.talframework.objexj.exceptions.ContainerInvalidException;
 import org.talframework.objexj.exceptions.EventHandlerNotFoundException;
 import org.talframework.objexj.exceptions.ObjectNotFoundException;
-import org.talframework.objexj.exceptions.ObjectRemovedException;
+import org.talframework.objexj.exceptions.ObjectTypeNotFoundException;
 import org.talframework.objexj.object.RootObjexObj;
 import org.talframework.objexj.query.Query;
 
@@ -62,10 +59,8 @@ public final class SimpleContainer implements InternalContainer {
     /** Holds the runtime middleware for this container */
     private final ContainerMiddleware middleware;
 
-    /** Member holds a cache of all objects served by container */
-    private Map<ObjexID, ObjexObj> objexObjCache;
-    /** The cache of all objects in the transaction */
-    private TransactionCache transactionCache;
+    /** The cache of all objects served by the container */
+    private ContainerObjectCache cache;
     
     /**
      * Standard constructor for the container.
@@ -85,17 +80,38 @@ public final class SimpleContainer implements InternalContainer {
         this.id = id;
         this.strategy = strategy;
         this.middleware = middleware;
-        if( open ) this.transactionCache = middleware.getCache();
+        this.cache = middleware.init(this);
         
-        middleware.init(this);
+        // This is a new container, so create the root object
+        if( this.id == null ) {
+            if( !open ) throw new IllegalArgumentException("The container cannot be new (no ID) and not be open at creation!");
+            
+            ObjectStrategy rootStrategy = this.strategy.getObjectStrategy(this.strategy.getRootObjectName());
+            if( rootStrategy == null ) throw new IllegalArgumentException("The container strategy has no root object or not strategy for the root object");
+            
+            // Get the root ID or form a new one
+            ObjexID rootId = this.strategy.getRootObjectID();
+            if( rootId == null ) rootId = new DefaultObjexID(rootStrategy.getTypeName(), 1);
+            
+            ObjexObj ret = rootStrategy.createInstance(this, null, rootId, null);
+            cache.addObject(ret, true);
+        }
+    }
+    
+    /**
+     * Helper to quickly check the container is usable. The container
+     * is not usable after saving, suspending or closing the container.
+     * Also serves to ensure the container is setup correctly.
+     */
+    private void checkUsable() {
+        if( cache == null ) throw new IllegalStateException("The container instance is not usable anymore, please re-open");
     }
     
     /**
      * Helper to determine if we are in a transaction or not.
-     * This is based on whether we have a transaction cache.
      */
     private void checkInTransaction() {
-        if( transactionCache == null ) throw new IllegalStateException("The container [" + this.id + "] is not open so changes cannot be made");
+        if( !middleware.isOpen() ) throw new IllegalStateException("The container [" + this.id + "] is not open so changes cannot be made");
     }
     
     /**
@@ -124,6 +140,24 @@ public final class SimpleContainer implements InternalContainer {
     }
     
     /**
+     * Attempts to convert object into an ID
+     */
+    @Override
+    public ObjexID getIdOfObject(Object obj) {
+        ObjexID ret = null;
+        
+        if( obj instanceof ObjexID ) ret = (ObjexID)obj;
+        else if( obj instanceof ObjexObj ) ret = ((ObjexObj)obj).getId();
+        else if( obj instanceof String ) ret = DefaultObjexID.getId(obj);
+        else {
+            ObjectStrategy objectStrategy = strategy.getObjectStrategyForObject(obj);
+            if( objectStrategy != null ) ret = objectStrategy.getObjexID(obj);
+        }
+        
+        return ret;
+    }
+    
+    /**
      * Gets the object by the ID and then the expected
      * behvaiour.
      */
@@ -143,54 +177,25 @@ public final class SimpleContainer implements InternalContainer {
      * for future use.</p>
      */
     public ObjexObj getObject(Object id) {
+        checkUsable();
         if( id == null ) return null; // Just protect from a stupid call!!
         
         ObjexID realId = DefaultObjexID.getId(id);
         if( realId == null ) throw new IllegalArgumentException("ID passed in does not appear to be valid: " + id);
         
         // See if we already have it
-        ObjexObj ret = getLocalObject(realId);
+        ObjexObj ret = cache.getObject(realId, false);
         
         // Go to middleware if neccessary
-        if( ret == null ) {
+        if( ret == null && middleware.exists(realId, false) ) {
             ObjectStrategy objectStrategy = strategy.getObjectStrategy(realId.getType());
+            ret = objectStrategy.createInstance(this, null, realId, null);
             
-            ObjexObjStateBean state = middleware.loadObject(objectStrategy.getStateClass(), realId);
-            if( state != null ) {
-                ret = objectStrategy.getObjexObjInstance(this, DefaultObjexID.getId(state.getParentId()), realId, state);
-                if( objexObjCache == null ) objexObjCache = new HashMap<ObjexID, ObjexObj>();
-                objexObjCache.put(realId, ret);
-            }
-            else {
-                throw new ObjectNotFoundException(this.id, realId.toString());
-            }
+            ret = middleware.loadObject(ret);
+            if( ret != null ) cache.addObject(ret, false);
         }
         
-        return ret;
-    }
-    
-    /**
-     * Helper to get an object, but only if held locally.
-     * This method will not call the middleware.
-     * 
-     * @param id The ID of the object
-     * @return The object if known in container
-     */
-    private ObjexObj getLocalObject(ObjexID id) {
-        ObjexObj ret = null;
-        
-        // a. See if we already hold it as an object
-        ret = objexObjCache != null ? objexObjCache.get(id) : null;
-        if( ret != null ) return ret;
-        
-        // b. See if in cache, if so create ObjexObj around it and cache that
-        ObjexObjStateBean state = transactionCache != null ? transactionCache.findObject(id, null) : null;
-        if( state != null ) {
-            ObjectStrategy objectStrategy = strategy.getObjectStrategy(id.getType());
-            ret = objectStrategy.getObjexObjInstance(this, DefaultObjexID.getId(state.getParentId()), id, state);
-            if( objexObjCache == null ) objexObjCache = new HashMap<ObjexID, ObjexObj>();
-            objexObjCache.put(id, ret);
-        }
+        if( ret == null ) throw new ObjectNotFoundException(this.id, realId.toString()); 
         
         return ret;
     }
@@ -201,6 +206,7 @@ public final class SimpleContainer implements InternalContainer {
      * FUTURE: Work out objects not held locally and get in one op
      */
     public List<ObjexObj> getObjectList(List<? extends Object> ids) {
+        checkUsable();
         if( ids == null ) return null;
         
         List<ObjexObj> ret = new ArrayList<ObjexObj>();
@@ -239,6 +245,7 @@ public final class SimpleContainer implements InternalContainer {
      * FUTURE: Work out objects not held locally and get in one op
      */
     public Map<String, ObjexObj> getObjectMap(Map<String, ? extends Object> ids) {
+        checkUsable();
         if( ids == null ) return null;
         
         Map<String, ObjexObj> ret = new HashMap<String, ObjexObj>();
@@ -281,6 +288,7 @@ public final class SimpleContainer implements InternalContainer {
      * executes the query.
      */
     public QueryResult executeQuery(QueryRequest request) {
+        checkUsable();
         Query query = strategy.getQuery(request.getName());
         return query.execute(this, strategy, request);
     }
@@ -291,6 +299,7 @@ public final class SimpleContainer implements InternalContainer {
      * @throws EventHandlerNotFoundException If the event is unknown
      */
     public void processEvent(Event event) {
+        checkUsable();
         EventHandler handler = strategy.getEventHandler(event.getEventName());
         handler.execute(this, event);
     }
@@ -303,7 +312,8 @@ public final class SimpleContainer implements InternalContainer {
      */
     public Container openContainer() {
         if( isOpen() ) throw new IllegalArgumentException("The container is already open");
-        if( transactionCache == null ) transactionCache = middleware.open();
+        middleware.open();
+        if( !middleware.isOpen() ) throw new IllegalArgumentException("The container [" + this.id + "] does not allowing being opened after creation");
         return this;
     }
     
@@ -311,6 +321,7 @@ public final class SimpleContainer implements InternalContainer {
      * Asks the middleware if the container is new
      */
     public boolean isNew() {
+        checkUsable();
         return middleware.isNew();
     }
     
@@ -318,7 +329,8 @@ public final class SimpleContainer implements InternalContainer {
      * Determines based on the transaction cache presence
      */
     public boolean isOpen() {
-        return transactionCache != null;
+        checkUsable();
+        return middleware.isOpen();
     }
 
     /**
@@ -329,7 +341,7 @@ public final class SimpleContainer implements InternalContainer {
         RootObjexObj root = (obj instanceof RootObjexObj) ? (RootObjexObj)obj : null; 
         
         // Validate
-        ValidationRequest request = ContainerValidator.validate(this, transactionCache, root != null ? root.getErrors() : null);
+        ValidationRequest request = ContainerValidator.validate(cache, root != null ? root.getErrors() : null);
         
         // Save with root if applicable
         request = root != null ? root.processValidation(request) : request;
@@ -348,7 +360,8 @@ public final class SimpleContainer implements InternalContainer {
     
     /**
      * Validates the container, assigns any permanent IDs and
-     * then saves via the middleware. 
+     * then saves via the middleware. After use the container
+     * should no longer be used. 
      */
     public String saveContainer() {
         checkInTransaction();
@@ -364,172 +377,58 @@ public final class SimpleContainer implements InternalContainer {
             throw new ContainerInvalidException(id, request);
         }
         
-        // b. Assign perm IDs
-        assignPermanentIds();
-    
-        // c. Save
+        // b. Save
         String status = root != null ? root.getStatus() : null;
         Map<String, String> header = root != null ? root.getHeader() : null;
-        id = middleware.save(status, header);
-        objexObjCache = null;
-        transactionCache = null;
+        id = middleware.save(cache, status, header);
+        cache = null;
         return getId();
     }
     
     /**
-     * Removes any caches and suspends the middleware.
+     * Removes any caches and suspends the middleware. After use
+     * the container should no longer be used.
      */
     public String suspend() {
         checkInTransaction();
-        
-        objexObjCache = null;
-        transactionCache = null;
-        return middleware.suspend();
+        String ret = middleware.suspend(cache);
+        cache = null;
+        return ret;
     }
     
     /**
      * Removes any caches and clears the middleware.
      */
     public void closeContainer() {
-        objexObjCache = null;
-        transactionCache = null;
-        middleware.clear();
+        middleware.clear(cache);
+        cache = null;
     }
     
     ///////////////////////////////////////////////
     // Internal Specific
     
-    /**
-     * Simply defers to the cache to answer the question
-     */
-    public ObjectRole getObjectRole(ObjexID id) {
-        return transactionCache != null ? transactionCache.getObjectRole(id) : ObjectRole.NONE;
-    }
-    
-    /**
-     * Called by children to add themselves to the transaction when
-     * they are about to change. If already in the transaction this
-     * is a no-op.
-     */
-    public void addObjectToTransaction(ObjexObj obj, ObjexObjStateBean state) {
+    @Override
+    public ObjexObj createObject(ObjexObj parentObj, Object source) {
         checkInTransaction();
         
-        ObjectRole role = transactionCache.getObjectRole(obj.getId());
+        ObjectStrategy objectStrategy = strategy.getObjectStrategyForObject(source);
+        if( objectStrategy == null ) throw new ObjectTypeNotFoundException(source != null ? source.toString() : "<>");
         
-        switch(role) {
-        case NONE:
-            transactionCache.addObject(ObjectRole.UPDATED, obj.getId(), state);
-            state.setEditable();
-            break;
-            
-        case REMOVED:
-            throw new ObjectRemovedException(id, obj.getId().toString());
-        }
-    }
-    
-    /**
-     * Creates the object and adds both it and the parent object
-     * to the transaction.
-     */
-    public ObjexObj newObject(ObjexObj obj, ObjexObjStateBean state, String type) {
-        checkInTransaction();
+        // a. Create the new ID
+        ObjexID id = objectStrategy.getObjexID(source);
+        if( id == null ) id = middleware.getNextObjectId(objectStrategy.getTypeName());
+        ObjexID parentId = parentObj != null ? parentObj.getId() : null;
         
-        ObjectStrategy objectStrategy = strategy.getObjectStrategy(type);
-        Class<? extends ObjexObjStateBean> stateClass = objectStrategy.getStateClass();
+        // b. Create the object & add to cache
+        ObjexObj ret = objectStrategy.createInstance(this, parentId, id, source);
+        cache.addObject(ret, true);
         
-        // a. Create the temp ID
-        ObjexIDStrategy idStrategy = objectStrategy.getIdStrategy();
-        if( idStrategy == null ) idStrategy = middleware.getIdStrategy();
-        ObjexID newId = idStrategy.createId(this, stateClass, type, null);
-        ObjexID parentId = obj != null ? obj.getId() : null;
-        
-        // b. Create the state object & add to transaction
-        ObjexObjStateBean newState = createStateBean(objectStrategy.getStateClass(), parentId);
-        newState.setEditable();
-        transactionCache.addObject(ObjectRole.NEW, newId, newState);
-        
-        // c. Create ObjexObj, add it to cache and return it
-        ObjexObj ret = objectStrategy.getObjexObjInstance(this, parentId, newId, newState);
-        if( objexObjCache == null ) objexObjCache = new HashMap<ObjexID, ObjexObj>();
-        objexObjCache.put(newId, ret);
         return ret;
     }
     
     public void removeObject(ObjexObj obj) {
         checkInTransaction();
         
-        ObjexObjStateBean state = transactionCache.findObject(obj.getId(), null);
-        if( state == null ) state = middleware.loadObject(strategy.getObjectStrategy(obj.getType()).getStateClass(), obj.getId());
-        
-        transactionCache.addObject(ObjectRole.REMOVED, obj.getId(), state);
-    }
-    
-    /**
-     * Helper to create a state bean given its class.
-     * The bean will be writable straight away
-     * 
-     * @param cls The class of the state bean
-     * @param parentId The parentId (if any)
-     * @return The new state bean
-     */
-    private ObjexObjStateBean createStateBean(Class<? extends ObjexObjStateBean> cls, ObjexID parentId) {
-        try {
-            ObjexObjStateBean bean = cls.newInstance();
-            bean.create(parentId);
-            return bean;
-        }
-        catch( RuntimeException e ) {
-            throw e;
-        }
-        catch( Exception e ) {
-            throw new IllegalArgumentException("Cannot create state bean: " + cls, e);
-        }
-    }
-    
-    ///////////////////////////////////////////////
-    // Internal
-    
-    /**
-     * Helper to assign permanent IDs to any new objects that
-     * have temporary IDs
-     */
-    private void assignPermanentIds() {
-        Map<ObjexID, ObjexObjStateBean> newObjects = transactionCache.getObjects(ObjectRole.NEW);
-        if( newObjects != null ) {
-            Map<ObjexID, ObjexID> tempRefs = null;
-            Iterator<ObjexID> it = newObjects.keySet().iterator();
-            while( it.hasNext() ) {
-                ObjexID temp = it.next();
-                if( temp.isTemp() ) {
-                    if( tempRefs == null ) tempRefs = new HashMap<ObjexID, ObjexID>();
-                    ObjexID realId = null; // TODO: Get the real ID
-                    tempRefs.put(temp, realId);
-                }
-            }
-            
-            // Now clean up any references
-            if( tempRefs != null ) {
-                it = tempRefs.keySet().iterator();
-                while( it.hasNext() ) {
-                    ObjexID temp = it.next();
-                    ObjexObjStateBean bean = newObjects.get(temp);
-                    newObjects.remove(temp);
-                    newObjects.put(tempRefs.get(temp), bean);
-                }
-                
-                it = newObjects.keySet().iterator();
-                while( it.hasNext() ) {
-                    newObjects.get(it.next()).updateTemporaryReferences(tempRefs);
-                }
-                
-                Map<ObjexID, ObjexObjStateBean> updatedObjects = transactionCache.getObjects(ObjectRole.UPDATED);
-                if( updatedObjects != null ) {
-                    it = updatedObjects.keySet().iterator();
-                    while( it.hasNext() ) {
-                        updatedObjects.get(it.next()).updateTemporaryReferences(tempRefs);
-                    }
-                }
-            }
-        }
+        cache.removeObject(obj);
     }
 }

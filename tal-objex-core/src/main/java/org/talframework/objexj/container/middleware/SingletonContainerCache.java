@@ -19,7 +19,7 @@ package org.talframework.objexj.container.middleware;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.talframework.objexj.container.TransactionCache;
+import org.talframework.objexj.ObjexID;
 
 /**
  * This acts as a cache for the in-memory middleware to use
@@ -32,7 +32,7 @@ import org.talframework.objexj.container.TransactionCache;
 public final class SingletonContainerCache {
     private static final SingletonContainerCache INSTANCE = new SingletonContainerCache();
     
-    private Map<String, TransactionCache> cache;
+    private Map<String, Map<ObjexID, Map<String, Object>>> cache;
     
     /** Hidden constructor */
     private SingletonContainerCache() {}
@@ -50,7 +50,7 @@ public final class SingletonContainerCache {
      * @param transactionId The ID of the transaction
      * @return The cache
      */
-    public TransactionCache getCache(String transactionId) {
+    public Map<ObjexID, Map<String, Object>> getCache(String transactionId) {
         if( transactionId == null ) throw new IllegalArgumentException("Transaction ID must not be null when using the in-memory container cache");
         
         return cache != null ? cache.get(transactionId) : null;
@@ -62,10 +62,10 @@ public final class SingletonContainerCache {
      * @param transactionId The ID of the cache
      * @param cache The cache itself
      */
-    public void setCache(String transactionId, TransactionCache cache) {
+    public void setCache(String transactionId, Map<ObjexID, Map<String, Object>> cache) {
         if( transactionId == null ) throw new IllegalArgumentException("Transaction ID must not be null when using the in-memory container cache");
         
-        if( this.cache == null ) this.cache = new HashMap<String, TransactionCache>();
+        if( this.cache == null ) this.cache = new HashMap<String, Map<ObjexID,Map<String,Object>>>();
         this.cache.put(transactionId, cache);
     }
 }

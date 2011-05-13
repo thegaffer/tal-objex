@@ -35,6 +35,8 @@ public interface Query {
      * Call to execute the query against the given container with
      * the given parameters.
      * 
+     * TODO: Do not like the passing of InternalContainer or Strategy here!!! Cyclical dependencies!
+     * 
      * @param container The container to run against
      * @param strategy The container strategy (used to get at the object strategies)
      * @param request The request and its parameters

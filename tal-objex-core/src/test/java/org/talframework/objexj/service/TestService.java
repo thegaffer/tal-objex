@@ -16,15 +16,22 @@
 
 package org.talframework.objexj.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.Assert;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.talframework.objexj.Container;
+import org.talframework.objexj.DefaultObjexID;
+import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.container.ContainerMiddlewareFactory;
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.container.impl.SimpleContainerStrategy;
@@ -32,148 +39,208 @@ import org.talframework.objexj.container.middleware.InMemoryMiddlewareFactory;
 import org.talframework.objexj.container.middleware.SingletonContainerStore;
 import org.talframework.objexj.locator.ContainerFactory;
 import org.talframework.objexj.locator.SimpleContainerFactory;
-import org.talframework.objexj.object.SimpleObjectStrategy;
-import org.talframework.objexj.object.testbeans.CategoryBean;
-import org.talframework.objexj.object.testbeans.ProductBean;
+import org.talframework.objexj.object.DefaultObjectStrategy;
+import org.talframework.objexj.object.testmodel.api.ICategory;
+import org.talframework.objexj.object.testmodel.pojo.Category;
+import org.talframework.objexj.object.testmodel.pojo.Product;
 
 /**
- * This class represents a service that would be written
- * to access an Objex container and manipulate it. This
- * method serves as a basic integration test, but also a
- * documentation of how to use objex.
+ * This integration class demonstrated how to interact with
+ * Objex containers in a number of different scenarios.
  * 
- * <p>Note: In this test when interacting with the objects
- * we get the state bean and then change that. This is not
- * really the way to use objects, but rather get hold of
- * a business interface from the ObjexObj and use it 
- * directly. This test will be changed in the future to do
- * this, but for now it is a guide more on how to use a
- * container.</p>
+ * <p>The example are all based on our simple 'Stock' objects
+ * used in other tests. The root object is a category object 
+ * that holds more 'categories' and products. The container is 
+ * treated as a document, but in reality a store is probably 
+ * more realistic.</p>
+ * 
+ * <p>Note that we use the interfaces to our objects, which 
+ * are preffixed 'I' simply because we wanted to create objects
+ * of the same name - I do not recommend the prefix 'I' for
+ * instances (though if that floats your boat then hey ho).</p>
  * 
  * @author Tom Spencer
  */
 public class TestService {
 	
-	private static ContainerFactory factory;
+	private ContainerFactory factory;
 	
 	/**
-	 * Sets up the definition of our little test container
-	 * using the InMemory middleware implementation. This
-	 * is done only once for all tests
+	 * This sets up the initial data for our tests in the store
+	 * that the InMemory middleware uses
 	 */
 	@BeforeClass
-	public static void setup() {
-	    ContainerStrategy strategy = new SimpleContainerStrategy("Test", "Category", 
-	            new SimpleObjectStrategy("Category", null, CategoryBean.class),
-	            new SimpleObjectStrategy("Product", null, ProductBean.class));
+	public static void staticsetup() {
+	    // Test/123, just a root object
+	    Map<ObjexID, Map<String, Object>> objs = new HashMap<ObjexID, Map<String,Object>>();
+	    Map<String, Object> vals = new HashMap<String, Object>();
+	    vals.put("name", "Root");
+	    vals.put("description", "A default root category");
+	    objs.put(new DefaultObjexID("Category", 1), vals);
+	    SingletonContainerStore.getInstance().setObjects("Test/123", objs);
 	    
-	    ContainerMiddlewareFactory middlewareFactory = new InMemoryMiddlewareFactory();
-	    
-	    factory = new SimpleContainerFactory(strategy, middlewareFactory);
-	    
-	    // Now setup a couple of containers
-	    List<ObjexObjStateBean> test1Objs = new ArrayList<ObjexObjStateBean>(3);
-	    test1Objs.add(new CategoryBean("RootCategory", "Root"));
-	    test1Objs.add(new ProductBean("Product1", "Product1", 0, 100.0));
-	    test1Objs.add(new CategoryBean("Cat1", "Cat1"));
-	    SingletonContainerStore.getInstance().setObjects("Test/123", test1Objs);
-	    
-	    List<ObjexObjStateBean> test2Objs = new ArrayList<ObjexObjStateBean>(6);
-        test2Objs.add(new CategoryBean("RootCategory", "Root"));
-        test2Objs.add(new CategoryBean("Cat1", "Cat1"));
-        test2Objs.add(new CategoryBean("Cat2", "Cat2"));
-        test2Objs.add(new CategoryBean("Cat3", "Cat3"));
-        test2Objs.add(new CategoryBean("Cat4", "Cat4"));
-        test2Objs.add(new CategoryBean("Cat5", "Cat5"));
-        SingletonContainerStore.getInstance().setObjects("Test/456", test2Objs);
+	    // Test/456, as above
+	    objs = new HashMap<ObjexID, Map<String,Object>>();
+        vals = new HashMap<String, Object>();
+        vals.put("name", "Root");
+        vals.put("description", "A default root category");
+        objs.put(new DefaultObjexID("Category", 1), vals);
+        SingletonContainerStore.getInstance().setObjects("Test/456", objs);
+        
+        // Test/789, as above
+        objs = new HashMap<ObjexID, Map<String,Object>>();
+        vals = new HashMap<String, Object>();
+        vals.put("name", "Root");
+        vals.put("description", "A default root category");
+        objs.put(new DefaultObjexID("Category", 1), vals);
+        SingletonContainerStore.getInstance().setObjects("Test/789", objs);
+	}
+	
+	@Before
+	public void setup() {
+	    // Create a strategy for the container type - this is done once in config
+	    ContainerStrategy strategy = new SimpleContainerStrategy("Test", "Category",
+	            DefaultObjectStrategy.calculateStrategy(null, Category.class, true),
+	            DefaultObjectStrategy.calculateStrategy(null, Product.class, true));
+        
+	    // Setup our middleware factory - again you have one of these, setup in config
+        ContainerMiddlewareFactory middlewareFactory = new InMemoryMiddlewareFactory();
+        
+        // Finally we setup our container factory - and you guessed it, we have 1 of these, setup in config
+        factory = new SimpleContainerFactory(strategy, middlewareFactory);
 	}
 	
 	/**
-	 * The first test creates a new container
+	 * Simply creates a new container, gets holds of the root category
+	 * and sets it's properties.
 	 */
 	@Test
 	public void create() {
+	    // Ask the factory to create our new container
 	    Container container = factory.create();
-	    Assert.assertTrue(container.isOpen()); // Is open after creating
-	    Assert.assertTrue(container.isNew()); // Is new when just created
 	    
-	    // Changing the root object
-	    container.getRootObject().setProperty("name", "RootCat");
-	    container.getRootObject().setProperty("description", "This is the real description");
+	    // Get the root object for the container, a category, a just interact with it.
+	    ICategory category = container.getRootObject().getBehaviour(ICategory.class);
+        category.setName("Root Category");
+	    category.setDescription("This is a real description");
 	    
-	    container.saveContainer();
+	    // Now save the container away
+	    String containerId = container.saveContainer();
+	    container = null; // Container cannot be used after save (or suspend or clear), this serves to re-inforce the point!
+	    
+	    // Show that the container now exists under containerId
+	    container = factory.get(containerId);
+	    assertEquals("Root Category", container.getRootObject().getBehaviour(ICategory.class).getName());
 	}
 	
 	/**
-	 * This method describes how to create an aggregate
-	 * response from objects inside a container. In this
-	 * example we know the IDs of the objects we want, 
-	 * we could choose to walk the objects from the root
-	 * of the container, i.e. get object 1. The ID of
-	 * the container though is neccessary.
+	 * This example shows how we can get an existing container and once
+	 * we have the root object, simply walk through that object quite
+	 * naturally and without recourse to Objex.
 	 */
 	@Test
-	public void createAggregateResponse() {
+	public void getContainer() {
+	    // Open the container and get the root object
 	    Container container = factory.get("Test/123");
-		
-		ObjexObj obj1 = container.getObject("Category/3");
-		ObjexObj obj2 = container.getObject("Product/2");
-		
-		// You could now form and return you aggregate object, we are going to test it though!
-		Assert.assertNotNull(obj1);
-		Assert.assertEquals("Cat1", obj1.getProperty("name"));
-		Assert.assertNotNull(obj2);
-		Assert.assertEquals("Product1", obj2.getProperty("name"));
+	    ICategory category = container.getRootObject().getBehaviour(ICategory.class);
+	    
+	    // Right, so now we can just "walk" the product
 	}
 	
 	/**
-	 * This method describes how to make an immediate
-	 * change on a container
+	 * This example shows what happens if you try to edit an object, but
+	 * don't open it first. It should be noted that there are ways to
+	 * cheat the protection demonstrated in this test, but it is not
+	 * possible for those changes to be saved without directly accessing
+	 * the internals of the container (which you obviously should not do!)
+	 */
+	@Test(expected=IllegalStateException.class)
+	public void editUnopenedContainer() {
+	    Container container = factory.get("Test/123");
+        ICategory category = container.getRootObject().getBehaviour(ICategory.class);
+        
+        category.setName("Something");
+	}
+	
+	/**
+	 * This example takes an existing container (similar in state to the
+	 * one created above) and adds some new categories and products into
+	 * it, then saves them away
 	 */
 	@Test
-	public void update() {
-	    Container store = factory.open("Test/123");
-		
-		ObjexObj category = store.getObject("Category/1");
-		category.setProperty("name", "RootCat_edited");
-		
-		store.saveContainer();
-		
-		// Asserts
-		Container store1 = factory.get("Test/123");
-		Assert.assertEquals("RootCat_edited", store1.getObject("Category/1").getProperty("name"));
-	}
+	public void updateContainer() {
+	    Container container = factory.open("Test/456");
+	    ICategory category = container.getRootObject().getBehaviour(ICategory.class);
+	    
+	    // Lets change the name (proving we are actually changing the name)
+	    assertNotSame("The Root Category", category.getName());
+        category.setName("The Root Category");
+	    
+	    // Add some new categories to the root, a product and then a product into one of our new categories
+        // Note because its an ObjexObj any reference or child list, set or map prop will be non-null!
+	    category.getCategories().put("Laptops", new Category("Cat1", "A New Category"));
+	    category.getCategories().put("Projectors", new Category("Cat2", "A second Category"));
+	    category.getProducts().add(new Product("Product1", "The secret ingredient", 2, 59.99));
+	    category.getCategories().get("Laptops").getProducts().add(new Product("Acer e456", "The next gen laptops", 50, 349.99));
+	 
+	    // Note: We do need to get 'back' our category having added it because we need the ObjexObj version
+	    // So although a Category() is not implementing the ObjexObj, it is now, for instance ...
+	    assertFalse(ObjexObj.class.isAssignableFrom(Category.class));
+	    assertTrue(category.getCategories().get("Laptops") instanceof ObjexObj);   // Magic
+	    assertTrue(category.getCategories().get("Laptops") instanceof ICategory);  // Well not magic, but nice!
+	    
+	    // Lets just save the container
+	    container.saveContainer();
+	    container = null; // Container cannot be used after save (or suspend or clear), this serves to re-inforce the point!
+	    
+	    // And lets now prove that the changes were saved
+	    container = factory.get("Test/456");
+	    category = container.getRootObject().getBehaviour(ICategory.class);
+	    assertEquals("The Root Category", category.getName());
+	    assertEquals(2, category.getCategories().size());
+	    assertEquals(1, category.getProducts().size());
+	    assertEquals(1, category.getCategories().get("Laptops").getProducts().size());
+    }
 	
 	/**
-	 * This method describes how to make updates inside
-	 * the long-lived edit
+	 * This example shows how our changes can extend over a couple of
+	 * separate edits by using the suspend functionality.
+	 * 
+	 * <p>Although we are writing this single test, instead think of
+	 * the break here because completely separate - perhaps two seperate
+	 * invocations of a Web App or Web Service. The time in between can
+	 * be quite large.</p>
 	 */
 	@Test
 	public void updateLongLivedEdit() {
-	    // Start the transaction - 1 call
-	    Container store = factory.open("Test/456");
-		String transId = store.suspend(); // Unlikely you will just suspend it
-		
-		// ... Other things happen
-		
-		// Update Container inside transaction
-		store = factory.open(transId);
-		Assert.assertNotNull(store);
-		
-		ObjexObj category = store.getObject("Category/4");
-		category.setProperty("name", "Cat1_edited_again");
-		category.setProperty("description", "Something");
-		Assert.assertEquals("Cat1_edited_again", store.getObject("Category/4").getProperty("name"));
-		
-		// ... Other things happen
-		
-		// Now go and save the container
-		store.saveContainer();
-		Assert.assertFalse(store.isOpen());
-		
-		// Test that our change is now part of the transaction.
-		Container store1 = factory.get("Test/456");
-		category = store1.getObject("Category/4");
-		Assert.assertEquals("Cat1_edited_again", category.getProperty("name"));
+	    // The initial call, open the container, make a change and suspend it
+	    Container container = factory.open("Test/789");
+        ICategory category = container.getRootObject().getBehaviour(ICategory.class);
+        
+        category.setName("Stock");
+        
+        String transactionId = container.suspend();
+        container = null; // Container cannot be used after suspend (or save or clear), this serves to re-inforce the point!
+        
+        // ... Other things happen
+        // Here we will return the transactionId and keep it somewhere, then
+        // provide it to the next call below
+        
+        // The second part, lets create a new category and then save everything
+        // Remember you need to get everything again as this will be in a new method
+        container = factory.open(transactionId);
+        category = container.getRootObject().getBehaviour(ICategory.class);
+        assertEquals("Stock", category.getName());
+        
+        category.setDescription("Oh yes, the new description");
+        category.getCategories().put("New", new Category("NewCat", "New & Exciting products"));
+        
+        container.saveContainer();
+        container = null; // Container cannot be used after save (or suspend or clear), this serves to re-inforce the point!
+        
+        // Now lets just get the container back and test our changes
+	    container = factory.get("Test/789");
+	    assertEquals("Stock", container.getRootObject().getProperty("name"));
+	    assertNotNull(container.getRootObject().getBehaviour(ICategory.class).getCategories().get("New"));
 	}
 }

@@ -16,11 +16,14 @@
 
 package org.talframework.objexj.container.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import junit.framework.Assert;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
 import org.talframework.objexj.Container;
@@ -28,22 +31,15 @@ import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.Event;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.QueryRequest;
 import org.talframework.objexj.QueryResult;
-import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.ContainerMiddleware;
+import org.talframework.objexj.container.ContainerObjectCache;
 import org.talframework.objexj.container.ContainerStrategy;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.container.ObjectStrategy;
-import org.talframework.objexj.container.ObjexIDStrategy;
-import org.talframework.objexj.container.TransactionCache;
-import org.talframework.objexj.container.TransactionCache.ObjectRole;
 import org.talframework.objexj.events.EventHandler;
-import org.talframework.objexj.exceptions.ContainerInvalidException;
-import org.talframework.objexj.exceptions.ObjectRemovedException;
-import org.talframework.objexj.object.RootObjexObj;
-import org.talframework.objexj.object.testbeans.CategoryBean;
+import org.talframework.objexj.object.testmodel.api.ICategory;
 import org.talframework.objexj.query.Query;
 
 /**
@@ -52,59 +48,41 @@ import org.talframework.objexj.query.Query;
  * @author Tom Spencer
  */
 public class TestSimpleContainer {
+    
+    private ContainerStrategy strategy = null;
+    private ObjectStrategy objectStrategy = null;
+    private ContainerMiddleware middleware = null;
+    private ContainerObjectCache cache = null;
 
-private Mockery context = new JUnit4Mockery();
-    
-    private ContainerStrategy strategy;
-    private ObjectStrategy testStrategy;
-    private ContainerMiddleware middleware;
-    
-    private RootObject root = null;
-    private ObjexObj obj = null;
-    
     /**
      * Sets up the main collaborators including their
      * default behaviour.
      */
     @Before
     public void setup() {
-        strategy = context.mock(ContainerStrategy.class);
-        testStrategy = context.mock(ObjectStrategy.class, "test");
-        middleware = context.mock(ContainerMiddleware.class);
+        strategy = mock(ContainerStrategy.class);
+        middleware = mock(ContainerMiddleware.class);
+        cache = mock(ContainerObjectCache.class);
         
-        final ObjexID rootId = new DefaultObjexID("Test", 1);
-        root = context.mock(RootObject.class, "root");
-        final ObjexObjStateBean rootState = context.mock(ObjexObjStateBean.class, "rootState");
+        objectStrategy = mock(ObjectStrategy.class);
+        ObjexObj root = mock(ObjexObj.class);
+        ObjexObj obj1 = mock(ObjexObj.class);
         
-        final ObjexID objId = new DefaultObjexID("Test", 1234);
-        obj = context.mock(ObjexObj.class, "obj");
-        final ObjexObjStateBean objState = context.mock(ObjexObjStateBean.class, "objState");
+        when(root.getId()).thenReturn(new DefaultObjexID("Test", 1));
+        when(obj1.getId()).thenReturn(new DefaultObjexID("Test", 1234));
+        when(obj1.getParentId()).thenReturn(new DefaultObjexID("Test", 1));
         
+        when(middleware.init(any(Container.class))).thenReturn(cache);
         
+        when(strategy.getContainerName()).thenReturn("TestContainer");
+        when(strategy.getRootObjectID()).thenReturn(new DefaultObjexID("Test", 1));
+        when(strategy.getObjectStrategy("Test")).thenReturn(objectStrategy);
+        when(objectStrategy.createInstance(any(InternalContainer.class), any(ObjexID.class), eq(new DefaultObjexID("Test", 1)), any(Object.class))).thenReturn(root);
+        when(objectStrategy.createInstance(any(InternalContainer.class), any(ObjexID.class), eq(new DefaultObjexID("Test", 1234)), any(Object.class))).thenReturn(obj1);
         
-        context.checking(new Expectations() {{
-            atMost(1).of(middleware).init(with(any(Container.class)));
-            atMost(1).of(middleware).loadObject(CategoryBean.class, rootId); will(returnValue(rootState));
-            atMost(1).of(middleware).loadObject(CategoryBean.class, objId); will(returnValue(objState));
-            
-            // Container Strategy Defaults
-            allowing(strategy).getObjectStrategy("Test"); will(returnValue(testStrategy));
-            allowing(strategy).getRootObjectID(); will(returnValue(rootId));
-            allowing(strategy).getContainerName(); will(returnValue("TestContainer"));
-            
-            // Test Object Strategy Defaults
-            allowing(testStrategy).getStateClass(); will(returnValue(CategoryBean.class));
-            allowing(testStrategy).getObjexObjInstance(with(any(InternalContainer.class)), (ObjexID)with(anything()), with(rootId), with(any(ObjexObjStateBean.class)));
-                will(returnValue(root));
-            allowing(testStrategy).getObjexObjInstance(with(any(InternalContainer.class)), (ObjexID)with(anything()), with(objId), with(any(ObjexObjStateBean.class)));
-                will(returnValue(obj));
-                
-            // Default Object
-            allowing(root).getId(); will(returnValue(rootId));
-            allowing(rootState).getParentId(); will(returnValue(null));
-            allowing(obj).getId(); will(returnValue(objId));
-            allowing(objState).getParentId(); will(returnValue("Test/1"));
-        }});
+        when(middleware.exists(any(ObjexID.class), eq(false))).thenReturn(true);
+        when(middleware.loadObject(root)).thenReturn(root);
+        when(middleware.loadObject(obj1)).thenReturn(obj1);
     }
 
     /**
@@ -114,15 +92,14 @@ private Mockery context = new JUnit4Mockery();
     @Test
     public void basic() {
         SimpleContainer container = new SimpleContainer("test", strategy, middleware, false);
-            
+        
         Assert.assertEquals("test", container.getId());
         Assert.assertEquals("TestContainer", container.getType());
+        
         Assert.assertNotNull(container.getRootObject());
         Assert.assertNotNull(container.getObject("Test/1234"));
         Assert.assertEquals(container.getObject("Test/1234"), container.getObject("Test/1234"));
         Assert.assertFalse(container.isOpen());
-        
-        context.assertIsSatisfied();
     }
     
     /**
@@ -143,13 +120,16 @@ private Mockery context = new JUnit4Mockery();
     public void getObjectBehaviour() {
         SimpleContainer container = new SimpleContainer("test", strategy, middleware, false);
         
-        final CategoryBean bean = new CategoryBean();
+        ObjexObj obj = mock(ObjexObj.class);
+        when(obj.getId()).thenReturn(new DefaultObjexID("Test", 2));
+        when(objectStrategy.createInstance(any(InternalContainer.class), any(ObjexID.class), eq(new DefaultObjexID("Test", 2)), any())).thenReturn(obj);
+        when(middleware.loadObject(obj)).thenReturn(obj);
         
-        context.checking(new Expectations() {{
-            oneOf(obj).getBehaviour(CategoryBean.class); will(returnValue(bean));
-        }});
+        ICategory behaviour = mock(ICategory.class);
+        when(obj.getBehaviour(ICategory.class)).thenReturn(behaviour);
         
-        Assert.assertNotNull(container.getObject("Test/1234", CategoryBean.class));
+        Assert.assertNotNull(container.getObject("Test/2", ICategory.class));
+        verify(obj).getBehaviour(ICategory.class);
     }
     
     /**
@@ -167,20 +147,18 @@ private Mockery context = new JUnit4Mockery();
      */
     @Test
     public void executeQuery() {
-        final SimpleContainer container = new SimpleContainer("test", strategy, middleware, false);
+        SimpleContainer container = new SimpleContainer("test", strategy, middleware, false);
         
-        final QueryRequest request = context.mock(QueryRequest.class);
-        final Query query = context.mock(Query.class);
-        final QueryResult result = context.mock(QueryResult.class);
+        QueryRequest request = mock(QueryRequest.class);
+        Query query = mock(Query.class);
+        QueryResult result = mock(QueryResult.class);
         
-        context.checking(new Expectations() {{
-            oneOf(request).getName(); will(returnValue("testQuery"));
-            oneOf(strategy).getQuery("testQuery"); will(returnValue(query));
-            oneOf(query).execute(container, strategy, request); will(returnValue(result));
-        }});
+        when(request.getName()).thenReturn("testQuery");
+        when(strategy.getQuery("testQuery")).thenReturn(query);
+        when(query.execute(container, strategy, request)).thenReturn(result);
         
         Assert.assertEquals(result, container.executeQuery(request));
-        context.assertIsSatisfied();
+        verify(query, times(1)).execute(container, strategy, request);
     }
     
     /**
@@ -188,24 +166,21 @@ private Mockery context = new JUnit4Mockery();
      */
     @Test
     public void processEvent() {
-        final SimpleContainer container = new SimpleContainer("test", strategy, middleware, false);
+        SimpleContainer container = new SimpleContainer("test", strategy, middleware, false);
         
-        final Event event = context.mock(Event.class);
-        final EventHandler handler = context.mock(EventHandler.class);
+        Event event = mock(Event.class);
+        EventHandler handler = mock(EventHandler.class);
         
-        context.checking(new Expectations() {{
-            oneOf(event).getEventName(); will(returnValue("testEvent"));
-            oneOf(strategy).getEventHandler("testEvent"); will(returnValue(handler));
-            oneOf(handler).execute(container, event);
-        }});
+        when(event.getEventName()).thenReturn("testEvent");
+        when(strategy.getEventHandler("testEvent")).thenReturn(handler);
         
         container.processEvent(event);
-        context.assertIsSatisfied();
+        verify(handler, times(1)).execute(container, event);
     }
- 
+
     /**
      * Ensures we can open a container and then close it
-     */
+     *//*
     @Test
     public void openContainer() {
         SimpleContainer container = new SimpleContainer("test", strategy, middleware, false);
@@ -226,11 +201,11 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * Tests we can validate the container. Note it does not test 
      * the validator, this is done in its own tests.
      * 
-     */
+     *//*
     @Test
     public void validate() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -255,9 +230,9 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * Ensures we can save a container
-     */
+     *//*
     @Test
     public void save() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -282,10 +257,10 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * Ensures the save throws an exception if there are errors
      * on save
-     */
+     *//*
     @Test(expected=ContainerInvalidException.class)
     public void saveWithErrors() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -305,16 +280,16 @@ private Mockery context = new JUnit4Mockery();
         container.saveContainer();
     }
     
-    /**
+    *//**
      * Ensures new ID's are generated if there are temp IDs
-     */
+     *//*
     public void saveAndAssign() {
         // TODO: Assigning is not complete yet
     }
     
-    /**
+    *//**
      * Ensures we can suspend the container
-     */
+     *//*
     @Test
     public void suspend() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -329,10 +304,10 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * Tests we can add an object that is about to be updated
      * to the container
-     */
+     *//*
     @Test
     public void updateObject() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -350,10 +325,10 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * Tests that if we try to update an object that is 
      * already removed it fails.
-     */
+     *//*
     @Test(expected=ObjectRemovedException.class)
     public void updateRemovedObject() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -369,9 +344,9 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * Ensures we can add an object to the container
-     */
+     *//*
     @Test
     public void addObject() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -399,9 +374,9 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * This tests we can remove an object from the container
-     */
+     *//*
     @Test
     public void removeObj() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -418,9 +393,9 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * Ensures the we can get an objects role in the transaction
-     */
+     *//*
     @Test
     public void getRole() {
         final TransactionCache cache = context.mock(TransactionCache.class);
@@ -435,18 +410,18 @@ private Mockery context = new JUnit4Mockery();
         context.assertIsSatisfied();
     }
     
-    /**
+    *//**
      * As above, but outside a transaction so should get null
-     */
+     *//*
     @Test
     public void getRoleOutsideTransaction() {
         SimpleContainer container = new SimpleContainer("test", strategy, middleware, false);
         Assert.assertEquals(ObjectRole.NONE, container.getObjectRole(obj.getId()));
     }
     
-    /**
+    *//**
      * Test interface so we can have a root object
-     */
+     *//*
     private static interface RootObject extends ObjexObj, RootObjexObj {
-    }
+    }*/
 }

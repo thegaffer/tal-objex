@@ -16,22 +16,21 @@
 
 package org.talframework.objexj.container.middleware;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.mockito.Mockito.*;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.talframework.objexj.Container;
 import org.talframework.objexj.DefaultObjexID;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.container.TransactionCache;
-import org.talframework.objexj.container.TransactionCache.ObjectRole;
-import org.talframework.objexj.container.impl.SimpleTransactionCache;
-import org.talframework.objexj.object.testbeans.CategoryBean;
+import org.talframework.objexj.ObjexID;
+import org.talframework.objexj.container.InternalContainer;
+import org.talframework.objexj.container.impl.DefaultContainerObjectCache;
+import org.talframework.objexj.object.testmodel.objex.Category;
+import org.talframework.objexj.object.testmodel.objex.Product;
 
 /**
  * Tests the in memory middleware works
@@ -40,7 +39,7 @@ import org.talframework.objexj.object.testbeans.CategoryBean;
  */
 public class TestInMemoryMiddleware {
     
-    private Mockery context = new JUnit4Mockery();
+    private InternalContainer container = null;
     
     /**
      * This adds our test container to the in memory store.
@@ -50,47 +49,61 @@ public class TestInMemoryMiddleware {
      */
     @BeforeClass
     public static void containerSetup() {
-        List<ObjexObjStateBean> objs = new ArrayList<ObjexObjStateBean>();
-        objs.add(new CategoryBean("Cat1", "Cat1"));
-        objs.add(new CategoryBean("Cat2", "Cat2"));
+        // Container 1
+        Map<ObjexID, Map<String, Object>> objs = new HashMap<ObjexID, Map<String,Object>>();
+        Map<String, Object> vals = new HashMap<String, Object>();
+        vals.put("name", "Cat1"); vals.put("description", "Cat1");
+        objs.put(new DefaultObjexID("Category", 1), vals);
+        vals = new HashMap<String, Object>();
+        vals.put("name", "Cat2"); vals.put("description", "Cat2");
+        objs.put(new DefaultObjexID("Category", 2), vals);
         SingletonContainerStore.getInstance().setObjects("123", objs);
         
-        objs = new ArrayList<ObjexObjStateBean>();
-        objs.add(new CategoryBean("Cat1", "Cat1"));
-        objs.add(new CategoryBean("Cat2", "Cat2"));
+        // Container 2
+        objs = new HashMap<ObjexID, Map<String,Object>>();
+        vals = new HashMap<String, Object>();
+        vals.put("name", "Cat1"); vals.put("description", "Cat1");
+        objs.put(new DefaultObjexID("Category", 1), vals);
+        vals = new HashMap<String, Object>();
+        vals.put("name", "Cat2"); vals.put("description", "Cat2");
+        objs.put(new DefaultObjexID("Category", 2), vals);
         SingletonContainerStore.getInstance().setObjects("456", objs);
         
-        objs = new ArrayList<ObjexObjStateBean>();
-        objs.add(new CategoryBean("Cat1", "Cat1"));
-        objs.add(new CategoryBean("Cat2", "Cat2"));
+        // Container 3
+        objs = new HashMap<ObjexID, Map<String,Object>>();
+        vals = new HashMap<String, Object>();
+        vals.put("name", "Cat1"); vals.put("description", "Cat1");
+        objs.put(new DefaultObjexID("Category", 1), vals);
+        vals = new HashMap<String, Object>();
+        vals.put("name", "Cat2"); vals.put("description", "Cat2");
+        objs.put(new DefaultObjexID("Category", 2), vals);
         SingletonContainerStore.getInstance().setObjects("789", objs);
         
-        SingletonContainerCache.getInstance().setCache("123:trans", new SimpleTransactionCache());
+        //SingletonContainerCache.getInstance().setCache("123:trans", new SimpleTransactionCache());
+    }
+    
+    @Before
+    public void setup() {
+        container = mock(InternalContainer.class);
+        when(container.getType()).thenReturn("Stock");
     }
 
     @Test
     public void newContainer() {
-        final Container container = context.mock(Container.class);
-        
-        InMemoryMiddleware underTest = new InMemoryMiddleware(null, true);
+        InMemoryMiddleware underTest = new InMemoryMiddleware(null, false);
         underTest.init(container);
+        underTest.open();
         
-        Assert.assertNull(underTest.getContainerId());
         Assert.assertTrue(underTest.isNew());
-        Assert.assertNotNull(underTest.getIdStrategy());
-        Assert.assertEquals(new DefaultObjexID("Test", 2), underTest.getIdStrategy().createId(null, null, "Test", null));
-        Assert.assertNotNull(underTest.getCache());
-        Assert.assertEquals(underTest.getCache(), underTest.open());
+        Assert.assertTrue(underTest.isOpen());
+        Assert.assertEquals(new DefaultObjexID("Product", 2), underTest.getNextObjectId("Product"));
         
-        context.checking(new Expectations() {{
-            oneOf(container).getType(); will(returnValue("TestContainer"));
-        }});
+        Product product = new Product("Product1", "Test", 1, 9.99);
+        product.init(container, new DefaultObjexID("Prouct", 3), null);
+        DefaultContainerObjectCache cache = new DefaultContainerObjectCache(1);
+        cache.addObject(product, true);
         
-        Assert.assertTrue(underTest.save(null, null).startsWith("TestContainer/"));
-        
-        underTest.clear();
-        
-        context.assertIsSatisfied();
+        Assert.assertTrue(underTest.save(cache, null, null).startsWith("Stock/"));
     }
     
     @Test
@@ -98,39 +111,42 @@ public class TestInMemoryMiddleware {
         InMemoryMiddleware underTest = new InMemoryMiddleware("123", false);
         Assert.assertEquals("123", underTest.getContainerId());
         Assert.assertFalse(underTest.isNew());
-        Assert.assertNotNull(underTest.getIdStrategy());
-        Assert.assertEquals(new DefaultObjexID("Test", 3), underTest.getIdStrategy().createId(null, null, "Test", null));
-        Assert.assertNull(underTest.getCache());
-        Assert.assertNotNull(underTest.open());
         
-        ObjexObjStateBean cat1 = underTest.loadObject(CategoryBean.class, new DefaultObjexID("Any", 1));
-        Assert.assertNotNull(cat1);
-        Assert.assertEquals("Cat1", ((CategoryBean)cat1).getName());
+        Category cat1 = new Category();
+        cat1.init(container, new DefaultObjexID("Category", 1), null);
+        Assert.assertNotNull(underTest.loadObject(cat1));
+        Assert.assertEquals("Cat1", cat1.getName());
         
-        ObjexObjStateBean cat2 = underTest.loadObject(CategoryBean.class, new DefaultObjexID("Any", 2));
-        Assert.assertNotNull(cat2);
-        Assert.assertEquals("Cat2", ((CategoryBean)cat2).getName());
+        Category cat2 = new Category();
+        cat2.init(container, new DefaultObjexID("Category", 2), null);
+        Assert.assertNotNull(underTest.loadObject(cat2));
+        Assert.assertEquals("Cat2", cat2.getName());
     }
     
     @Test
     public void openExistingContainer() {
-        InMemoryMiddleware underTest = new InMemoryMiddleware("123", true);
+        InMemoryMiddleware underTest = new InMemoryMiddleware("123", false);
         Assert.assertEquals("123", underTest.getContainerId());
         Assert.assertFalse(underTest.isNew());
-        Assert.assertNotNull(underTest.getIdStrategy());
-        Assert.assertEquals(new DefaultObjexID("Test", 3), underTest.getIdStrategy().createId(null, null, "Test", null));
-        Assert.assertNotNull(underTest.getCache());
-        Assert.assertEquals(underTest.getCache(), underTest.open());
+        underTest.open();
+        Assert.assertTrue(underTest.isOpen());
+        Assert.assertEquals(new DefaultObjexID("Product", 3), underTest.getNextObjectId("Product"));
         
-        // Make sure we get the edited object, not the original
-        TransactionCache cache = underTest.getCache();
-        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Any", 2), new CategoryBean("Cat2_edited", "Cat2"));
-        ObjexObjStateBean cat2 = underTest.loadObject(CategoryBean.class, new DefaultObjexID("Any", 2));
-        Assert.assertEquals("Cat2_edited", ((CategoryBean)cat2).getName());
+        // Now get one of the objects and edit it, then save it away
+        Category cat2 = new Category();
+        cat2.init(container, new DefaultObjexID("Category", 2), null);
+        Assert.assertNotNull(underTest.loadObject(cat2));
+        Assert.assertEquals("Cat2", cat2.getName());
+        
+        cat2.setName("Cat2_edited");
+        DefaultContainerObjectCache cache = new DefaultContainerObjectCache(1);
+        cache.addObject(cat2, true);
+        
+        Assert.assertEquals("123:trans", underTest.suspend(cache));
     }
     
-    @Test
-    public void openExistingTransaction() {
+    //@Test
+    /*public void openExistingTransaction() {
         InMemoryMiddleware underTest = new InMemoryMiddleware("123:trans", true);
         Assert.assertEquals("123", underTest.getContainerId());
         Assert.assertFalse(underTest.isNew());
@@ -138,36 +154,58 @@ public class TestInMemoryMiddleware {
         Assert.assertEquals(new DefaultObjexID("Test", 3), underTest.getIdStrategy().createId(null, null, "Test", null));
         Assert.assertNotNull(underTest.getCache());
         Assert.assertEquals(underTest.getCache(), underTest.open());
-    }
+    }*/
     
     @Test
     public void saveContainer() {
         InMemoryMiddleware underTest = new InMemoryMiddleware("456", true);
         
         // Make some changes (as if container)
-        TransactionCache cache = underTest.getCache();
-        cache.addObject(ObjectRole.NEW, new DefaultObjexID("Category", 3), new CategoryBean("NewCat", "NewCat"));
-        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Category", 1), new CategoryBean("Cat1_edited", "Cat1"));
-        cache.addObject(ObjectRole.REMOVED, new DefaultObjexID("Category", 2), new CategoryBean("Cat2_removed", "Cat2"));
+        Category newCat1 = new Category("NewCat", "NewCat");
+        newCat1.init(container, new DefaultObjexID("Category", 3), null);
+        Category cat1 = new Category();
+        cat1.init(container, new DefaultObjexID("Category", 1), null);
+        Category cat2 = new Category();
+        cat2.init(container, new DefaultObjexID("Category", 2), null);
+        Assert.assertNotNull(underTest.loadObjects(cat1, cat2));
         
-        Assert.assertEquals("456", underTest.save(null, null));
+        cat1.setDescription("Test 1");
+        cat2.setDescription("Test 3");
+        
+        DefaultContainerObjectCache cache = new DefaultContainerObjectCache(1);
+        cache.addObject(newCat1, true);
+        cache.addObject(cat1, false);
+        cache.addObject(cat2, false);
+        
+        Assert.assertEquals("456", underTest.save(cache, null, null));
         Assert.assertEquals(3, SingletonContainerStore.getInstance().getObjects("456").size());
-        Assert.assertNotNull(SingletonContainerStore.getInstance().getObjects("456").get(0));
-        Assert.assertNull(SingletonContainerStore.getInstance().getObjects("456").get(1));
-        Assert.assertNotNull(SingletonContainerStore.getInstance().getObjects("456").get(2));
+        Assert.assertNotNull(SingletonContainerStore.getInstance().getObjects("456").get(new DefaultObjexID("Category", 1)));
+        Assert.assertNotNull(SingletonContainerStore.getInstance().getObjects("456").get(new DefaultObjexID("Category", 2)));
+        Assert.assertNotNull(SingletonContainerStore.getInstance().getObjects("456").get(new DefaultObjexID("Category", 3)));
     }
     
     @Test
     public void suspendContainer() {
         InMemoryMiddleware underTest = new InMemoryMiddleware("789", true);
         
-        // Make some changes (as if container)
-        TransactionCache cache = underTest.getCache();
-        cache.addObject(ObjectRole.NEW, new DefaultObjexID("Category", 3), new CategoryBean("NewCat", "NewCat"));
-        cache.addObject(ObjectRole.UPDATED, new DefaultObjexID("Category", 1), new CategoryBean("Cat1_edited", "Cat1"));
-        cache.addObject(ObjectRole.REMOVED, new DefaultObjexID("Category", 2), new CategoryBean("Cat2_removed", "Cat2"));
+        Category newCat1 = new Category("NewCat", "NewCat");
+        newCat1.init(container, new DefaultObjexID("Category", 3), null);
+        Category cat1 = new Category();
+        cat1.init(container, new DefaultObjexID("Category", 1), null);
+        Category cat2 = new Category();
+        cat2.init(container, new DefaultObjexID("Category", 2), null);
+        Assert.assertNotNull(underTest.loadObjects(cat1, cat2));
         
-        Assert.assertEquals("789:trans", underTest.suspend());
-        Assert.assertNotNull(SingletonContainerCache.getInstance().getCache("789:trans"));
+        cat1.setDescription("Test 1");
+        cat2.setDescription("Test 3");
+        
+        DefaultContainerObjectCache cache = new DefaultContainerObjectCache(1);
+        cache.addObject(newCat1, true);
+        cache.addObject(cat1, false);
+        cache.addObject(cat2, false);
+        
+        Assert.assertEquals("789:trans", underTest.suspend(cache));
+        Assert.assertNotNull(SingletonContainerCache.getInstance().getCache("789"));
+        // Test the maps held!!
     }
 }

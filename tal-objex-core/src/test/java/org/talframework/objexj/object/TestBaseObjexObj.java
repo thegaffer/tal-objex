@@ -16,11 +16,7 @@
 
 package org.talframework.objexj.object;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Proxy;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -28,13 +24,15 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.talframework.objexj.DefaultObjexID;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.container.InternalContainer;
 import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
-import org.talframework.objexj.object.testbeans.CategoryBean;
+import org.talframework.objexj.object.fields.ProxyReference;
+import org.talframework.objexj.object.testmodel.api.ICategory;
+import org.talframework.objexj.object.testmodel.api.IProduct;
+import org.talframework.objexj.object.testmodel.objex.Category;
 
 /**
  * This test class tests the {@link BaseObjexObj} class.
@@ -65,8 +63,12 @@ public class TestBaseObjexObj {
             allowing(container).isOpen(); will(returnValue(true));
         }});
         
-        underTest = new DummyObject();
+        underTest = new Category("Cat1", "Cat1 Desc");
         underTest.init(container, id, parentId);
+        ((Category)underTest).setMainProduct(IProduct.class.cast(Proxy.newProxyInstance(
+                this.getClass().getClassLoader(), 
+                new Class<?>[]{ObjexObj.class, IProduct.class}, 
+                new ProxyReference(DefaultObjexID.getId("Product/101"), container))));
     }
     
     /**
@@ -76,29 +78,33 @@ public class TestBaseObjexObj {
     @Test
     public void basic() {
         Assert.assertEquals(id, underTest.getId());
-        Assert.assertEquals("DummyObject", underTest.getType());
+        Assert.assertEquals("Category", underTest.getType());
         Assert.assertEquals(parentId, underTest.getParentId());
         Assert.assertEquals(parent, underTest.getParent());
         Assert.assertEquals(container, underTest.getContainer());
         Assert.assertTrue(underTest.isUpdateable());
         
-        Assert.assertEquals(underTest, underTest.getBehaviour(DummyObject.class));
+        Assert.assertEquals(underTest, underTest.getBehaviour(ICategory.class));
         
         Assert.assertEquals("Cat1", underTest.getProperty("name", String.class));
         Assert.assertEquals("Cat1 Desc", underTest.getPropertyAsString("description"));
         
         final ObjexObj mainProduct = context.mock(ObjexObj.class, "mainProduct");
         context.checking(new Expectations() {{
-            oneOf(container).getObject("Product/101"); will(returnValue(mainProduct));
+            oneOf(container).getObject(DefaultObjexID.getId("Product/101")); will(returnValue(mainProduct));
+            oneOf(mainProduct).getParentId(); will(returnValue(DefaultObjexID.getId("Category/110")));
         }});
-        Assert.assertEquals(mainProduct, underTest.getProperty("mainProduct"));
-        
-        underTest.setProperty("name", "Cat1_edited");
-        Assert.assertEquals("Cat1_edited", underTest.getProperty("name"));
-        
-        Assert.assertNotNull(underTest.createReference("products", null));
+        Assert.assertEquals(DefaultObjexID.getId("Category/110"), ((ObjexObj)underTest.getProperty("mainProduct")).getParentId());
         
         context.assertIsSatisfied();
+    }
+    
+    /**
+     * Ensures we cannot use the base setProperty on the base object
+     */
+    public void cannotSet() {
+        underTest.setProperty("name", "Cat1_edited");
+        Assert.assertEquals("Cat1_edited", underTest.getProperty("name"));
     }
     
     /**
@@ -116,11 +122,6 @@ public class TestBaseObjexObj {
     @Test(expected=ObjectFieldInvalidException.class)
     public void invalidSet() {
         underTest.setProperty("name2", "test");
-    }
-    
-    @Test(expected=UnsupportedOperationException.class)
-    public void invalidCreate() {
-        underTest.createReference("Categories", "Category");
     }
     
     @Test(expected=ClassCastException.class)
@@ -143,7 +144,7 @@ public class TestBaseObjexObj {
     
     @Test(expected=IllegalStateException.class)
     public void testNotInitialised() {
-        underTest = new DummyObject();
+        underTest = new Category();
         underTest.getId();
     }
     
@@ -169,228 +170,4 @@ public class TestBaseObjexObj {
     
     
     
-    /**
-     * Dummy test object that extends {@link BaseObjexObj} to
-     * allow the latter to be tested. 
-     * 
-     * <p><b>Note: </b>Do not use this as an example of an
-     * {@link ObjexObj} implementation. It does not check
-     * the state bean is editable or add the object to
-     * the current transaction.
-     *
-     * @author Tom Spencer
-     */
-    public class DummyObject extends BaseObjexObj {
-        
-        private CategoryBean state;
-        
-        public DummyObject() {
-            state = new CategoryBean();
-            state.setName("Cat1");
-            state.setDescription("Cat1 Desc");
-            state.setMainProduct("Product/101");
-            state.setEditable();
-        }
-        
-        @Override
-        protected ObjexObjStateBean getStateBean() {
-            return state;
-        }
-        
-        public void acceptReader(ObjexStateReader reader) {
-            // Does nothing as not part of test
-        }
-        
-        /**
-         * Test can set method that stops us setting Error
-         * on the description.
-         */
-        public boolean canSetDescription(String desc) {
-            if( "Error".equals(desc) ) return false;
-            return true;
-        }
-        
-        /**
-         * Test onSet handler that sets the old name in
-         * the description field.
-         */
-        public void onSetName(String oldName) {
-            state.setDescription(oldName);
-        }
-        
-        //////////////////////////////////////
-        // Getter / Setters
-        
-        /**
-         * @return the name
-         */
-        public String getName() {
-            return state.getName();
-        }
-        
-        /**
-         * @param name the name to set
-         */
-        public void setName(String name) {
-            if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-            
-            state.setName(name);
-        }
-        
-        /**
-         * @return the description
-         */
-        public String getDescription() {
-            return state.getDescription();
-        }
-        
-        /**
-         * @param description the description to set
-         */
-        public void setDescription(String description) {
-            if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-            
-            state.setDescription(description);
-        }
-        
-        public String getName2() {
-            return state.getName();
-        }
-        
-        /**
-         * @return the mainProduct
-         */
-        public ObjexObj getMainProduct() {
-            return getContainer().getObject(state.getMainProduct());
-        }
-        
-        /**
-         * @return the mainProduct
-         */
-        public String getMainProductRef() {
-            return state.getMainProduct();
-        }
-
-        /**
-         * Setter for the mainProduct field
-         *
-         * @param mainProduct the mainProduct to set
-         */
-        public void setMainProduct(ObjexObj mainProduct) {
-            if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-            
-            if( mainProduct == null ) state.setMainProduct(null);
-            else state.setMainProduct(mainProduct.getId().toString());
-        }
-        
-        /**
-         * Setter for the mainProduct field
-         *
-         * @param mainProduct the mainProduct to set
-         */
-        public void setMainProductRef(String mainProduct) {
-            if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-            
-            state.setMainProduct(mainProduct);
-        }
-
-        /**
-         * @return the products
-         */
-        public List<ObjexObj> getProducts() {
-            return getContainer().getObjectList(state.getProducts());
-        }
-        
-        /**
-         * @return the products
-         */
-        public List<String> getProductsRef() {
-            return state.getProducts();
-        }
-        
-        /**
-         * Creates a reference. We are only testing this is
-         * called.
-         * 
-         * @param type
-         * @return
-         */
-        public ObjexObj createProduct(String type) {
-            return context.mock(ObjexObj.class, "newParent");
-        }
-
-        /**
-         * Setter for the products field
-         *
-         * @param products the products to set
-         */
-        public void setProducts(List<ObjexObj> products) {
-            if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-            
-            List<String> prods = products != null ? new ArrayList<String>() : null;
-            if( products != null ) {
-                Iterator<ObjexObj> it = products.iterator();
-                while( it.hasNext() ) {
-                    prods.add(it.next().getId().toString());
-                }
-            }
-            state.setProducts(prods);
-        }
-        
-        /**
-         * Setter for the products field
-         *
-         * @param products the products to set
-         */
-        public void setProductsRef(List<String> products) {
-            if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-            
-            state.setProducts(products);
-        }
-
-        /**
-         * @return the categories
-         */
-        public Map<? extends Object, ObjexObj> getCategories() {
-            return getContainer().getObjectMap(state.getCategories());
-        }
-        
-        /**
-         * @return the categories
-         */
-        public Map<String, String> getCategoriesRef() {
-            return state.getCategories();
-        }
-
-        /**
-         * Setter for the categories field
-         *
-         * @param categories the categories to set
-         */
-        public void setCategories(Map<String, ObjexObj> categories) {
-            if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-            
-            Map<String, String> cats = categories != null ? new HashMap<String, String>() : null;
-            if( categories != null ) {
-                Iterator<String> it = categories.keySet().iterator();
-                while( it.hasNext() ) {
-                    String k = it.next();
-                    ObjexObj val = categories.get(k);
-                    cats.put(k, val != null ? val.getId().toString() : null);
-                }
-            }
-            state.setCategories(cats);
-        }
-        
-        /**
-         * Setter for the categories field
-         *
-         * @param categories the categories to set
-         */
-        public void setCategoriesRef(Map<String, String> categories) {
-            if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-            
-            state.setCategories(categories);
-        }
-    }
 }

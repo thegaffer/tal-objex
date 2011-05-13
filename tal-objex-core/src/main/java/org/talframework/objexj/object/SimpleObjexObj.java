@@ -16,25 +16,11 @@
 
 package org.talframework.objexj.object;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.ObjexStateReader;
 import org.talframework.objexj.container.ObjectStrategy;
-import org.talframework.objexj.exceptions.ObjectFieldInvalidException;
-import org.talframework.objexj.object.utils.SimpleFieldUtils;
-import org.talframework.util.beans.BeanDefinition;
-import org.talframework.util.beans.definition.BeanDefinitionsSingleton;
 
 /**
  * Although ObjexObj objects should be behaviourally rich
@@ -63,8 +49,6 @@ import org.talframework.util.beans.definition.BeanDefinitionsSingleton;
  * still not be the same as native access.
  * </ul>
  * 
- * FUTURE: Allow implementation of simple interfaces via use of a proxy
- * 
  * @author Tom Spencer
  */
 @XmlRootElement
@@ -72,15 +56,14 @@ public final class SimpleObjexObj extends BaseObjexObj {
 
 	/** The strategy for this object */
     private final ObjectStrategy strategy;
-	
-	/** Member holds the detail or state object */
-	private ObjexObjStateBean state;
+	/** Member holds the state object */
+	private Object state;
 	
 	public SimpleObjexObj() {
 	    throw new IllegalArgumentException("Cannot create a SimpleObjexObj directly");
 	}
 	
-	public SimpleObjexObj(ObjectStrategy strategy, ObjexObjStateBean state) {
+	public SimpleObjexObj(ObjectStrategy strategy, Object state) {
 	    if( strategy == null ) throw new IllegalArgumentException("Cannot create object without a strategy");
 		if( state == null ) throw new IllegalArgumentException("Cannot create object without a state object");
 		
@@ -91,282 +74,20 @@ public final class SimpleObjexObj extends BaseObjexObj {
 	/**
 	 * Default is simple name of outer class
 	 */
+	@Override
 	public String getType() {
 		return strategy.getTypeName();
 	}
 	
-	/**
-	 * Overridden based on whether state object is
-	 * updateable or not.
-	 */
-	@XmlTransient
-	@Override
-	public boolean isUpdateable() {
-	    if( state.isEditable() ) return true;
-	    return super.isUpdateable();
-	}
-	
 	@XmlAnyElement
 	@Override
-	protected ObjexObjStateBean getStateBean() {
+	@Valid
+	protected Object getStateBean() {
 	    return state;
 	}
 	
-	/**
-	 * Returns a cloned copy of the state object
-	 * 
-	 * @deprecated
-	 */
-	@XmlTransient
-    public Object getStateObject() {
-		return state.cloneState();
-	}
-	
-	/**
-	 * Helper that returns the state object without 
-	 * cloning it. Can be used by the derived class.
-	 * 
-	 * @return The state object
-	 * @deprecated
-	 */
-	protected ObjexObjStateBean getState() {
-		return state;
-	}
-	
-	/**
-	 * Helper to return an editable version of the
-	 * state object. This is useful if holding the
-	 * object as part of a behavioural implementation.
-	 * Using it does mean that the object will be
-	 * set as edited even through nothing may have
-	 * changed. 
-	 * 
-	 * @return The state object in editable form
-	 */
-	@XmlTransient
-    public ObjexObjStateBean getEditableLocalState() {
-	    if( !state.isEditable() ) getInternalContainer().addObjectToTransaction(this, state);
-	    return state;
-	}
-	
-	
-	/**
-     * Uses the name as a property and reflects value from
-     * state bean.
-     */
-	@SuppressWarnings("unchecked")
-    @Override
-    public Object getProperty(String name) {
-        checkInitialised();
-        
-        String realName = convertReferencePropertyName(name);
-        
-        BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
-        Object ret = null;
-        if( def.hasProperty(realName) && def.canRead(realName) ) ret = def.read(state, realName);
-        
-        // See if it is a reference prop and convert
-        if( name.equals(realName) && isReferenceProperty(realName) ) {
-            if( ret instanceof Map<?, ?> ) ret = getContainer().getObjectMap((Map<String, Object>)ret);
-            else if( ret instanceof List<?> ) ret = getContainer().getObjectList((List<Object>)ret);
-            else ret = getContainer().getObject(ret);
-        }
-        
-        // Attempt to Clone value
-        ret = cloneValue(ret);
-        
-        return ret;
+	@Override
+    protected ObjectStrategy getStrategy() {
+        return strategy;
     }
-    
-    /**
-     * Delegates handling to private setProperty method.
-     */
-    @Override
-    public void setProperty(String name, Object val) {
-        checkUpdateable();
-        
-        BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
-        
-        val = handleReferenceProperty(def, name, val);
-        name = convertReferencePropertyName(name);
-        
-        // Basic checks
-        if( !def.getPropertyType(name).isAssignableFrom(val.getClass()) ) {
-            throw new IllegalArgumentException("Cannot set property because type [" + def.getPropertyType(name) + "] not compatible with: " + val);
-        }
-        if( !def.canWrite(name) ) {
-            throw new IllegalArgumentException("Cannot set property because it is not updateable: " + name);
-        }
-        
-        Object current = def.read(state, name);
-        if( (current != null && current.equals(val)) || current == val ) return;
-        
-        val = SimpleFieldUtils.setSimple(this, state, name, val, current);
-        def.write(state, name, val);
-    }
-    
-    /**
-     * Overridden from base to check the property is a
-     * reference property and further that on the state
-     * bean it is held as reference or a list.
-     * 
-     * <p>Currently creating a new object on a reference
-     * field is not supported.</p>
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public ObjexObj createReference(String name, String type) {
-        checkInitialised();
-        
-        Map<String, Class<?>> refProps = strategy.getOwnedReferenceProperties();
-        
-        ObjexObj newObj = null;
-        if( refProps != null && refProps.containsKey(name) ) {
-            BeanDefinition def = BeanDefinitionsSingleton.getInstance().getDefinition(state.getClass());
-            Class<?> refType = def.getPropertyType(name);
-            
-            // Maps currently unsupported
-            if( Map.class.isAssignableFrom(refType) ) {
-                throw new ObjectFieldInvalidException(name, "Cannot create new object inside map reference currently");
-            }
-            
-            // Create new object and add to reference prop
-            else if( List.class.isAssignableFrom(refType) ) {
-                newObj = getInternalContainer().newObject(this, state, type);
-                Object id = newObj.getId();
-                if( refProps.get(name).equals(String.class) ) id = id.toString();
-                
-                List<Object> currentRefs = getProperty(name + "Ref", List.class);
-                if( currentRefs == null ) currentRefs = new ArrayList<Object>();
-                currentRefs.add(id);
-                setProperty(name + "Ref", currentRefs);
-            }
-            
-            // Create reference and set in property
-            else {
-                // FUTURE: Should really remove current if owned (also on set)!
-                
-                newObj = getInternalContainer().newObject(this, state, type);
-                setProperty(name, newObj);
-            }
-        }
-        else {
-            throw new ObjectFieldInvalidException(name, "Cannot create new object on a non-reference or non-owned property");
-        }
-        
-        return newObj;
-    }
-    
-    /**
-     * Simply passes to the state bean as there is no behaviour in
-     * a simple object.
-     */
-    public void acceptReader(ObjexStateReader reader) {
-        getStateBean().acceptReader(reader);
-    }
-	
-	/////////////////////////////////////////////
-	// Internal
-	
-	/**
-	 * Helper to determine if given property is a 
-	 * reference property or not.
-	 */
-	protected boolean isReferenceProperty(String name) {
-	    Map<String, Class<?>> refProps = strategy.getReferenceProperties();
-	    return refProps != null && refProps.containsKey(name);
-	}
-	
-	/**
-	 * This helper method is called when setting a property
-	 * to convert the incoming value for reference properties.
-	 * If the property is a reference prop then this incoming
-	 * value should be either an ObjexObj, a List of ObjexObj
-	 * or a Map of Object to ObjexObj instances as appropriate.
-	 * This method converts it to a reference (scalar, list or
-	 * map as needed). If the property is not a reference prop
-	 * then the value is simply ignored.
-	 */
-	protected Object handleReferenceProperty(BeanDefinition def, String name, Object val) {
-	    Object ret = val;
-	    
-	    if( isReferenceProperty(name) ) {
-	        Class<?> referenceType = strategy.getReferenceProperties().get(name);
-	        boolean storeAsString = referenceType.equals(String.class);
-	        Class<?> storageType = def.getPropertyType(name);
-	        
-	        ret = null;
-	        
-	        // Map
-	        if( storageType.isAssignableFrom(Map.class) ) {
-	            if( !Map.class.isInstance(val) ) throw new IllegalArgumentException("Trying to set map property [" + name + "] with non-map value"); 
-	            
-	            Map<?, ?> objects = (Map<?, ?>)val;
-	            if( objects != null && objects.size() > 0 ) {
-	                Map<Object, Object> refs = new HashMap<Object, Object>(objects.size());
-	                Iterator<?> it = objects.keySet().iterator();
-	                while( it.hasNext() ) {
-	                    Object k = it.next();
-	                    Object obj = objects.get(k);
-	                    if( !(obj instanceof ObjexObj) ) throw new IllegalArgumentException("Trying to set map reference [" + name + "] with at least 1 non-ObjexObj entry: " + k + "=" + obj);
-	                    ObjexID id = ((ObjexObj)obj).getId();
-	                    refs.put(k, storeAsString ? id.toString() : id);
-	                }
-	                
-	                ret = refs;
-	            }
-	        }
-	        
-	        // List
-	        else if( storageType.isAssignableFrom(List.class) ) {
-	            if( !List.class.isInstance(val) ) throw new IllegalArgumentException("Trying to set list property [" + name + "] with non-list value");
-	            
-	            List<?> objects = (List<?>)val;
-	            if( objects != null && objects.size() > 0 ) {
-	                List<Object> refs = new ArrayList<Object>(objects.size());
-	                Iterator<?> it = objects.iterator();
-	                while( it.hasNext() ) {
-	                    Object obj = it.next();
-	                    if( !(obj instanceof ObjexObj) ) throw new IllegalArgumentException("Trying to set list reference [" + name + "] with at least 1 non-ObjexObj entry: " + obj);
-                        ObjexID id = ((ObjexObj)obj).getId();
-                        refs.add(storeAsString ? id.toString() : id);
-	                }
-	                
-	                ret = refs;
-	            }
-	        }
-	        
-	        // Simple ref
-	        else if( val != null ) {
-	            if( !(val instanceof ObjexObj) ) throw new IllegalArgumentException("Trying to set ref property [" + name + "] with non-ObjexObj value");
-	            ObjexID id = ((ObjexObj)val).getId();
-	            ret = storeAsString ? id.toString() : id;
-	        }
-	    }
-	    
-	    return ret;
-	}
-	
-	/**
-	 * This method converts the name of the requested property
-	 * when the request prop is a reference property suffixed 
-	 * with Ref. This means the client wants just the raw 
-	 * reference value (scalar, list or map).
-	 * 
-	 * @param name The original name of the property 
-	 * @return The real property name
-	 */
-	protected String convertReferencePropertyName(String name) {
-	    String ret = name;
-	    
-	    Map<String, Class<?>> refProps = strategy.getReferenceProperties();
-        if( refProps != null && (name.endsWith("Ref") && name.length() > 3) ) {
-            String possibleRef = name.substring(0, name.length() - 3);
-            if( refProps.containsKey(possibleRef) ) {
-                ret = possibleRef;
-            }
-        }
-	    
-	    return ret;
-	}
 }

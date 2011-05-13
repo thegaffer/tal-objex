@@ -139,20 +139,6 @@ public interface ObjexObj {
     public void setProperty(String name, Object newValue);
     
     /**
-     * Call to create a new object in the container under
-     * the reference property named. The property named
-     * must be an owned reference property. Although type
-     * is passed in it may be ignored if the reference
-     * property only supports a single pre-determined
-     * object type.
-     * 
-     * @param name The name of the reference property
-     * @param type The type of object to create
-     * @return The newly constructed object
-     */
-    public ObjexObj createReference(String name, String type);
-	
-	/**
 	 * Call this method to validate an object. This can be called
 	 * at any time to have an object validate itself. It is called
 	 * as part of the saving process automatically, but often we
@@ -163,4 +149,43 @@ public interface ObjexObj {
 	 * @return True if the object is valid, false otherwise
 	 */
 	public void validate(ValidationRequest request);
+	
+	/**
+     * This enum represents the possible types of each field. It
+     * is used to remove ambiguity that can arise from simply 
+     * looking at the objects type - for instance a String and
+     * a Memo are both represented as strings.
+     * 
+     * SUGGEST: This is not extensible, if it needs to be (and I'm not sure it does) consider a field type annotation?
+     *
+     * @author Tom Spencer
+     */
+    public static enum ObjexFieldType {
+        /** Indicates the field represents the parent ID */
+        PARENT_ID,
+        /** Indicates the field is a text field */
+        STRING,
+        /** Indicates the field is a potentially large field */
+        MEMO,
+        /** Indicates the field is a number */
+        NUMBER,
+        /** Indicates the field is a boolean */
+        BOOL,
+        /** Indicates the field is a date field */
+        DATE,
+        /** Indicates the field is a short binary (byte) field */
+        SHORT_BLOB,
+        /** Indicates the field is a blob (byte) field */
+        BLOB,
+        /** Indicates the field references an external blob field */
+        BLOB_REFERENCE,
+        /** Indicates the field represents a user */
+        USER,
+        /** Indicates the field references another object */
+        REFERENCE,
+        /** Indicates the field references an owned object */
+        OWNED_REFERENCE,
+        /** Indicates the field holds an arbitrary object */
+        OBJECT;
+    }
 }

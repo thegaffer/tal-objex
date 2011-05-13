@@ -22,16 +22,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
 import org.talframework.objexj.ValidationError;
 import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.ValidationRequest.ValidationType;
-import org.talframework.objexj.container.TransactionCache;
-import org.talframework.objexj.container.TransactionCache.ObjectRole;
+import org.talframework.objexj.container.ContainerObjectCache;
+import org.talframework.objexj.container.ContainerObjectCache.CacheState;
 import org.talframework.objexj.validation.CurrentValidationRequest;
 import org.talframework.objexj.validation.SimpleValidationRequest;
 
@@ -57,10 +56,8 @@ import org.talframework.objexj.validation.SimpleValidationRequest;
  */
 public final class ContainerValidator {
 
-    /** The container we are acting on */
-    private final Container container;
     /** Holds the transaction cache of all objects to validate */
-    private final TransactionCache cache;
+    private final ContainerObjectCache cache;
     
     /**
      * Static method to enable 1-line validation of a container
@@ -69,13 +66,12 @@ public final class ContainerValidator {
      * @param cache The cache for the transaction
      * @return The request (which contains any errors)
      */
-    public final static ValidationRequest validate(final Container container, final TransactionCache cache, final ValidationRequest oldRequest) {
-        ContainerValidator validator = new ContainerValidator(container, cache);
+    public final static ValidationRequest validate(final ContainerObjectCache cache, final ValidationRequest oldRequest) {
+        ContainerValidator validator = new ContainerValidator(cache);
         return validator.validate(oldRequest);
     }
     
-    public ContainerValidator(final Container container, final TransactionCache cache) {
-        this.container = container;
+    public ContainerValidator(final ContainerObjectCache cache) {
         this.cache = cache;
     }
     
@@ -88,27 +84,18 @@ public final class ContainerValidator {
         try {
             previous = CurrentValidationRequest.start(request);
             
-            // Step 1 - Validate all objects within themselves
-            List<ObjexID> changedObjects = getObjectsToValidate();
-            Iterator<ObjexID> it = changedObjects.iterator();
-            while( it.hasNext() ) {
-                ObjexID id = it.next();
-                if( oldErrors != null && oldErrors.containsKey(id) ) oldErrors.remove(id);
-                container.getObject(id).validate(request);
-            }
+            // Step 1 - Validate all (active) objects within themselves
+            Set<ObjexObj> changedObjects = cache.getObjects(CacheState.NEWORCHANGED);
+            for( ObjexObj obj : changedObjects ) obj.validate(request);
             
             // Step 2 - Validate all objects against others
             request.setType(ValidationType.INTER_OBJECT); 
-            it = changedObjects.iterator();
-            while( it.hasNext() ) {
-                container.getObject(it.next()).validate(request);
-            }
+            for( ObjexObj obj : changedObjects ) obj.validate(request);
             
             // Step 3 - Validate the parents all the way to the root
             request.setType(ValidationType.CHILDREN);
             ParentObjectBuilder parents = getParentObjectBuilder(changedObjects);
-            int i = parents.getMaxDepth();
-            for( ; i >= 0 ; i-- ) {
+            for( int i = parents.getMaxDepth(); i >= 0 ; i-- ) {
                 Iterator<ObjexObj> it2 = parents.getObjects(i).iterator();
                 while( it2.hasNext() ) {
                     ObjexObj parent = it2.next();
@@ -126,7 +113,9 @@ public final class ContainerValidator {
             Iterator<ObjexID> it = oldErrors.keySet().iterator();
             while( it.hasNext() ) {
                 ObjexID id = it.next();
-                if( cache.findObject(id, ObjectRole.REMOVED) == null ) {
+                
+                CacheState state = cache.getObjectCacheState(id);
+                if( state == null || state == CacheState.NONE || state == CacheState.ACTIVE ) {
                     request.addErrors(id, oldErrors.get(id));
                 }
             }
@@ -136,49 +125,22 @@ public final class ContainerValidator {
     }
     
     /**
-     * @return All objects requiring basic validation (i.e. have changed)
-     */
-    private final List<ObjexID> getObjectsToValidate() {
-        Map<ObjexID, ObjexObjStateBean> newObjs = cache.getObjects(ObjectRole.NEW);
-        Map<ObjexID, ObjexObjStateBean> updatedObjs = cache.getObjects(ObjectRole.UPDATED);
-        int size = newObjs != null ? newObjs.size() : 0;
-        size += updatedObjs != null ? updatedObjs.size() : 0;
-        
-        List<ObjexID> ret = new ArrayList<ObjexID>(size);
-        
-        Iterator<ObjexID> it = newObjs != null ? newObjs.keySet().iterator() : null;
-        while( it != null && it.hasNext() ) {
-            ret.add(it.next());
-        }
-        
-        it = updatedObjs != null ? updatedObjs.keySet().iterator() : null;
-        while( it != null && it.hasNext() ) {
-            ret.add(it.next());
-        }
-        
-        return ret;
-    }
-    
-    /**
      * Helper to get the parent object builder for all parent
      * objects.
      * 
      * @return The parent object builder.
      */
-    private final ParentObjectBuilder getParentObjectBuilder(final List<ObjexID> changedObjects) {
+    private final ParentObjectBuilder getParentObjectBuilder(final Set<ObjexObj> changedObjects) {
         ParentObjectBuilder builder = new ParentObjectBuilder();
         
-        Iterator<ObjexID> it = changedObjects.iterator();
-        while( it.hasNext() ) {
-            builder.addParent(container.getObject(it.next()));
-        }
+        for( ObjexObj obj : changedObjects ) builder.addParent(obj);
         
         return builder;
     }
     
     /**
      * This private inner class contains the magic for arranging
-     * the parent objects by depth, where the parent id depth 0
+     * the parent objects by depth, where the root object i depth 0
      * and any of its children are depth 1 etc, etc. It also
      * contains logic to ensure a parent object is only evaluated
      * once and then provides methods to get the max depth and
