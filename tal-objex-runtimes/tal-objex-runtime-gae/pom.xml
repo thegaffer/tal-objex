@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+  	<groupId>org.talframework.objex</groupId>
+  	<artifactId>tal-objex-parent</artifactId>
+  	<version>1.0-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>tal-objex-runtime-gae</artifactId>
+  <name>Objex Runtime GAE</name>
+  <description>An Objex runtime persistence engine for Google App Engine</description>
+  
+  <properties>
+  	<gae.version>1.3.2</gae.version>
+  </properties>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-core</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	
+  	<dependency>
+  		<groupId>org.talframework.tal</groupId>
+		<artifactId>tal-aspects</artifactId>
+  	</dependency>
+  	
+  	<!-- Google App Engine -->
+  	<dependency>            
+		<groupId>com.google.appengine</groupId>            
+		<artifactId>appengine-api-1.0-sdk</artifactId>            
+		<version>1.3.7</version>            
+	</dependency>
+	<dependency>
+	  	<groupId>com.google.appengine</groupId>
+	  	<artifactId>appengine-api-labs</artifactId>
+	  	<version>1.3.7</version>
+	</dependency>
+  </dependencies>
+
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+	 		<groupId>org.tpspencer.tal</groupId>
+			<artifactId>tal-gae-runtime</artifactId>
+			<version>${gae.version}</version>
+			<type>pom</type>
+	 	</dependency>
+	</dependencies>
+  </dependencyManagement>
+</project>
