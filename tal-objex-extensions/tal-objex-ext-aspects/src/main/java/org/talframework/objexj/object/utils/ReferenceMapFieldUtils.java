@@ -1,14 +1,5 @@
 package org.talframework.objexj.object.utils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.talframework.objexj.DefaultObjexID;
-import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.BaseObjexObj;
 
 /**
  * This static class contains various methods that the
@@ -22,14 +13,14 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
     
     /**
      * Call to get a reference property
-     */
+     *//*
     public static <T> Map<String, T> getMap(BaseObjexObj obj, Class<T> expected, Map<String, String> refs) {
         return obj.getContainer().getObjectMap(refs, expected);
     }
 
-    /**
+    *//**
      * Helper to set a reference list against a set of incoming objects 
-     */
+     *//*
     public static <T> Map<String, String> setMap(BaseObjexObj obj, ObjexObjStateBean state, Map<String, String> current, Map<String, T> val, boolean owned) {
         Map<String, String> ret = current;
         
@@ -57,9 +48,9 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         return ret;
     }
     
-    /**
+    *//**
      * Helper to add a new element to a map
-     */
+     *//*
     public static Map<String, String> addMap(BaseObjexObj obj, ObjexObjStateBean state, boolean owned, String type, String key, Map<String, String> current) {
         Map<String, String> ret = null;
         
@@ -78,9 +69,9 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         return ret;
     }
 
-    /**
+    *//**
      * Helper to get a map element by key
-     */
+     *//*
     public static <T> T getMapByKey(BaseObjexObj obj, ObjexObjStateBean state, String key, Map<String, String> current, Class<T> expected) {
         T ret = null;
         
@@ -97,9 +88,9 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         return ret;
     }
     
-    /**
+    *//**
      * Helper to remove from a map by key
-     */
+     *//*
     public static Map<String, String> removeMapByKey(BaseObjexObj obj, ObjexObjStateBean state, boolean owned, String key, Map<String, String> current) {
         Map<String, String> ret = current;
         
@@ -115,9 +106,9 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         return ret;
     }
     
-    /**
+    *//**
      * Helper to remove from a list an object by its ID
-     */
+     *//*
     public static Map<String, String> removeMapById(BaseObjexObj obj, ObjexObjStateBean state, boolean owned, Object id, Map<String, String> current) {
         if( current == null || current.size() == 0 ) return current;
         
@@ -142,9 +133,9 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         return ret;
     }
 
-    /**
+    *//**
      * Helper to remove all objects in a map
-     */
+     *//*
     public static Map<String, String> removeMapAll(BaseObjexObj obj, ObjexObjStateBean state, boolean owned, Map<String, String> current) {
         if( current == null || current.size() == 0 ) return current;
         
@@ -154,10 +145,10 @@ public final class ReferenceMapFieldUtils extends FieldUtils {
         return null;
     }
     
-    /**
+    *//**
      * Helper to remove all objects from a list
-     */
+     *//*
     private static void removeObjects(Map<String, String> ids) {
        // TODO: Remove at the container level 
-    }
+    }*/
 }

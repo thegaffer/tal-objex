@@ -16,9 +16,9 @@
   <description>The runtime engines supported by Objex (at least thouse that are part of the source anyway)</description>
   
   <modules>
-  	<module>tal-objex-gae</module>
-  	<module>tal-objex-gae-testapp</module>
-  	<module>tal-objex-runtime-webservice</module>
+  	<!-- <module>tal-objex-gae</module>
+  	<module>tal-objex-gae-testapp</module> -->
+  	<!-- <module>tal-objex-runtime-webservice</module> - Not compiling currently -->
   	<module>tal-objex-runtime-globals</module>
   	<module>tal-objex-runtime-gae</module>
   	<module>tal-objex-runtime-sql</module>

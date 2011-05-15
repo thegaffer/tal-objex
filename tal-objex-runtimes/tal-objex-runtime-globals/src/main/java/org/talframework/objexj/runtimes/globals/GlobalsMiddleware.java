@@ -43,6 +43,11 @@ public class GlobalsMiddleware implements ContainerMiddleware {
     /** If the container is new, holds the last ID dished out */
     private long lastId = 1;
     
+    public GlobalsMiddleware() {
+        this.type = null;
+        this.version = 1;
+    }
+    
     private NodeReference getContainerNode() {
         // TODO: Implement!!
         node.setSubscriptCount(containerNodeCount);

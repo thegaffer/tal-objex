@@ -160,6 +160,7 @@
 	<plugins>
 	  <plugin>
       	<artifactId>maven-surefire-report-plugin</artifactId>
+      	<version>2.4.3</version>
       	<configuration>
       		<xrefLocation>${project.reporting.outputDirectory}/../xref-test</xrefLocation>
       	</configuration>
@@ -167,6 +168,7 @@
       <plugin>
       	<groupId>org.apache.maven.plugins</groupId>
       	<artifactId>maven-pmd-plugin</artifactId>
+      	<version>2.4</version>
       	<configuration>
       		<targetJdk>1.6</targetJdk>
       		<rulesets>
@@ -182,6 +184,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.3</version>
         <configuration>
           <xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation>
           <configLocation>C:\Dev\Data\Site\checkstyle\tal_checks.xml</configLocation>

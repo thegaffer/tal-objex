@@ -20,10 +20,9 @@ import java.util.Map;
 
 import org.talframework.objexj.Container;
 import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexObjStateBean;
+import org.talframework.objexj.ObjexObj;
 import org.talframework.objexj.container.ContainerMiddleware;
-import org.talframework.objexj.container.ObjexIDStrategy;
-import org.talframework.objexj.container.TransactionCache;
+import org.talframework.objexj.container.ContainerObjectCache;
 import org.talframework.objexj.events.EventListener;
 
 /**
@@ -33,62 +32,86 @@ import org.talframework.objexj.events.EventListener;
  * @author Tom Spencer
  */
 public class ObjexWebServiceMiddleware implements ContainerMiddleware {
-
-    public void init(Container container) {
+    
+    @Override
+    public ContainerObjectCache init(Container container) {
         // TODO Auto-generated method stub
-        
+        return null;
     }
     
+    @Override
     public String getContainerId() {
         // TODO Auto-generated method stub
         return null;
     }
     
+    @Override
+    public boolean exists(ObjexID id, boolean accurate) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    
+    @Override
+    public ObjexObj loadObject(ObjexObj obj) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public Map<ObjexID, ObjexObj> loadObjects(ObjexObj... objs) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
     public boolean isNew() {
         // TODO Auto-generated method stub
         return false;
     }
     
-    public ObjexObjStateBean loadObject(Class<? extends ObjexObjStateBean> type, ObjexID id) {
+    @Override
+    public boolean isOpen() {
         // TODO Auto-generated method stub
-        return null;
+        return false;
     }
     
-    public TransactionCache open() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    public TransactionCache getCache() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    public ObjexIDStrategy getIdStrategy() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    public String save(String status, Map<String, String> header) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    public String suspend() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    public void clear() {
+    @Override
+    public void open() {
         // TODO Auto-generated method stub
         
     }
     
+    @Override
+    public ObjexID getNextObjectId(String type) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public String save(ContainerObjectCache cache, String status, Map<String, String> header) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public String suspend(ContainerObjectCache cache) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public void clear(ContainerObjectCache cache) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
     public void registerListener(EventListener listener) {
         // TODO Auto-generated method stub
         
     }
     
+    @Override
     public void registerListenerForTransaction(EventListener listener) {
         // TODO Auto-generated method stub
         

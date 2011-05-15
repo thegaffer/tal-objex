@@ -1,14 +1,5 @@
 package org.talframework.objexj.object.utils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.talframework.objexj.DefaultObjexID;
-import org.talframework.objexj.ObjexID;
-import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.BaseObjexObj;
 
 /**
  * This static class contains various methods that the
@@ -22,14 +13,14 @@ public final class ReferenceListFieldUtils extends FieldUtils {
     
     /**
      * Call to get a reference property
-     */
+     *//*
     public static <T> List<T> getList(BaseObjexObj obj, Class<T> expected, List<String> refs) {
         return obj.getContainer().getObjectList(refs, expected);
     }
     
-    /**
+    *//**
      * Helper to get a list element by index
-     */
+     *//*
     public static <T> T getElementByIndex(BaseObjexObj obj, Class<T> expected, List<String> current, int index) {
         T ret = null;
         
@@ -46,9 +37,9 @@ public final class ReferenceListFieldUtils extends FieldUtils {
         return ret;
     }
 
-    /**
+    *//**
      * Helper to set a reference list against a set of incoming objects 
-     */
+     *//*
     public static <T> List<String> setList(BaseObjexObj obj, ObjexObjStateBean state, List<String> current, List<T> val, boolean owned) {
         List<String> ret = current;
         
@@ -75,19 +66,19 @@ public final class ReferenceListFieldUtils extends FieldUtils {
         return ret;
     }
     
-    /**
+    *//**
      * Helper to create a new element - note this method does not add
      * the element to the list, the caller should call addListElement
      * to do this.
-     */
+     *//*
     public static <T> T createElement(BaseObjexObj obj, ObjexObjStateBean state, Class<T> expected, String type) {
         ObjexObj newObj = obj.getInternalContainer().newObject(obj, state, type);
         return newObj.getBehaviour(expected);
     }
     
-    /**
+    *//**
      * Helper to add a given element to a list prop
-     */
+     *//*
     public static <T> List<String> addElement(BaseObjexObj obj, ObjexObjStateBean state, List<String> current, T val) {
         List<String> ret = null;
         
@@ -126,9 +117,9 @@ public final class ReferenceListFieldUtils extends FieldUtils {
         return ret;
     }
     
-    /**
+    *//**
      * Helper to remove from a list an object by its ID
-     */
+     *//*
     public static List<String> removeElementById(BaseObjexObj obj, ObjexObjStateBean state, List<String> current, boolean owned, Object id) {
         if( current == null || current.size() == 0 ) return current;
         
@@ -153,9 +144,9 @@ public final class ReferenceListFieldUtils extends FieldUtils {
         return ret;
     }
 
-    /**
+    *//**
      * Helper to remove all objects in a list
-     */
+     *//*
     public static List<String> removeAll(BaseObjexObj obj, ObjexObjStateBean state, List<String> current, boolean owned) {
         if( current == null || current.size() == 0 ) return current;
         
@@ -165,10 +156,10 @@ public final class ReferenceListFieldUtils extends FieldUtils {
         return null;
     }
     
-    /**
+    *//**
      * Helper to remove all objects from a list
-     */
+     *//*
     private static void removeObjects(List<String> ids) {
        // TODO: Remove at the container level 
-    }
+    }*/
 }

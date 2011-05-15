@@ -20,7 +20,7 @@
   	<!-- Note: No dependency on core because I don't want to bundle it, but might be useful?? -->
   	
   	<!-- OSGi -->
-    <dependency>
+    <!-- <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.core</artifactId>
         <version>4.1.0</version>
@@ -29,17 +29,17 @@
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.compendium</artifactId>
         <version>4.1.0</version>
-    </dependency>
+    </dependency>  -->
   	
   	<!-- Apache Felix -->
-    <dependency>
+    <!-- <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.scr.annotations</artifactId>
         <version>1.2.0</version>
-    </dependency>
+    </dependency>  -->
   	
   	<!-- Roo -->
-  	<dependency>
+  	<!-- <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.metadata</artifactId>
       <version>${roo.version}</version>
@@ -86,7 +86,7 @@
       <artifactId>org.springframework.roo.classpath</artifactId>
       <version>${roo.version}</version>
       <type>bundle</type>
-    </dependency>
+    </dependency> -->
 	<!-- <dependency>
 		<groupId>org.springframework.roo</groupId>
 		<artifactId>org.springframework.roo.addon.javabean</artifactId>

@@ -1,15 +1,5 @@
 package org.talframework.objexj.runtime.globals;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.talframework.objexj.ObjexObjStateBean.ObjexFieldType;
-import org.talframework.objexj.ObjexStateWriter;
-
-import com.intersys.globals.Connection;
-import com.intersys.globals.NodeReference;
-import com.intersys.globals.ValueList;
 
 /**
  * This class writes the state of an Objex object into the globals
@@ -20,11 +10,11 @@ import com.intersys.globals.ValueList;
  *
  * @author Tom Spencer
  */
-public class GlobalsObjectWriter implements ObjexStateWriter {
+public class GlobalsObjectWriter { // implements ObjexStateWriter {
     
-    /** The connection to the DB so we can create lists */
+    /** The connection to the DB so we can create lists *//*
     private final Connection connection;
-    /** The top level node we are referencing */
+    *//** The top level node we are referencing *//*
     private final NodeReference node;
     
     public GlobalsObjectWriter(Connection connection, NodeReference node) {
@@ -32,9 +22,9 @@ public class GlobalsObjectWriter implements ObjexStateWriter {
         this.node = node;
     }
     
-    /**
+    *//**
      * {@inheritDoc}
-     */
+     *//*
     public void write(String name, Object obj, ObjexFieldType type, boolean persistent) {
         if( !persistent ) return;
         
@@ -79,9 +69,9 @@ public class GlobalsObjectWriter implements ObjexStateWriter {
         }
     }
     
-    /**
+    *//**
      * {@inheritDoc}
-     */
+     *//*
     public void writeReference(String name, String ref, ObjexFieldType type, boolean persistent) {
         if( !persistent ) return;
         
@@ -93,9 +83,9 @@ public class GlobalsObjectWriter implements ObjexStateWriter {
         node.set(ref, name);
     }
     
-    /**
+    *//**
      * {@inheritDoc}
-     */
+     *//*
     public void writeReferenceList(String name, List<String> ref, ObjexFieldType type, boolean persistent) {
         if( !persistent ) return;
         
@@ -109,9 +99,9 @@ public class GlobalsObjectWriter implements ObjexStateWriter {
         node.set(list, name);
     }
     
-    /**
+    *//**
      * {@inheritDoc}
-     */
+     *//*
     public void writeReferenceMap(String name, Map<String, String> ref, ObjexFieldType type, boolean persistent) {
         if( !persistent ) return;
         
@@ -124,5 +114,5 @@ public class GlobalsObjectWriter implements ObjexStateWriter {
         for( String key : ref.keySet() ) {
             node.set(ref.get(key), name, key);
         }
-    }
+    }*/
 }

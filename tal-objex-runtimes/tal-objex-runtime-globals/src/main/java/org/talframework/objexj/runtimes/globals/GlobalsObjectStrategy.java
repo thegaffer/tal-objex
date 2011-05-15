@@ -38,13 +38,13 @@ public class GlobalsObjectStrategy {
         for( int i = 0 ; i < this.fields.size() ; i++ ) fields.put(this.fields.get(i), i);
     
         int size = fields.size();
-        for( String prop : strategy.getProperties() ) {
+        /*for( String prop : strategy.getProperties() ) {
             // TODO: If ref list, set, map or large blob or memo should be in own node??
             if( !fields.containsKey(prop) ) {
                 this.fields.add(prop);
                 fields.put(prop, this.fields.size());
             }
-        }
+        }*/
         
         if( this.fields.size() > size ) save();
     }

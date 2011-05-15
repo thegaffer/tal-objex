@@ -1,8 +1,5 @@
 package org.talframework.objexj.object.utils;
 
-import org.talframework.objexj.ObjexObj;
-import org.talframework.objexj.ObjexObjStateBean;
-import org.talframework.objexj.object.BaseObjexObj;
 
 /**
  * This static class contains various methods that the
@@ -16,7 +13,7 @@ public final class ReferenceFieldUtils extends FieldUtils {
     
     /**
      * Helper method to get a reference as the expected type
-     */
+     *//*
     public static <T> T getReference(BaseObjexObj obj, Class<T> expected, String val) {
         T ret = null;
         
@@ -28,10 +25,10 @@ public final class ReferenceFieldUtils extends FieldUtils {
         return ret;
     }
 
-    /**
+    *//**
      * Helper method that sets a reference field to the incoming
      * ObjexObj field. 
-     */
+     *//*
     public static <T> String setReference(BaseObjexObj obj, ObjexObjStateBean state, String current, T val, boolean owned, String type) {
         String ret = null;
         
@@ -74,5 +71,5 @@ public final class ReferenceFieldUtils extends FieldUtils {
     public static <T> T createReference(BaseObjexObj obj, ObjexObjStateBean state, Class<T> expected, String type) {
         ObjexObj newObj = obj.getInternalContainer().newObject(obj, state, type);
         return newObj.getBehaviour(expected);
-    }
+    }*/
 }
