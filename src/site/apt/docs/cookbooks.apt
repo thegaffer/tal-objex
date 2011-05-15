@@ -14,5 +14,4 @@ Cook Books
     * {{{cookbook_implicitbehaviour.html}Implicit Behaviour}} - A guide on how to write and
     declare implicit behaviour on your objects.
     
-    * {{{cookbook_statebeans.html}Implementing a State Bean}} - A guide to writing the state
-    bean manually or adding custom persistence technology to it.
+    

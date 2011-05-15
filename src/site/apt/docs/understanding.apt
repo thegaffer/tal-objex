@@ -10,9 +10,9 @@ Domains
   depends on your system, but in most organisations you will have high-level business
   concepts such as Customers, Orders, Products, Suppliers, People etc, etc. But, your
   concepts could be wildly different or more abstract. A airport system would have
-  domains represent Aeroplanes, Runways, Terminals etc.
+  domains representing Aeroplanes, Runways, Terminals etc.
   
-  Not always, but typically these high-level entities would actually contain a whole
+  Not always, but typically, these high-level entities would actually contain a whole
   set of related objects. Orders would have various elements such as the items or
   products in the order, the delivery address, the invoice address etc.
   
@@ -59,11 +59,11 @@ Objects
   special object, ObjexID.
   
   An objects state is it's properties or fields. The state may be data values, Strings,
-  numbers, dates etc. Or they may be references (ObjexID's) to other objects in the same
-  container (or even a different container). I should say I am using the formal term
-  state here to describe all fields of the object. This is different from any lifecycle
-  state the object may have, but as far as Objex is concerned that is just one field on
-  the object that you define (and control).
+  numbers, dates etc. Or they may be references to other objects in the same container 
+  (or even a different container). I should say I am using the formal term state here 
+  to describe all fields of the object. This is different from any lifecycle state the 
+  object may have, but as far as Objex is concerned that is just one field on the object 
+  that you define (and control).
   
   An objects behaviour boils down to two key elements. Firstly there is implicit behaviour
   where changing the state causes other side effects inside the same or collaborating 
@@ -72,24 +72,6 @@ Objects
   saved. Secondly there is explicit behaviour where an object offers up an operation that can
   be performed on it.
   
-State
-
-[../images/uml/objectstate.png] Object and its State
-
-  The state of an object is the sum of all its properties or fields. An ObjexObj instance
-  does not, however, hold all those fields as, for example, member variables. Instead
-  you place all of the state into a separate object we refer to as a state bean.
-  
-  This is important because the state bean represents the persisted form of the object.
-  By holding it as a separate object you are free to inject in different versions of
-  this object and can more easily change your persistence strategy without affecting the
-  core behaviour. It should be noted however that field level validations are documented
-  (via annotations) against the state bean.
-  
-  The state bean is never directly exposed to clients. You purposefully expose it if
-  you wanted to, but it is not recommended. This is because the state bean is the
-  preserve of the persistence and this should never be exposed to your clients.
-
 Object Relationships
 
 [../images/uml/object_relationships.png] Object Relationships
@@ -163,7 +145,8 @@ Validation
   It should be noted, however, that objects that have not changed (and their children
   have not changed) are not invited to participate in the validation. This allows us
   to support very big containers without the need to load all the objects. You are
-  still free, as part of the validation, to load/read any other object if required.
+  still free, as part of the validation on one object, to load/read any other object 
+  if required.
   
   Validation is actually supported internally by JSR 303 Validation. However, we wrap
   it because we want to express the errors against the ID of the object that caused it
@@ -209,8 +192,7 @@ Implicit Behaviour
   I personally feel it is there area that Objex adds value. Once you get into Objex
   and, hopefully, see how it allows you to easily create the domains and gives you
   a framework such as this to define this behaviour you can actually devote more
-  time to it. And as behaviour is the key to OO, hopefully it will allow you to create
-  richer applications.
+  time to it. Hopefully Objex will allow you to create richer applications.
   
 Explicit Behaviour
 

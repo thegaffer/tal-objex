@@ -1,16 +1,37 @@
   Objex is a long-term personal project for its author Tom Spencer. I conceived the idea
-  in the mid-nineties after constructing my first software project. I was shocked about
-  the concepts of the relational database and how fundamentally it stored information 
-  together that had no business relationship. I could not understand how such a model could 
-  scale.
+  in the mid-nineties after constructing my first software project. My route into IT was
+  not a typical education led route, computing was a passion (I think we're called geeks!)
+  and that passion brought me into IT professionally.
   
-  I of course now understand more of the constraints that do or have existed that made 
-  relational database technology mainstream, and some of the mechanisms the RDBMS vendors 
-  have for scalability. I still fundamentally hold the belief though that when I pull a 
-  file from a filing cabinet the speed at which I can find information inside that file 
-  should be proportional to the amount of information inside the file, not proportional to 
-  the amount of similar pieces of information that exist across all the files in the filing
-  cabinet.
+  When I was creating my first software project I had naturally chosen a document 
+  orientated approach. The system stored quotes and each 'quote' was a file on the file
+  system. When I looked into hooking up to a DB this was the first time I had really
+  looked into the relational database model. I was actually shocked to see that its view
+  of the data was so totally at odds to my document orientated model. 
+  
+  Specifically how all the data was separated by type, not by it's relationship. So the
+  speed of pulling an item from a quote document when stored in a relational database is
+  proportional to the total amount of items in all quotes stored - not proportional to
+  the amount of items inside the 1 quote I am looking at. Of course RDBMS's have all 
+  sorts of tricks to speed that kind of search up, but the point remains.
+  
+  Clearly relational databases do make it easy to search across quotes to answer all
+  sorts of questions - BI. And frankly BI is actually more important that how I basically
+  store the data. BI is the value add that IT offers. That said, it is my view that the
+  RDBMS creates friction in systems that allow people to create, modify and process
+  documents. 
+  
+  That friction manifests itself not only because there is a mis-match between how people 
+  view their data (in mostly document form) and how the DB views their data (as a bunch 
+  of addresses, another bunch of order items etc, etc). But also because the RDBMS
+  typically (not always, but typically) says that all your data must go into the same
+  database - I cannot pick and choose my persistence technology according to what is
+  best.  
+  
+  And these days there are different approaches that can be taken to BI - 
+  indeed many companies don't report off online transactional systems, instead export
+  the data into a warehouse for reporting. So why is it that relational databases still
+  pervade as the de-facto cornerstone of every transactional system??
   
   So over the years Objex has been a way of expressing and proving some of these ideas.
   I've partially implemented it in both C++ and Java, although currently it is only the

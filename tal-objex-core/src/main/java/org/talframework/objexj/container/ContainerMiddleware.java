@@ -51,6 +51,9 @@ public interface ContainerMiddleware {
 	/**
 	 * Call to get the containers ID. This is done because a
 	 * middleware is often created based on a transaction ID.
+	 * Note that this should be called once by the container
+	 * and then cached - it might not be that efficient to
+	 * keep getting this.
 	 * 
 	 * @return The containers ID
 	 */

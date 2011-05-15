@@ -1,139 +1,141 @@
 Using Objex
 
- This page details how to use Objex when writing applications that make
- use of it. If you want to know how to write containers this is contained
- in the page on Writing Containers.
+ The Integration tests that are part of the sample application provide the
+ best demonstration to using Objex.
  
-Brief
-
- Lets look at the steps involved in using an Objex container. The rest
- of the section will guide us through this. The easiest way is with a
- small code snippet
+Basic
+ 
+ Using an objex container uses the following:
+ 
+  * Get an objex container by either creating it, getting an existing one
+  or opening an existing one
+  
+  * Get the root object from the container as an instance of your own
+  business interface.
+  
+  * Interact with your objects, if the container is open then change the
+  values.
+  
+  * Discard the container or save it if changes have been made.
+  
+ The following example shows this when opening a container:
  
 +--
-class MyApplicationService
+// 1. Open the container
+Container existingOrder = orderFactory.open(orderId);
 
-  private ContainerFactory factory;
-  
-  public void viewSomething() {
-    Container doc = factory.get("MyDocumentID");
-    ObjexObj root = doc.getRootObject();
-    MyInterface collaborator = root.getBehaviour(MyInterface.class);
-    // Use collaborator to get fields, other objects etc, etc
-  }
-  
-  public void saveSomething() {
-  	Container doc = factory.open("MyDocumentID");
-  	ObjexObj root = doc.getRootObject();
-    MyInterface collaborator = root.getBehaviour(MyInterface.class);
-    collaborator.setSomeField("value");
-    collaborator.someMethod();
-    // Other changes calls ...
-    
-    dov.validate(); // Checking for errors not shown
-    doc.save();
-  }
-}
+// 2. Get the root object 
+Order order = newOrder.getRootObject().getBehaviour(Order.class);
+
+// 3. Now interact with the objects (not Objex specific)
+order.getCustomer().setName("NewWidgetCo");
+// ...
+
+// 4. Save the container
+existingOrder.save(); 
 +--
 
- Hopefully that should immediately provide you with some idea of how to use
- Objex. In simple terms it takes a couple of lines to get to the objects and
- then you use them as you would if you were not using Objex.
- 
-The Container Factory
+Adding Objects
 
- First element in the example of the ContainerFactory. This interface
- provides access to the containers. Every container has an ID and this
- is used to get the instance you want. A container factory instance
- typically serves up only a single type of container.
+ One thing that can often be difficult to see is how I create new objects
+ in a Document or Store. Simple, just add it:
  
- There are three methods of the ContainerFactory instance. One to get
- the container (the resulting container will be, initially at least, 
- read-only. Another to open the container (this will make the container
- editable from the outset). And a third to create a new instance of
- the container type the ContainerFactory represents.
- 
- Once you've got a container you don't look at the factory again!
- 
-The Container
-
- This interface represents the container, be that document or store.
- It's primary purpose is to serve up the objects that it contains. Shown
- in the example is the root object. 
- 
- However, you can also get any object in the container by it's ID. All 
- objects inside a container have an ID that is unique to that container.
- If you know the ID you want then you can query for the object from the
- container. There are also methods to get a bunch of objects in one go,
- which depending on how the container connects to the data storage will
- likely be more efficient.
- 
- The container also contains a method to perform queries for objects
- inside the container. All queries are pre-defined and then accessed via
- name. Setting up queries is detailed on a separate page.
- 
- Finally the container contains a bunch of transaction methods to save,
- suspend or close the container - see below. 
- 
-The Objects
-
- Every single object inside the container exposes itself as an instance
- of the ObjexObj interface. This interface does provide you, the client,
- with the ability to get hold of the objects ID, it's parent object,
- another mechanism to get the root object and even provides generic
- methods to get at the objects state fields.
- 
- However, in keeping with OO principles you are far more likely to define
- you own non-Objex polluted interfaces representing your domain objects.
- The ObjexObj objects will therefore expose these interfaces. Although it
- is possible in simple cases to test the objects for your interfaces via
- instanceof, it is safer to use the getBehaviour method. This is because
- Objex will support some advanced polymorphic features including forming
- true compound objects and will allow objects to expose interfaces only
- at certain points in their lifecycle.
- 
-Saving Containers
-
-  The final point is how to make changes. Put simply instead of calling
-  get on the factory you call open. Then you can get hold of the objects
-  in exactly the same way and make whatever changes you want. When
-  finished you make a call to save().
-  
-  At this point the container is validated and if there are any errors
-  a ContainerInvalidException is thrown. Although not a checked exception
-  you may want to catch this exception explicitly. However, the preferred
-  mechanism is that you call validate on the container before call save()
-  (as shown). It is not possible to save a container with errors on it.
-  
-  However, you may also see on the container interface a method called
-  suspend() and be intrigued. Objex recognises the fact that changes to a
-  document, in particular, may occur over multiple interactions with the
-  end user. Therefore, temporary changes can be made and then suspended.
-  The return from suspend() is an ID that you can use with the factory to
-  re-open the container and make further changes to. For instance ...
-  
 +--
-public String firstInteraction() {
-  Container doc = factory.open("ID");
-  // Use doc and make some changes
-  return doc.suspend();
-}
+Container existingOrder = orderFactory.open(orderId);
+Order order = existingOrder.getRootObject().getBehaviour(Order.class);
 
-public void secondInteraction(String transId) {
-  Container doc = factory.open(transId);
-  // Make further changes to objects in the document
-  
-  doc.validate();
-  doc.save();
-}
+// Simply add a new item at the relevant point
+order.getOrderItems().add(new ProductItemImpl());
+
+existingOrder.save(); 
 +--
 
-  It is possible that containers might not support suspend(), but we encourage
-  it as it's application is very powerful and I think extremely common in
-  Enterprise applications.
+ The object you pass in (new ProductItemImpl) is called a seed object.
+ It is not used directly, but it's type is used to determine what type of
+ object to create. Also any properties it holds are copied over into the
+ new instance. But, if you immediately got the object back it would be
+ different:
+ 
++--
+OrderItem seed=new ProductItemImpl();
+seed.setDescription("Testing");
+order.getOrderItems().add(seed);
+OrderItem newItem = order.getOrderItems().get(0); // Assume none existing before call
+
+assertEquals(seed, newItem);						// This test would FAIL!
+assertTrue(newItem instanceof ProductItem);			// This test would SUCCEED
+assertEquals("Testing", newItem.getDescription());	// This test would SUCCEED
+assertTrue(newItem instanceof ObjexObj);			// This test would SUCCEED!!
++-- 
+
+ The last line often gets people - ProductItemImpl does not implement ObjexObj!
+
+Using ObjexObj
+
+ All objects inside a container will expose the ObjexObj interface. Your free to
+ use this interface if you so wish. It offers the following services:
+ 
+  * Ability to get or set any property by name
   
-  The final lifecycle method is the closeContainer() method. This effectively
-  aborts any changes that have not been persisted. The container will only go
-  back to the state of the last open, save or suspend. In the future it is
-  my hope that we will support a richer undo/redo functionality as part of the
-  containers interaction.
+  * Ability to get the objects ID in the container
+  
+  * Ability to get the objects parent object or the container
+  
+  * Ability to invoke the validate method. This is called by the container
+  when you save, but you can use it yourself.
+  
+ For instance:
+ 
++--
+Container existingOrder = orderFactory.get(orderId);
+Order order = existingOrder.getRootObject().getBehaviour(Order.class);
+
+OrderItem item = order.getOrderItems().get(0);
+
+ObjexObj objexItem = (ObjexObj)item;
+ObjexID id = objexItem.getId();				// The objects ID
+
+ObjexObj parent = objexItem.getParent();
+assertEquals(order, parent);				// This should PASS
+
+Container container = objexItem.getContainer();
+assertEquals(container, existingOrder);		// This should PASS
+
+ValidationRequest request = new SimpleValidationRequest();
+objexItem.validate(request);
+assertFalse(request.hasErrors());
+assertFalse(request.hasErrors(id));
+// ...
++--
+
+Suspending Containers
+
+ It should be noted that when you make changes to a container nothing is
+ saved until you hit save. As an added feature Objex also supports the
+ ability to suspend the changes you have made, then come back to them and
+ optionally make further changes and then save the whole thing.
+ 
+ It should be noted that not all runtimes are expected to support this
+ functionality.
+ 
+ Here is how it would be used:
+ 
++--
+Container existingOrder = orderFactory.open(orderId);
+
+// Now make a bunch of changes
+existingOrder.getRootObject().setProperty("someProperty", "newValue");
+// ...
+
+// Now suspend
+String transId = existingOrder.suspend();
+
+// transId holds an id to get the container and the suspended changes back
+// it should be held onto and then at some future point ...
+Container container = orderFactory.open(transId);
+
+// Now make any further changes
+
+// Finally save the container away
+container.save();
++--

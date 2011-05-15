@@ -31,7 +31,7 @@ Validation Basics
   
 How Objex Performs Validation
 
-  Very simply we don't, we use the standard Java mechanism for validation,
+  Very simply we don't! Objex uses the standard Java mechanism for validation,
   namely JSR 303 - Bean Validation.
   
   The idea of bean validation is that you use annotations to clearly mark
@@ -78,12 +78,11 @@ How Objex Performs Validation
   
 * Field Level Validation
 
-  Field level validations should be applied to your state bean. The
-  simplest way is to annotate your state bean as follows:
+  Field level validations should be applied to your objects properties. 
+  For instance:
   
 +--
-ObjexObjStateBean(name="MyObject")
-public class MyObjectStateBean {
+public class MyObject {
 	@NotNull(groups={FieldGroup.class})
 	private String name;
 	@Max(value=100)
@@ -101,11 +100,6 @@ public class MyObjectStateBean {
   real Objex Object, and they are also checked at the point of Intra Object
   validation.
   
-  Although not immediately supported, at least in the generators, right now,
-  if you define interfaces to your state bean you can easily apply the
-  annotations to the accessor/getter methods of your state bean instead of
-  to the fields directly.
-  
 * Intra Object Validation
 
   So far this is pretty standard JSR 303 validation. This change somewhat
@@ -120,9 +114,8 @@ public class MyObjectStateBean {
   validator and apply it to your Objex object. For instance:
   
 +--
-@ObjexObj(MyObjectStateBean.class)
 @MyCustomConstraint(groups={IntraObjectGroup.class})
-public class MyObjectImpl {
+public class MyObject {
   ...
 }
 +--
@@ -143,8 +136,8 @@ public class MyObjectImpl {
   as being validators. Like so:
   
 +--
-@ObjexObj(MyObjectStateBean.class)
-public class MyObjectImpl {
+@ObjexObj
+public class MyObject {
   ...
   
   @ObjexCheck(group=IntraObjectGroup.class, message="some.error.key")
@@ -219,13 +212,12 @@ Enrichment
   we would get a special location ID back from the service.
   
   Now you could envisage calling this service each any every time we
-  were asked to validate. But, I am sure you may have realised this
-  was not the speediest operation. So the solution was instead of
-  validating the address fields each time, we would instead hold the
-  service location. Each time any of the address fields changed we
-  would reset this field, then validate that this field was not 0. If
-  it was 0 we would call the service, store the returned value and
-  then raise an error if it was still 0.
+  were asked to validate. But, this was not the speediest operation. 
+  So the solution was instead of validating the address fields each 
+  time, we would instead hold the service location. Each time any of 
+  the address fields changed we would reset this field, then validate 
+  that this field was not 0. If it was 0 we would call the service, 
+  store the returned value and then raise an error if it was still 0.
   
   Obviously when you consider this scenario we are performing 
   enrichment as well as validation. So it makes perfect sense to allow
@@ -253,7 +245,7 @@ Enrichment
   mark your Objex object with @ObjexEnrich annotations. For instance:
   
 +--
-@ObjexObj(MyObjectStateBean.class)
+@ObjexObj
 public class MyObjectImpl {
   ...
   
@@ -287,9 +279,10 @@ Performance
   There are a number of tips and tricks you should employ and think
   about in terms of validation and making it fast:
   
-    * Check was has changed before apply validation. The container
+    * Check was has changed before appling validation. The container
     gives you access to the old state of your object and it can 
-    tell you which of your child objects has changed.
+    tell you which of your child objects has changed (but, you need
+    to code against Objex to do this.)
     
     * Use the enrichment idea to add in hidden, externally read-only
     fields that you reset when relevant public fields in your 

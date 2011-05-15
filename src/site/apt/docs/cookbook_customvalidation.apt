@@ -1,0 +1,7 @@
+How To Implement Custom Validation
+
+  Sorry, I've not written this yet. This will be a guide to writing a custom
+  validation support in your objects directly (by-passing the 303 mechanism)
+  
+  To be honest, I'm not sure I am ever going to write this because although it
+  is possible why would you not use JSR 303??

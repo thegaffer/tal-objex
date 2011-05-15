@@ -39,6 +39,7 @@ public class GlobalsObjectStrategy {
     
         int size = fields.size();
         for( String prop : strategy.getProperties() ) {
+            // TODO: If ref list, set, map or large blob or memo should be in own node??
             if( !fields.containsKey(prop) ) {
                 this.fields.add(prop);
                 fields.put(prop, this.fields.size());
@@ -50,5 +51,12 @@ public class GlobalsObjectStrategy {
     
     private void save() {
         // TODO: Save this away
+    }
+    
+    /**
+     * @return The fields in order - not all these fields are neccessarily still value
+     */
+    public List<String> getFields() {
+        return fields;
     }
 }

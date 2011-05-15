@@ -35,12 +35,12 @@ Installation
   <artifactId>tal-objex-runtime-globals</artifactId>
   <scope>runtime</scope> <!-- You should not compile against this -->
 </dependency>
-+--
 
-<!-- A runtime environment, here we use Google App Engine -->
+<!-- A runtime environment for Google App Engine.
+	 GAE will need to be available -->
 <dependency>
   <groupId>org.talframework.objex</groupId>
-  <artifactId>tal-objex-gae</artifactId>
+  <artifactId>tal-objex-runtime-gae</artifactId>
   <scope>runtime</scope> <!-- You should not compile against this -->
 </dependency>
 +--

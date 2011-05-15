@@ -1,0 +1,7 @@
+How To Fire Events
+
+ Objex provides hooks that when your container is saved Events can be fired
+ off to other containers. For instance save an "Order" document, fire an event
+ off to the "Orders" store to update the index of this order.
+ 
+ Sorry, I've not written this doc yet!

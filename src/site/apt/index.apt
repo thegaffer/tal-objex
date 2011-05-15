@@ -1,38 +1,46 @@
 Objex
 
-  Welcome to the site for the Tal Framework Objex project.
+  Welcome!
   
-  Ever noticed that Enterprises don't actually work on neat tables of two dimensional
-  data, but instead fundamentally work by creating, processing and updating documents.
+  Objex is personal pet project that attempts it make it easy to create document 
+  orientated, object-orientated, persistence agnostic domains for use in, 
+  typically Enterprise, systems.
   
-  Our databases systems, however, do tend to group data by type - so all invoice items,
-  for example, are grouped together, when in fact it would make more sense to group
-  them by invoice. This in itself is not neccessarily bad, there may be good technical
-  reasons for grouping the data in this way. However, what constantly amazes me is that
-  we still very often create our systems around the fact that all data of a particular
-  type is stored together. Even ORM technologies often encourage this thinking.
+    <<Document Orientated>> because life in most organisations is centred on files or
+    documents. Typically in IT we tend to group data by type. This can mean that we
+    are storing information together that has no logical relationship in the transactional
+    system. Fine for BI, but a scalability hurdle in the transaction system.
   
-  Objex represents my personal thoughts on redressing the balance. A framework that
-  encourages systems to be build around the concept of a document. Where the document
-  contains objects that reference and interact with one another. But, where the integrity
-  of the document is the most important concept.  
+    <<Object Orientated>> because data by itself it useless and it is far more natural
+    to think about objects containing both state & behaviour. Also as part of an 
+    objects state it should have relationships to other objects that we can follow.
   
+    <<Persistence Agnostic>> because you should be free to pick the right DB/Persistence
+    technology to match the nature of your documents and further mix persistence engines
+    for different types of documents in the same system. Views that your initially 
+    chosen persistence engine has should not permeate your core logic otherwise 
+    you will be stuck with that persistence engine choice even when it doesn't suit.
+
   Please note that this project is just a personal project. Although licensed as Open
   Source, it's real purpose is as a vehicle for me to explore my ideas - not set the
-  world alight. If your interested in the ideas then I'd love to hear from you.
+  world alight. If your interested in the ideas then I'd love to hear from you, but
+  please don't use this in a real project or expect loads of support from me (I have
+  a day job!) - if that position ever changes I'll be sure to move the project away 
+  from my own site!
   
 Releases
 
-  The current release is 0.9. See {{{./releases.apt}Releases}} page for information.
+  The current release is 0.9. See {{{./releases.html}Releases}} page for information.
 
 Installation
 
-  See {{{./download.apt}Download}} page for information.
+  See {{{./download.html}Download}} page for information.
 
 Roadmap
 
-  The roadmap right now is to get to a 1.0 release. See {{{./roadmap.apt}Roadmap}} for
-  more information.
+  The roadmap right now is to get to a 2.0 release. I've made several major changes
+  so I'm jumping up to a 2.0 - hey it makes sense to me! See the 
+  {{{./roadmap.html}Roadmap}} for more information.
 
 History
 
@@ -44,18 +52,21 @@ History
 
 License
 
-  Copyright 2010 Thomas Spencer.
+  Objex - Document Orientated OO Domain Framework
   
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-  
-      http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+  Copyright \251 2011 Thomas Spencer
 
-  The license is also available {{{./license.apt}here}}
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  The license is also available {{{./license.html}here}}

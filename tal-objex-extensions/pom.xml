@@ -17,10 +17,10 @@
   
   <modules>
   	<!-- Non-Proxy Objex -->
-  	<module>tal-objex-roo-addon</module>
+  	<!-- <module>tal-objex-roo-addon</module>
   	<module>tal-objex-sample-api</module>
   	<module>tal-objex-sample-impl</module>
-  	<module>tal-objex-sample-impl-generated</module>
+  	<module>tal-objex-sample-impl-generated</module> -->
   	<module>tal-objex-ext-aspects</module>
   	<module>tal-objex-ext-generator</module>
   	<module>tal-objex-ext-sample</module>

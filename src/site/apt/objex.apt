@@ -3,14 +3,19 @@ Objex
  Objex is a concept of how to visual enterprise systems and it is a
  framework supporting that concept.
  
- There are actually two drivers behind Objex. The first is a Document
+ There are actually three drivers behind Objex. The first is a Document
  Orientated approach to enterprise systems - everything is a document
  of some form. The second is a true Object Orientated approach within
  the documents, whereby both data and behaviour/process is considered
- together. Very often, particularly in Enterprise systems, largely I 
- think due to the widespread use of Relational Databases the object view 
+ together. And finally there is the desire to ensure that we can mix
+ and match and change what persistence engine we actually use. 
+ 
+ Very often, particularly in Enterprise systems, largely I think due 
+ to the widespread use of Relational Databases, the object view  
  becomes obscured. Objex is a way to put documents and OO at the very 
- heart of applications.
+ heart of applications. I do not for a minute that persistence is not
+ important, because it is - but it is not more important than your
+ core logic.
  
 Concept
 
@@ -37,10 +42,10 @@ Concept
  distributed to everyone in the company.
  
  Fundamentally though regardless of the type of containers all containers
- hold is objects. The hold a special object called the root object and then
+ hold is objects. They hold a special object called the root object and then
  there can be a hierarchy of other object instances. When updating you change
  or add objects in the container and then save it as a whole. Because the
- container exists to enforce OO principles all the objects in the container
+ container exists to enforce OO principles, all the objects in the container
  collaborate with one another - so a change in one object may cause changes
  in other objects in the same container. When you save the container all objects
  are validated both with respect to themselves and each other. After the

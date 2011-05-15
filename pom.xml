@@ -121,20 +121,20 @@
 			</additionalparam>
 		</configuration>
       </plugin>
-      <plugin>
+      <!-- <plugin>
       	<groupId>org.apache.maven.plugins</groupId>
       	<artifactId>maven-jxr-plugin</artifactId>
       	<configuration>
       		<aggregate>true</aggregate>
       	</configuration>
-      </plugin>
-      <plugin>
+      </plugin>  -->
+      <!-- <plugin>
       	<artifactId>maven-surefire-report-plugin</artifactId>
       	<configuration>
       		<xrefLocation>${project.reporting.outputDirectory}/../xref-test</xrefLocation>
       	</configuration>
-      </plugin>
-      <plugin>
+      </plugin>  -->
+      <!-- <plugin>
       	<groupId>org.apache.maven.plugins</groupId>
       	<artifactId>maven-pmd-plugin</artifactId>
       	<configuration>
@@ -149,7 +149,7 @@
       		<minimumTokens>100</minimumTokens>
       		<xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation>
       	</configuration>
-      </plugin>
+      </plugin>  -->
       <plugin>
       	<groupId>org.codehaus.mojo</groupId>
       	<artifactId>cobertura-maven-plugin</artifactId>
@@ -165,13 +165,13 @@
       		<xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
       	</configuration>
       </plugin>
-      <plugin>
+      <!-- <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation>
           <configLocation>C:\Dev\Data\Site\checkstyle\tal_checks.xml</configLocation>
         </configuration>
-      </plugin>
+      </plugin>  -->
 	  <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jdepend-maven-plugin</artifactId>

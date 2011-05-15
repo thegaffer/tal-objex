@@ -1,0 +1,8 @@
+How To Add Implicit Behaviour
+
+  Sorry, I've not written this yet. It will describe annotations that can be 
+  placed on your objects and their methods so the methods are called when
+  certain events occur. 
+  
+  Your free to add this in to your objects anyway, for instance by calling
+  methods in the setX methods. I hope to make this easier though!

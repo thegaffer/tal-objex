@@ -1,45 +1,66 @@
 Roadmap
 
-  This page contains the roadmap of future versions.
-
-Version 1.0
-
-  Version 1.0 will be a full version and will concentrate on the following features.
-  I anticipate completing this for October 2010.
+  Objex is a personal project that I use to explore my ideas. This Java version has
+  been an on-off kind of project since 2004, and a C++ version predates that. What
+  I am trying to say is Objex does <<not>> have a roadmap that it is going to take 
+  it to a conclusion! 
   
-    * More Unit Tests to improve coverage
-    
-    * At the very least a file based test runtime environment (only GAE and InMemory
-    exist right now).
-    
-    * More complete samples showing the range of allowed fields, validation etc
-    
-    * Complete eventing model that allows triggers on fields that have changed
-    
-    * Ideally a relational database runtime environment using JDO. This might get
-    dropped into 1.1
-    
-    * Full JSR 303 based validation model
-    
-Version 1.1
+  I do have some plans and features I'll try and put in which are listed below 
+  in two sections; first what I am working on right now and then what the the 
+  things beyond that. But, this list can be very fluid!!
 
-  Version 1.1 will concentrate on adding more runtime environments.
+Next Version (2.0)
+
+  Here are the things I am working on before doing the next "release".
   
-    * Globals DB runtime engine
-  
-    * Amazon Web Service platform, using SimpleDB, RDB and the Queing service
+    * Removing the StateBean concept. This just complicates things!
     
-    * Web Service access to Containers and Web Service client runtime environment to
-    allow for better distribution of load.
+    * Support for validation via JSR 303
     
-    * Testing around Major RDBMS, potentially by adding JPA to the generators.
+    * Adding in ProxyObject support - I've done some tests and they are not that
+    slow. This will allow objects to be used that know nothing of Objex.
     
-    * Support for aggregation relationships as 'compound' objects
+    * Changing the Google App Engine support to use the raw datastore and not the
+    complicated JDO offering.
     
-    * In built support for foreign references
+    * Adding in Globals DB support - (Disclaimer, I currently work for InterSystems
+    and GlobalsDB is their 'free' DB offering, but one that in principle is well
+    suited to Objex).
     
+    * Adding in a rudimentary SQL support - mainly so I can perform some comparisons
+    between GAE (really BigTable), Globals and a Relational DB.
+    
+    * Web Service support - at least a read-only version of the middleware to 
+	connect to, ideally with full two way support.
+	
+    * Better sample project using Proxy objects
+	
 Future
 
-  The following features are noted for inclusion in the future
+  Here are the things I have thought about, but not sure when!
+  
+* Core Support
+
+    * Foreign Refs, support to reference objects in other containers
     
-    * Parent handlers on changes in child objects
+    * Two-way references, support to automatically ensure both objects in a 
+    relationship reference each other (and it is removed when one is removed)
+    
+    * Eventing model that more naturally allows objects to raise events
+    as they are edited including passing to parent objects.
+    
+    * Compound objects - the ability for an object to expose a behaviour
+    (an interface) based on the behaviour of another object it holds. This
+    will allow objects to take on interfaces during their lifetime.
+
+* Extension
+
+    * Complete generator so that proxy objects do not need to be used.
+
+* Runtime Engines
+
+    * Amazon Simple DB, particularly for Stores where searching is key
+    
+    * MongoDB, which should be very similar to Globals
+    
+    * Redis DB - not 100% sure about this.
