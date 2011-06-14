@@ -13,6 +13,7 @@
   
   <properties>
   	<globalsdb.version>1.0</globalsdb.version>
+  	<gds.version>1.0-SNAPSHOT</gds.version>
   </properties>
   
   <dependencies>
@@ -27,5 +28,23 @@
   		<artifactId>globalsdb</artifactId>
   		<version>${globalsdb.version}</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.globalsdb</groupId>
+  		<artifactId>gds</artifactId>
+  		<version>${gds.version}</version>
+  	</dependency>
+  	
+  	<!-- Test -->
+  	<dependency>
+  		<groupId>org.talframework.objex</groupId>
+  		<artifactId>tal-objex-sample</artifactId>
+  		<version>${project.version}</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

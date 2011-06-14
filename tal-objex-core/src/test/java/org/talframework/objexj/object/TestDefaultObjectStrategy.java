@@ -1,19 +1,26 @@
-/*
- * Copyright 2009 Thomas Spencer
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2011 Tom Spencer <thegaffer@tpspencer.com>
+ *
+ * This file is part of Objex <http://www.tpspencer.com/site/objexj/>
+ *
+ * Objex is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Objex is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Objex. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Note on dates: Objex was first conceived in 1997. The Java version
+ * first started in 2004. Year in copyright notice is the year this
+ * version was built. Code was created at various points between these
+ * two years.
  */
-
 package org.talframework.objexj.object;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +59,7 @@ public class TestDefaultObjectStrategy {
 
 	@Test
 	public void basic() {
-	    DefaultObjectStrategy strategy = new DefaultObjectStrategy(Category.class, new ObjectStrategy.PropertyStrategy("name", ObjexFieldType.STRING, PropertyTypeEnum.STRING, PropertyCharacteristic.PERSISTENT));
+	    DefaultObjectStrategy strategy = new DefaultObjectStrategy(Category.class, new ObjectStrategy.PropertyStrategy("name", String.class, ObjexFieldType.STRING, PropertyTypeEnum.STRING, PropertyCharacteristic.PERSISTENT));
 	    
 	    // Simple tests
 	    assertEquals("Category", strategy.getTypeName());
@@ -77,7 +84,7 @@ public class TestDefaultObjectStrategy {
 	 */
 	@Test
     public void proxyObj() {
-	    DefaultObjectStrategy strategy = new DefaultObjectStrategy(org.talframework.objexj.object.testmodel.pojo.Category.class, new ObjectStrategy.PropertyStrategy("name", ObjexFieldType.STRING, PropertyTypeEnum.STRING, PropertyCharacteristic.PERSISTENT));
+	    DefaultObjectStrategy strategy = new DefaultObjectStrategy(org.talframework.objexj.object.testmodel.pojo.Category.class, new ObjectStrategy.PropertyStrategy("name", String.class, ObjexFieldType.STRING, PropertyTypeEnum.STRING, PropertyCharacteristic.PERSISTENT));
 	    
 	    ObjexObj obj = strategy.createInstance(container, new DefaultObjexID("Parent", 1), new DefaultObjexID("Category", 2), null);
         assertNotNull(obj);
@@ -98,10 +105,10 @@ public class TestDefaultObjectStrategy {
 	    DefaultObjectStrategy underTest = new DefaultObjectStrategy(
 	            "Product",
 	            SimpleProduct.class, 
-	            new ObjectStrategy.PropertyStrategy("name", ObjexFieldType.STRING, PropertyTypeEnum.STRING, PropertyCharacteristic.PERSISTENT),
-	            new ObjectStrategy.PropertyStrategy("description", ObjexFieldType.STRING, PropertyTypeEnum.STRING, PropertyCharacteristic.PERSISTENT),
-	            new ObjectStrategy.PropertyStrategy("price", ObjexFieldType.NUMBER, PropertyTypeEnum.DOUBLE, PropertyCharacteristic.PERSISTENT),
-	            new ObjectStrategy.PropertyStrategy("stockLevel", ObjexFieldType.NUMBER, PropertyTypeEnum.INT, PropertyCharacteristic.PERSISTENT));
+	            new ObjectStrategy.PropertyStrategy("name", String.class, ObjexFieldType.STRING, PropertyTypeEnum.STRING, PropertyCharacteristic.PERSISTENT),
+	            new ObjectStrategy.PropertyStrategy("description", String.class, ObjexFieldType.STRING, PropertyTypeEnum.STRING, PropertyCharacteristic.PERSISTENT),
+	            new ObjectStrategy.PropertyStrategy("price", double.class, ObjexFieldType.NUMBER, PropertyTypeEnum.DOUBLE, PropertyCharacteristic.PERSISTENT),
+	            new ObjectStrategy.PropertyStrategy("stockLevel", int.class, ObjexFieldType.NUMBER, PropertyTypeEnum.INT, PropertyCharacteristic.PERSISTENT));
 	    
 	    assertEquals("Product", underTest.getTypeName());
 	    

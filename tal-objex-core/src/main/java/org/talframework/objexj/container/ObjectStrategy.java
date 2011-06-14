@@ -1,20 +1,29 @@
-/*
- * Copyright 2009 Thomas Spencer
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2011 Tom Spencer <thegaffer@tpspencer.com>
+ *
+ * This file is part of Objex <http://www.tpspencer.com/site/objexj/>
+ *
+ * Objex is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Objex is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Objex. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Note on dates: Objex was first conceived in 1997. The Java version
+ * first started in 2004. Year in copyright notice is the year this
+ * version was built. Code was created at various points between these
+ * two years.
  */
-
 package org.talframework.objexj.container;
+
+import java.util.Collection;
 
 import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
@@ -53,6 +62,11 @@ public interface ObjectStrategy {
 	 * @return The class of the main class this is a strategy for
 	 */
 	public Class<?> getMainClass();
+	
+	/**
+	 * @return The names of all the properties held
+	 */
+	public Collection<String> getPropertyNames();
 	
 	/**
      * Given the name of a property returns its strategy object
@@ -132,19 +146,23 @@ public interface ObjectStrategy {
 	    private final PropertyTypeEnum propertyType;
 	    /** Any additional characteristics */
 	    private final PropertyCharacteristic[] characteristics;
+	    /** The raw Java type of this property */
+	    private final Class<?> rawType;
 	    /** The type of object accepted in a reference or child field - if collection, the E or V type */
 	    private final Class<?> elementType;
 	    
-	    public PropertyStrategy(String name, ObjexFieldType objexType, PropertyTypeEnum propertyType, PropertyCharacteristic... characteristics) {
+	    public PropertyStrategy(String name, Class<?> rawType, ObjexFieldType objexType, PropertyTypeEnum propertyType, PropertyCharacteristic... characteristics) {
 	        this.name = name;
+	        this.rawType = rawType;
 	        this.objexType = objexType;
 	        this.propertyType = propertyType;
 	        this.characteristics = characteristics;
 	        this.elementType = null;
 	    }
 	    
-	    public PropertyStrategy(String name, ObjexFieldType objexType, Class<?> elementType, PropertyTypeEnum propertyType, PropertyCharacteristic... characteristics) {
+	    public PropertyStrategy(String name, Class<?> rawType, ObjexFieldType objexType, Class<?> elementType, PropertyTypeEnum propertyType, PropertyCharacteristic... characteristics) {
 	        this.name = name;
+	        this.rawType = rawType;
             this.objexType = objexType;
             this.propertyType = propertyType;
             this.characteristics = characteristics;
@@ -156,6 +174,13 @@ public interface ObjectStrategy {
 	     */
 	    public String getName() {
             return name;
+        }
+	    
+	    /**
+	     * @return The raw type of this property
+	     */
+	    public Class<?> getRawType() {
+            return rawType;
         }
 
         /**

@@ -22,11 +22,7 @@
   		<groupId>org.talframework.tal</groupId>
 		<artifactId>tal-util-beans</artifactId>
   	</dependency>
-  	<dependency>
-  		<groupId>org.talframework.tal</groupId>
-		<artifactId>tal-aspects</artifactId>
-  	</dependency>
-  	
+  	  	
   	<dependency>
         <groupId>javax.validation</groupId>
         <artifactId>validation-api</artifactId>
@@ -44,31 +40,4 @@
         <scope>test</scope>
     </dependency>
   </dependencies>
-  
-  <build>
-  	<plugins>
-  	  <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>aspectj-maven-plugin</artifactId>
-        <version>1.3</version>
-        <configuration>
-            <complianceLevel>1.6</complianceLevel>
-            <aspectLibraries>
-                <aspectLibrary>
-                    <groupId>org.talframework.tal</groupId>
-                    <artifactId>tal-aspects</artifactId>
-                </aspectLibrary>
-            </aspectLibraries>
-        </configuration>
-        <executions>
-            <execution>
-                <goals>
-                    <goal>compile</goal>
-                    <goal>test-compile</goal>
-                </goals>
-            </execution>
-        </executions>
-	  </plugin>
-	</plugins>
-  </build>
 </project>

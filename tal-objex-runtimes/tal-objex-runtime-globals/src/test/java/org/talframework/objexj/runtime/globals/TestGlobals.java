@@ -1,3 +1,26 @@
+/**
+ * Copyright (C) 2011 Tom Spencer <thegaffer@tpspencer.com>
+ *
+ * This file is part of Objex <http://www.tpspencer.com/site/objexj/>
+ *
+ * Objex is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Objex is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Objex. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Note on dates: Objex was first conceived in 1997. The Java version
+ * first started in 2004. Year in copyright notice is the year this
+ * version was built. Code was created at various points between these
+ * two years.
+ */
 package org.talframework.objexj.runtime.globals;
 
 import org.apache.commons.logging.Log;
@@ -11,6 +34,7 @@ import com.intersys.globals.Connection;
 import com.intersys.globals.ConnectionContext;
 import com.intersys.globals.NodeReference;
 import com.intersys.globals.ValueList;
+import com.intersys.globals.impl.ConnectionImpl;
 
 /**
  * This is a temporary class that is testing behaviour of globals
@@ -20,11 +44,14 @@ import com.intersys.globals.ValueList;
 public class TestGlobals {
     private static final Log logger = LogFactory.getLog(TestGlobals.class);
     
+    /** Amount of runs the recursive tests take */
+    private static final int RUNS = 10000;
+    
     private Connection conn = null;
 
     @Before
     public void setup() {
-        conn = ConnectionContext.getConnection();
+        conn = new ConnectionImpl();
         conn.connect("USER", "SYS", "SYS");
         conn.startTransaction();
     }
@@ -73,7 +100,7 @@ public class TestGlobals {
     public void directWrite() {
         logger.info("Conn: " + conn);
         
-        for( int i = 0 ; i < 100000 ; i++ ) {
+        for( int i = 0 ; i < RUNS ; i++ ) {
             NodeReference ref = conn.createNodeReference("Direct");
             ref.appendSubscript("objects");
             for( int j = 0 ; j < 10 ; j++ ) {
@@ -89,7 +116,7 @@ public class TestGlobals {
     public void subscriptWrite() {
         logger.info("Conn: " + conn);
         
-        for( int i = 0 ; i < 100000 ; i++ ) {
+        for( int i = 0 ; i < RUNS ; i++ ) {
             NodeReference ref = conn.createNodeReference("Direct");
             for( int j = 0 ; j < 10 ; j++ ) {
                 ref.set("Test Node Val1", "objects", j);
@@ -102,7 +129,7 @@ public class TestGlobals {
     public void subscriptValueList() {
         logger.info("Conn: " + conn);
         
-        for( int i = 0 ; i < 100000 ; i++ ) {
+        for( int i = 0 ; i < RUNS ; i++ ) {
             ValueList lst = conn.createList();
             NodeReference ref = conn.createNodeReference("Direct");
             ref.appendSubscript("objects");

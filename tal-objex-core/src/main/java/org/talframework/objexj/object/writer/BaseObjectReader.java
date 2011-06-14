@@ -1,19 +1,26 @@
-/*
- * Copyright 2009 Thomas Spencer
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2011 Tom Spencer <thegaffer@tpspencer.com>
+ *
+ * This file is part of Objex <http://www.tpspencer.com/site/objexj/>
+ *
+ * Objex is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Objex is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Objex. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Note on dates: Objex was first conceived in 1997. The Java version
+ * first started in 2004. Year in copyright notice is the year this
+ * version was built. Code was created at various points between these
+ * two years.
  */
-
 package org.talframework.objexj.object.writer;
 
 import java.lang.reflect.Proxy;
@@ -52,7 +59,7 @@ import org.talframework.objexj.object.fields.ProxyReference;
  * 
  * @author Tom Spencer
  */
-public abstract class BaseObjectReader implements ObjexStateReader {
+public abstract class BaseObjectReader extends BaseReaderWriter implements ObjexStateReader {
     
     /** If true then only properties set on the input are actually read, requires bean to have isSet'Name' methods */
     private boolean merge = false;
@@ -168,18 +175,8 @@ public abstract class BaseObjectReader implements ObjexStateReader {
         if( !shouldSet(name) ) return current;
         if( !propertyExists(name, expected)) return current;
         
-        T ret = null;
         Object val = getProperty(name, expected, type, persistent);
-        
-        // See if conversion is needed
-        if( val != null && !expected.isInstance(val) ) {
-            /* Auto-boxing */ if( expected.isPrimitive() && Number.class.isInstance(val) ) ret = (T)val;
-            
-            // TODO: Other conversions - could we use the PropertyEditor style here??
-        }
-        else {
-            ret = (T)val;
-        }
+        T ret = (T)fromStorage(expected, val);
         
         return ret;
     }

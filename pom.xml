@@ -24,10 +24,9 @@
   
   <licenses>
 	<license>
-		<name>Apache 2</name>
-		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		<name>GPLv3</name>
+		<url>http://www.gnu.org/licenses/gpl.txt</url>
 		<distribution>repo</distribution>
-		<comments>A business-friendly OSS license</comments>
 	</license>
   </licenses>
   
@@ -93,6 +92,7 @@
           		<tagBase>https://dev.tpspencer.org/svn/repo/tps-objexj/tags</tagBase>
         	</configuration>
       	</plugin>
+      	
     </plugins>
   </build>
   
@@ -205,4 +205,35 @@
 	  </plugin> 
     </plugins>
   </reporting>
+  
+  <profiles>
+	<profile>
+		<id>reactorBuild</id>
+		
+		<build>
+			<plugins>
+				<plugin>
+					<groupId>com.mycila.maven-license-plugin</groupId>
+					<artifactId>maven-license-plugin</artifactId>
+					<version>1.9.0</version>
+					<configuration>
+						<header>${user.dir}/src/etc/license.txt</header>
+						<properties>
+							<year>2011</year>
+							<email>thegaffer@tpspencer.com</email>
+						</properties>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>install</phase> <!-- We can build, but not install without source license header -->
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions> 
+				</plugin>
+			</plugins>
+		</build>
+	</profile>
+  </profiles>
 </project>

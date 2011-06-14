@@ -1,16 +1,45 @@
+/**
+ * Copyright (C) 2011 Tom Spencer <thegaffer@tpspencer.com>
+ *
+ * This file is part of Objex <http://www.tpspencer.com/site/objexj/>
+ *
+ * Objex is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Objex is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Objex. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Note on dates: Objex was first conceived in 1997. The Java version
+ * first started in 2004. Year in copyright notice is the year this
+ * version was built. Code was created at various points between these
+ * two years.
+ */
 package org.talframework.objexj.object;
-
-import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Proxy;
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import org.talframework.objexj.Container;
 import org.talframework.objexj.DefaultObjexID;
+import org.talframework.objexj.Event;
+import org.talframework.objexj.ObjexID;
 import org.talframework.objexj.ObjexObj;
+import org.talframework.objexj.QueryRequest;
+import org.talframework.objexj.QueryResult;
+import org.talframework.objexj.ValidationRequest;
 import org.talframework.objexj.container.InternalContainer;
 
 /**
@@ -45,8 +74,10 @@ public class TestProxyObjexObj {
      */
     @Test
     public void proxyPerf() {
-        InternalContainer container = mock(InternalContainer.class);
-        when(container.isOpen()).thenReturn(true);
+        // InternalContainer container = mock(InternalContainer.class);
+        // when(container.isOpen()).thenReturn(true);
+        // Cannot use mockito as otherwise the performance of set falls off a cliff
+        InternalContainer container = new TestContainer();
         
         int testRun = 100000;
         
@@ -107,8 +138,8 @@ public class TestProxyObjexObj {
         logger.info("Time for proxy object get      ...: " + proxyGetTime + " (" + determinePerObject(proxyGetTime, testRun) + "ms)");
         
         // Ensure this whole method is done in less than 2 secs, otherwise shows issues!!
-        // Assert.assertTrue((normalTime + normalGetTime + normalSetTime + proxyTime + proxyGetTime + proxySetTime) < 2000);
-        // TODO: Put back in. We are now failing because accessing the mock in set takes a very long time!!!
+        Assert.assertTrue((normalTime + normalGetTime + normalSetTime + proxyTime + proxyGetTime + proxySetTime) < 2000);
+        // Not using time so we get just to core elements
     }
     
     /**
@@ -182,5 +213,120 @@ public class TestProxyObjexObj {
         public void setCurrency(String currency) {
             this.currency = currency;
         }
+    }
+    
+    /**
+     * This test container exists because when testing the performance of proxy 
+     * objects any set method on an object will ask the container if it is open.
+     * If we use a mock for the container then performance falls off a cliff so
+     * we have this container instead. Only the isOpen method needs to do anything
+     * in our tests.
+     *
+     * @author Tom Spencer
+     */
+    private static class TestContainer implements InternalContainer {
+
+        @Override
+        public String getId() {
+            return null;
+        }
+
+        @Override
+        public String getType() {
+            return null;
+        }
+
+        @Override
+        public ObjexObj getRootObject() {
+            return null;
+        }
+
+        @Override
+        public ObjexID getIdOfObject(Object obj) {
+            return null;
+        }
+
+        @Override
+        public <T> T getObject(Object id, Class<T> expected) {
+            return null;
+        }
+
+        @Override
+        public ObjexObj getObject(Object id) {
+            return null;
+        }
+
+        @Override
+        public List<ObjexObj> getObjectList(List<? extends Object> ids) {
+            return null;
+        }
+
+        @Override
+        public <T> List<T> getObjectList(List<? extends Object> ids, Class<T> expectedElement) {
+            return null;
+        }
+
+        @Override
+        public Map<String, ObjexObj> getObjectMap(Map<String, ? extends Object> ids) {
+            return null;
+        }
+
+        @Override
+        public <T> Map<String, T> getObjectMap(Map<String, ? extends Object> ids, Class<T> expectedElement) {
+            return null;
+        }
+
+        @Override
+        public QueryResult executeQuery(QueryRequest request) {
+            return null;
+        }
+
+        @Override
+        public void processEvent(Event event) {
+        }
+
+        @Override
+        public Container openContainer() {
+            return null;
+        }
+
+        @Override
+        public boolean isNew() {
+            return false;
+        }
+
+        @Override
+        public boolean isOpen() {
+            return true;
+        }
+
+        @Override
+        public ValidationRequest validate() {
+            return null;
+        }
+
+        @Override
+        public String saveContainer() {
+            return null;
+        }
+
+        @Override
+        public void closeContainer() {
+        }
+
+        @Override
+        public String suspend() {
+            return null;
+        }
+
+        @Override
+        public ObjexObj createObject(ObjexObj parentObj, Object source) {
+            return null;
+        }
+
+        @Override
+        public void removeObject(ObjexObj obj) {
+        }
+        
     }
 }

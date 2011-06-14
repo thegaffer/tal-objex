@@ -1,19 +1,26 @@
-/*
- * Copyright 2009 Thomas Spencer
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2011 Tom Spencer <thegaffer@tpspencer.com>
+ *
+ * This file is part of Objex <http://www.tpspencer.com/site/objexj/>
+ *
+ * Objex is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Objex is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Objex. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Note on dates: Objex was first conceived in 1997. The Java version
+ * first started in 2004. Year in copyright notice is the year this
+ * version was built. Code was created at various points between these
+ * two years.
  */
-
 package org.talframework.objexj.container.middleware;
 
 import java.util.HashMap;
@@ -33,6 +40,8 @@ import org.talframework.objexj.object.writer.BaseObjectReader.ObjectReaderBehavi
 import org.talframework.objexj.object.writer.BaseObjectWriter.ObjectWriterBehaviour;
 import org.talframework.objexj.object.writer.MapObjectReader;
 import org.talframework.objexj.object.writer.MapObjectWriter;
+import org.talframework.tal.aspects.annotations.Profile;
+import org.talframework.tal.aspects.annotations.Trace;
 
 /**
  * This class provides an implementation of the middleware that
@@ -57,7 +66,7 @@ public class InMemoryMiddleware implements ContainerMiddleware {
     /** Holds the transaction */
     private Map<ObjexID, Map<String, Object>> transaction = null;
     /** Holds the last ID of an object */
-    private long lastId = 1;
+    private long lastId = 0;
     
     /**
      * Constructs a new {@link InMemoryMiddleware} instance.
@@ -128,8 +137,9 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * {@inheritDoc}
      */
     @Override
+    @Trace
     public boolean exists(ObjexID id, boolean accurate) {
-        return objects.containsKey(id);
+        return objects != null ? objects.containsKey(id) : false;
     }
     
     /**
@@ -138,6 +148,8 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * FUTURE: This is wrong, the transaction objects should already be in the cache
      */
     @Override
+    @Trace
+    @Profile
     public ObjexObj loadObject(ObjexObj obj) {
         Map<String, Object> source = null;
         if( this.transaction != null ) source = this.transaction.get(obj.getId());
@@ -158,6 +170,8 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * whether you can batch load more efficiently here.
      */
     @Override
+    @Trace
+    @Profile
     public Map<ObjexID, ObjexObj> loadObjects(ObjexObj... objs) {
         Map<ObjexID, ObjexObj> ret = new HashMap<ObjexID, ObjexObj>();
         for( ObjexObj obj : objs ) {
@@ -187,6 +201,7 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * {@inheritDoc}
      */
     @Override
+    @Trace
     public void open() {
         if( open ) throw new IllegalStateException("Container is already open");
         if( SingletonContainerCache.getInstance().getCache(getOrGenerateContainerId()) != null ) throw new IllegalStateException("There is already another transaction on this container, cannot open");
@@ -212,6 +227,7 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * In this simple middleware we simply increment a last index used
      */
     @Override
+    @Trace
     public ObjexID getNextObjectId(String type) {
         if( !open ) throw new IllegalStateException("Middleware is not open so cannot generate a new ID");
         
@@ -230,6 +246,8 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * FUTURE: This is wrong, the transaction objects should be in cache. We should only consider passed in cache for objects!
      */
     @Override
+    @Trace
+    @Profile
     public String save(ContainerObjectCache cache, String status, Map<String, String> header) {
         if( !open || this.transaction == null ) throw new IllegalStateException("Container is not open, or not open correctly");
         
@@ -264,6 +282,8 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * {@inheritDoc}
      */
     @Override
+    @Trace
+    @Profile
     public String suspend(ContainerObjectCache cache) {
         if( !open || this.transaction == null ) throw new IllegalStateException("Container is not open, or not open correctly");
         
@@ -287,6 +307,8 @@ public class InMemoryMiddleware implements ContainerMiddleware {
      * {@inheritDoc}
      */
     @Override
+    @Trace
+    @Profile
     public void clear(ContainerObjectCache cache) {
         if( !open || this.transaction == null ) throw new IllegalStateException("Container is not open, or not open correctly");
         
