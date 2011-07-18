@@ -32,32 +32,29 @@ import org.talframework.objexj.container.impl.SimpleContainerStrategy;
 import org.talframework.objexj.locator.ContainerFactory;
 import org.talframework.objexj.locator.SimpleContainerFactory;
 import org.talframework.objexj.object.ObjectStrategyCompiler;
+import org.talframework.objexj.runtimes.globals.wrapper.impl.NodeService;
 import org.talframework.objexj.sample.stock.Category;
 import org.talframework.objexj.sample.stock.CategoryImpl;
 import org.talframework.objexj.sample.stock.ProductImpl;
 
-import com.intersys.gds.Connection;
-import com.intersys.gds.schema.GDSConnectionImpl;
-
 public class GlobalsITTest {
     
-    private Connection connection;
+    private NodeService service;
     private ContainerFactory factory;
     
     @Before
     public void setup() {
-        connection = new GDSConnectionImpl();
-        connection.connect("", "", "");
+        service = new NodeService();
         
         ContainerStrategy strategy = new SimpleContainerStrategy("Stock", "Stock", "Category",
                 ObjectStrategyCompiler.calculateStrategy("Category", new String[]{"categories", "products"}, null, CategoryImpl.class),
                 ObjectStrategyCompiler.calculateStrategy("product", null, new String[]{"nearestProduct"}, ProductImpl.class));
-        factory = new SimpleContainerFactory(strategy, new GlobalsMiddlewareFactory(connection, strategy));
+        factory = new SimpleContainerFactory(strategy, new GlobalsMiddlewareFactory(service, strategy));
     }
     
     @After
     public void teardown() {
-        if( connection != null && connection.isConnected() ) connection.close();
+        service.release();
     }
     
     @Test

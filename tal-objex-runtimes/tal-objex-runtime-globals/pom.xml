@@ -12,8 +12,7 @@
   <description>An Objex runtime persistence engine using the GlobalsDB.org Database</description>
   
   <properties>
-  	<globalsdb.version>1.0</globalsdb.version>
-  	<gds.version>1.0-SNAPSHOT</gds.version>
+  	<globalsdb.version>1.0.7</globalsdb.version>
   </properties>
   
   <dependencies>
@@ -27,11 +26,6 @@
   		<groupId>org.globalsdb</groupId>
   		<artifactId>globalsdb</artifactId>
   		<version>${globalsdb.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.globalsdb</groupId>
-  		<artifactId>gds</artifactId>
-  		<version>${gds.version}</version>
   	</dependency>
   	
   	<!-- Test -->

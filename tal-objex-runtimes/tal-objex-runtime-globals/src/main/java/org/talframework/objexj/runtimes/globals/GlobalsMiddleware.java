@@ -42,14 +42,9 @@ import org.talframework.objexj.object.writer.BaseObjectWriter.ObjectWriterBehavi
 import org.talframework.objexj.object.writer.MapObjectReader;
 import org.talframework.objexj.object.writer.MapObjectWriter;
 import org.talframework.objexj.object.writer.TypeConvertor;
+import org.talframework.objexj.runtimes.globals.wrapper.Node;
 import org.talframework.tal.aspects.annotations.Profile;
 import org.talframework.tal.aspects.annotations.Trace;
-
-import com.intersys.gds.Connection;
-import com.intersys.gds.Document;
-import com.intersys.gds.DocumentMap;
-import com.intersys.gds.DocumentType;
-import com.intersys.gds.schema.DocumentImpl;
 
 /**
  * This class represents the middleware when using the Globals DB. We
@@ -60,11 +55,12 @@ import com.intersys.gds.schema.DocumentImpl;
  */
 public final class GlobalsMiddleware implements ContainerMiddleware {
 
-    /** Member holds the document map for this type of document */
-    private final DocumentMap documentMap;
+    private final GlobalsMiddlewareFactory type;
     
-    /** The ID of the container (in its constituent parts) - if null the container is new */
+    /** The ID of the container (in its constituent parts, including type as first part) - if null the container is new */
     private String[] id;
+    /** The ID of the transaction if this is a transaction */
+    private String transactionId;
     /** The version of the container at the point it was opened */
     private long version;
     /** Member holds if we are currently open or not */
@@ -78,11 +74,35 @@ public final class GlobalsMiddleware implements ContainerMiddleware {
     /** Member holds the cache object writer for this class - do not use directly */
     private MapObjectWriter writer;
     
-    public GlobalsMiddleware(String[] id, boolean open, DocumentMap documentMap) {
+    public GlobalsMiddleware(GlobalsMiddlewareFactory type, String[] id, boolean open, String transactionId) {
+        this.type = type;
         this.id = id;
+        this.transactionId = transactionId;
         this.version = 1;
         this.open = open;
-        this.documentMap = documentMap;
+    }
+    
+    /**
+     * Helper to get the node at root of this document/store. The root node
+     * on ths node must be released after use.
+     * 
+     * @return This documents node
+     */
+    private Node getDocumentNode() {
+        if( id == null || id.length == 0 ) return null;
+        
+        return type.getContainerNode(id);
+    }
+    
+    /**
+     * Helper to get the root of the objects in the container
+     * 
+     * @return The objects node
+     */
+    private Node getObjectsNode() {
+        Node node = getDocumentNode();
+        if( node != null ) node = node.getSubNode("objects");
+        return node;
     }
     
     /**
@@ -179,7 +199,14 @@ public final class GlobalsMiddleware implements ContainerMiddleware {
     public boolean exists(ObjexID id, boolean accurate) {
         if( !checkExisting(false) ) return false;
         
-        return documentMap.containsObjectKey(this.id, id.getType(), id.getId());
+        boolean ret = false;
+        Node node = getObjectsNode();
+        if( node != null ) {
+            ret = node.getSubNode(id.getId().toString()).getSubNode(id.getType()).isDataNode();
+            node.getRootNode().release();
+        }
+        
+        return ret;
     }
     
     /**
@@ -193,10 +220,19 @@ public final class GlobalsMiddleware implements ContainerMiddleware {
         
         ObjexID objectId = obj.getId();
         
-        DocumentType gdsObjectType = documentMap.getConnection().getDocumentType(obj.getType());
-        Document doc = documentMap.loadObject(id, gdsObjectType, objectId.getType(), objectId.getId());
-        MapObjectReader reader = getReader();
-        reader.readObject(doc, obj);
+        Node node = getObjectsNode();
+        if( node != null ) {
+            try {
+                node = node.getSubNode(objectId.getId().toString()).getSubNode(objectId.getType());
+                node.setMapping(type.getObjectMapping(objectId.getType()));
+            
+                MapObjectReader reader = getReader();
+                reader.readObject(node, obj);
+            }
+            finally {
+                node.getRootNode().release();
+            }
+        }
         
         // If successful return the object
         return obj;
@@ -211,11 +247,25 @@ public final class GlobalsMiddleware implements ContainerMiddleware {
     @Override
     @Profile
     public Map<ObjexID, ObjexObj> loadObjects(ObjexObj... objs) {
+        if( !checkExisting(false) ) return null;
         Map<ObjexID, ObjexObj> ret = new HashMap<ObjexID, ObjexObj>();
         
-        for( ObjexObj obj : objs ) {
-            obj = loadObject(obj);
-            if( obj != null ) ret.put(obj.getId(), obj);
+        Node node = getObjectsNode();
+        if( node != null ) {
+            try {
+                MapObjectReader reader = getReader();
+                
+                for( ObjexObj obj : objs ) {
+                    ObjexID objectId = obj.getId();
+                    Node objNode = node.getSubNode(objectId.getId().toString()).getSubNode(objectId.getType());
+                    objNode.setMapping(type.getObjectMapping(objectId.getType()));
+                    reader.readObject(objNode, obj);
+                    ret.put(objectId, obj);
+                }
+            }
+            finally {
+                node.getRootNode().release();
+            }
         }
         
         return ret;
@@ -259,7 +309,12 @@ public final class GlobalsMiddleware implements ContainerMiddleware {
         checkOpen(true);
         
         if( isNew() ) return new DefaultObjexID(type, ++lastId);
-        else return new DefaultObjexID(type, documentMap.nextObjectId(id));
+        else {
+            Node node = getDocumentNode();
+            ObjexID ret = new DefaultObjexID(type, node.getSubNode("objects").increment(1));
+            node.getRootNode().release();
+            return ret;
+        }
     }
     
     /**
@@ -271,49 +326,52 @@ public final class GlobalsMiddleware implements ContainerMiddleware {
     public String save(ContainerObjectCache cache, String status, Map<String, String> header) {
         checkOpen(true);
         
-        Connection connection = documentMap.getConnection();
-        
-        MapObjectWriter writer = getWriter();
-        Document gdsObject = new DocumentImpl();
+        Node docNode = null;
         
         try {
-            connection.startTransaction();
+            MapObjectWriter writer = getWriter();
             
             // a. See if new container, if it is, create the new one
             if( id == null ) {
-                id = new String[]{Long.toString(documentMap.nextDocumentId())};
-                version = 1;
+                // TODO: Way to customise this!!
+                Node typeNode = type.getContainerNode(null);
+                long newId = typeNode.increment(1);
+                id = new String[]{type.getType(), Long.toString(newId)};
+                version = 0;
             }
-            else {
-                ++version;
-            }
+                
+            // b. Save information about the document away
+            docNode = getDocumentNode();
+            ++version;
+            docNode.put("version", version);
             
-            Document doc = new DocumentImpl();
-            doc.put("version", version);
-            documentMap.store(doc, id);
-            
-            // b. Save any new or changed objects
+            // c. Save any new or changed objects
+            Node objectsNode = docNode.getSubNode("objects");
             Set<ObjexObj> objs = cache.getObjects(CacheState.NEWORCHANGED);
             for( ObjexObj obj : objs ) {
-                gdsObject.clear();
-                
                 ObjexID objId = obj.getId();
-                DocumentType gdsObjectType = documentMap.getConnection().getDocumentType(obj.getType());
-                writer.writeObject(gdsObject, null, obj);
-                documentMap.storeObject(id, gdsObjectType, gdsObject, objId.getType(), objId.getId());
+                Node objNode = objectsNode.getSubNode(objId.getId().toString()).getSubNode(objId.getType());
+                objNode.setMapping(type.getObjectMapping(objId.getType()));
+                
+                writer.writeObject(objNode, null, obj);
             }
             
-            // c. Removed any deleted objects
+            // d. Removed any deleted objects
             objs = cache.getObjects(CacheState.REMOVED);
             for( ObjexObj obj : objs ) {
                 ObjexID objId = obj.getId();
-                documentMap.removeObject(id, objId.getType(), objId.getId());
+                Node objNode = objectsNode.getSubNode(objId.getId().toString());
+                objNode.kill();
             }
             
-            connection.commit();
+            // e. Actually persist the changes
+            docNode.getRootNode().commit(true);
         }
         catch( Throwable t ) {
-            connection.rollback();
+            docNode.getRootNode().abort();
+        }
+        finally {
+            if( docNode != null ) docNode.getRootNode().release();
         }
         
         return getContainerId();

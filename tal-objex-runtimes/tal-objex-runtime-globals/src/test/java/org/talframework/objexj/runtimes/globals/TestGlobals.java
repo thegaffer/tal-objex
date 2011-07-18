@@ -21,13 +21,14 @@
  * version was built. Code was created at various points between these
  * two years.
  */
-package org.talframework.objexj.runtime.globals;
+package org.talframework.objexj.runtimes.globals;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.intersys.globals.Connection;
@@ -37,10 +38,13 @@ import com.intersys.globals.ValueList;
 import com.intersys.globals.impl.ConnectionImpl;
 
 /**
- * This is a temporary class that is testing behaviour of globals
+ * This class contains various tests of Globals itself. This test pack
+ * is ignored generally as it has no tests against the core of this
+ * module.
  *
  * @author Tom Spencer
  */
+@Ignore
 public class TestGlobals {
     private static final Log logger = LogFactory.getLog(TestGlobals.class);
     
