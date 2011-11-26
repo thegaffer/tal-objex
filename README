@@ -1,0 +1,20 @@
+Objex; tal-objex
+Copyright (C) Thomas Spencer, 1997-2011
+License: GPL v3, see LICENSE
+
+Objex is a framework for creating rich OO domains. Rather than try to 
+aggregate all data together, Objex recognises that the natural structure of
+information in many enterprises is that of a document or folder. Therefore,
+it groups the objects in this way and maps that to a variety of database
+structures.
+
+Objex is currently written in Java to allow you to build rich domains 
+easily in Java without the persistence world leaking into your objects. 
+Earlier versions were written in C++ and the language objex is written in
+is relatively unimportant vs its concepts.
+
+Status: This is a personal project, something I have turned to a number of
+times during my real career to explore some ideas. It is not currently a
+goal of mine to "finish" this project (whatever that means), its main 
+purpose is to convey my thoughts and ideas - so I'd be happy to discuss 
+these further.
