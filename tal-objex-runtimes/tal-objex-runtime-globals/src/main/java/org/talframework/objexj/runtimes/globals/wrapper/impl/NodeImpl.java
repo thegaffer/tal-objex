@@ -2,6 +2,7 @@ package org.talframework.objexj.runtimes.globals.wrapper.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,10 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talframework.objexj.runtimes.globals.wrapper.Node;
 import org.talframework.objexj.runtimes.globals.wrapper.NodeMapping;
 import org.talframework.objexj.runtimes.globals.wrapper.NodeMapping.NodeType;
 import org.talframework.objexj.runtimes.globals.wrapper.NodeMapping.NodeValue;
+import org.talframework.objexj.runtimes.globals.wrapper.NodeMapping.ValueType;
 
 import com.intersys.globals.NodeReference;
 import com.intersys.globals.ValueList;
@@ -23,6 +27,7 @@ import com.intersys.globals.ValueList;
  * @author Tom Spencer
  */
 public class NodeImpl implements Node {
+    private static final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
 
     /** The root node */
     private final RootNodeImpl root;
@@ -36,9 +41,11 @@ public class NodeImpl implements Node {
     /** Holds any sub-nodes we have changed the value of */
     protected Map<String, NodeImpl> subNodes;
     /** Holds the value of this node */
-    protected Object[] currentValue;
-    /** Determine if we should kill all at commit time */
-    protected boolean killAll;
+    protected Object currentValue;
+    /** Holds the type of the current value */
+    protected ValueType currentType;
+    /** Determine what to do at commit time */
+    protected UpdateType updateType;
     
     protected NodeImpl(RootNodeImpl root, NodeImpl parent, Object subscript, NodeMapping mapping) {
         this.root = root;
@@ -67,7 +74,7 @@ public class NodeImpl implements Node {
      * @return The type of this node
      */
     protected NodeType getNodeType() {
-        return mapping != null ? mapping.getNodeType() : NodeType.NONE;
+        return (mapping != null && mapping.getNodeType() != null) ? mapping.getNodeType() : NodeType.NONE;
     }
     
     /**
@@ -111,7 +118,7 @@ public class NodeImpl implements Node {
      * @param node The node that has changed
      */
     protected void changedSubNode(NodeImpl node) {
-        if( killAll ) return;
+        if( updateType == UpdateType.KILL_ALL ) return;
         
         if( subNodes == null ) subNodes = new HashMap<String, NodeImpl>();
         subNodes.put(node.getName(), node);
@@ -124,38 +131,58 @@ public class NodeImpl implements Node {
     protected void onCommit() {
         // Save the current value if it has been set
         // If array is null then it has been unchanged
-        if( killAll ) {
+        switch( updateType ) {
+        case KILL_ALL:
             getNode().kill();
-            return;
-        }
+            break;
         
-        if( currentValue != null ) {
-            // Now empty, kill it
-            if( currentValue.length == 0 ) {
-                getNode().killNode();
-            }
+        case KILL:
+            getNode().killNode();
+            break;
             
-            // A single value, set it
-            else if( currentValue.length == 1 ) {
-                Object val = currentValue[0];
-                if( val == null ) getNode().killNode();
-                else if( val instanceof String ) getNode().set(val.toString());
-                else if( val instanceof Double ) getNode().set((Double)val);
-                else if( val instanceof Long ) getNode().set((Long)val);
-                else if( val instanceof Integer ) getNode().set((Integer)val);
-                else if( val instanceof byte[] ) getNode().set((byte[])val);
-                else getNode().set(val.toString());
-            }
+        case UPDATE:
+            NodeReference node = getNode();
             
-            // A list, create list and set it
-            else {
+            switch(currentType) {
+            case OBJECT:
+            case STRING_LIST:
+            case STRING_ARRAY:
+            case DOUBLE_ARRAY:
+            case FLOAT_ARRAY:
+            case LONG_ARRAY:
+            case INT_ARRAY:
+            case SHORT_ARRAY:
+            case CHAR_ARRAY:
                 ValueList lst = getRootNode().getTempList();
                 lst.append(currentValue);
-                getNode().set(lst);
-            }
+                node.set(lst);
+                break;
             
-            // Clear it as now set
-            currentValue = null;
+            case BYTE_ARRAY:
+                node.set((byte[])currentValue);
+                break;
+                
+            case STRING:
+                node.set((String)currentValue);
+                break;
+                
+            case DOUBLE:
+            case FLOAT:
+                node.set((Double)currentValue);
+                break;
+                
+            case LONG:
+                node.set((Long)currentValue);
+                break;
+                
+            case INT:
+            case SHORT:
+            case CHAR:
+            case BYTE:
+            case BOOL:
+                node.set((Integer)currentValue);
+                break;
+            }
         }
         
         // Tell children to change themselves
@@ -220,25 +247,205 @@ public class NodeImpl implements Node {
      * 
      * @return The nodes current value
      */
-    protected Object[] getCurrentValue() {
-        Object[] ret = currentValue;
+    @SuppressWarnings("unchecked")
+    protected <T> T getCurrentValue(ValueType type, Class<T> expected) {
+        // If we already have it, serve it up
+        if( currentValue != null &&
+                currentType == type &&
+                expected.isInstance(currentValue) ) {
+            return expected.cast(currentValue);
+        }
         
-        if( ret == null ) {
-            NodeReference node = getNode();
+        // If no data in node then it does not exist
+        NodeReference node = getNode();
+        if( !node.exists() ) return null;
+        
+        // Otherwise we need to get it
+        NodeType nodeType = getNodeType();
+        switch( nodeType ) {
+        case COMPLEX_OBJECT:
+        case SIMPLE_OBJECT:
+            currentValue = getRawValue(ValueType.OBJECT);
+            currentType = ValueType.OBJECT;
             
-            if( !node.exists() ) ret = null;
-            else if( !isListNode() ) {
-                Object val = node.getObject();
-                ret = new Object[]{val};
+        default:
+            currentValue = getRawValue(type);
+            currentType = type;
+        }
+        
+        return (T)convertValue(currentValue, expected, currentType);
+    }
+        
+    /**
+     * Internal helper to get the raw value held in the node 
+     */
+    protected Object getRawValue(ValueType type) {
+        NodeReference node = getNode();
+        if( !node.exists() ) return null;
+        
+        ValueList lst = null;
+        Object ret = null;
+        switch( type ) {
+        case STRING:
+            ret = node.getString();
+            break;
+            
+        case DOUBLE:
+            ret = node.getDouble();
+            break;
+            
+        case LONG:
+            ret = node.getLong();
+            break;
+            
+        case INT:
+            ret = node.getInt();
+            break;
+        
+        case SHORT:
+            ret = (short)node.getInt();
+            break;
+          
+        case CHAR:
+            ret = node.getString();
+            if( ret != null ) ret = ret.toString().charAt(0);
+            break;
+            
+        case BYTE:
+            byte[] bytes = node.getBytes();
+            if( bytes != null && bytes.length > 0 ) ret = bytes[0];
+            break;
+            
+        case BOOL:
+            ret = node.getInt() == 1;
+            break;
+            
+        case STRING_LIST:
+            lst = node.getList();
+            List<String> realList = new ArrayList<String>();
+            for( int i = 0 ; i < lst.length() ; i++ ) {
+                String s = lst.getNextString();
+                if( s != null ) realList.add(s);
             }
-            else {
-                ValueList lst = node.getList();
-                ret = lst.getAll();
-                lst.close();
-            }
+            ret = realList;
+            break;
+            
+        case STRING_ARRAY:
+            lst = node.getList();
+            String[] strarr = new String[lst.length()];
+            for( int i = 0 ; i < lst.length() ; i++ ) strarr[i] = lst.getNextString();
+            ret = strarr;
+            lst.close();
+            break;
+            
+        case DOUBLE_ARRAY:
+            lst = node.getList();
+            double[] dblarr = new double[lst.length()];
+            for( int i = 0 ; i < lst.length() ; i++ ) dblarr[i] = lst.getNextDouble();
+            ret = dblarr;
+            lst.close();
+            break;
+            
+        case FLOAT_ARRAY:
+            lst = node.getList();
+            float[] fltarr = new float[lst.length()];
+            for( int i = 0 ; i < lst.length() ; i++ ) fltarr[i] = (float)lst.getNextDouble();
+            ret = fltarr;
+            lst.close();
+            break;
+            
+        case LONG_ARRAY:
+            lst = node.getList();
+            long[] lngarr = new long[lst.length()];
+            for( int i = 0 ; i < lst.length() ; i++ ) lngarr[i] = lst.getNextLong();
+            ret = lngarr;
+            lst.close();
+            break;
+            
+        case INT_ARRAY:
+            lst = node.getList();
+            int[] intarr = new int[lst.length()];
+            for( int i = 0 ; i < lst.length() ; i++ ) intarr[i] = lst.getNextInt();
+            ret = intarr;
+            lst.close();
+            break;
+            
+        case SHORT_ARRAY:
+            lst = node.getList();
+            short[] shtarr = new short[lst.length()];
+            for( int i = 0 ; i < lst.length() ; i++ ) shtarr[i] = (short)lst.getNextInt();
+            ret = shtarr;
+            lst.close();
+            break;
+            
+        case CHAR_ARRAY:
+            lst = node.getList();
+            char[] chrarr = new char[lst.length()];
+            for( int i = 0 ; i < lst.length() ; i++ ) chrarr[i] = (char)lst.getNextInt();
+            ret = chrarr;
+            lst.close();
+            break;
+            
+        case BYTE_ARRAY:
+            ret = node.getBytes();
+            break;
+            
+        case OBJECT:
+            lst = node.getList();
+            ret = lst.getAll();
+            if( lst.length() == 1 ) ret = ((Object[])ret)[0];
+            lst.close();
+            break;
         }
         
         return ret;
+    }
+    
+    /**
+     * This internal helper method converts a raw value stored in the node
+     * into an external type.
+     * 
+     * FUTURE: Expand so this is ane extensible mechanism?
+     * 
+     * @param value The value to convert as necc
+     * @param expected The expected type
+     * @param type The storage type
+     * @return The value to return
+     */
+    private static Object convertValue(Object value, Class<?> expected, ValueType type) {
+        // If null then return it
+        if( value == null ) return null;
+        
+        // If matching, return it
+        else if( expected.isInstance(value) ) return expected.cast(value);
+        
+        // Primitive conversions
+        else if( expected.isPrimitive() ) {
+            if( !(value instanceof Number) ) {
+                logger.warn("Expected primitive, but did not get Number {}", value);
+                return null;
+            }
+            
+            // TODO: Trusting that types match!!
+            return value;
+        }
+        
+        // Simple date conversion
+        else if( Date.class.equals(expected) ) {
+            if( !(value instanceof Long) ) {
+                logger.warn("Expected date, but value {} is not a long", value);
+                return null;
+            }
+            else {
+                return new Date(((Long)value).longValue());
+            }
+        }
+        
+        // All else fails
+        else {
+            logger.warn("Unable to convert value {} to expected type: {}", value, expected);
+            return null;
+        }
     }
     
     /////////////////////////////////////////
@@ -354,8 +561,8 @@ public class NodeImpl implements Node {
     @Override
     public void kill() {
         currentValue = null;
-        killAll = true;
         subNodes = null;
+        updateType = UpdateType.KILL_ALL;
         if( parent != null ) parent.changedSubNode(this);
     }
     
@@ -483,29 +690,104 @@ public class NodeImpl implements Node {
      * specific property
      */
     public Object get(Object key) {
-        Object ret = null;
+        ValueType type = ValueType.OBJECT;
+        Class<?> storedType = Object.class;
+        
+        if( key == null && mapping != null ) {
+            type = mapping.getValueType();
+            storedType = mapping.getValueClass();
+        }
+        else if( key != null && mapping != null ) {
+            type = mapping.getNodeValue(key.toString()).getType();
+            storedType = mapping.getNodeValue(key.toString()).getExpected();
+        }
+        
+        return get(key != null ? key.toString() : null, storedType, type);
+    }
+    
+    /**
+     * Helper to use when the client knows the type of object held at key.
+     * 
+     * @param <T>
+     * @param key
+     * @param expected
+     * @return
+     */
+    public <T> T get(Object key, Class<T> expected) {
+        ValueType type = null;
+        Class<?> storedType = expected;
+        
+        if( key != null && mapping != null ) {
+            NodeValue value = mapping.getNodeValue(key.toString());
+            if( value != null ) {
+                type = value.getType();
+                storedType = value.getExpected();
+            }
+        }
+        
+        // If type not set try to work out from the expected type
+        if( type == null ) type = getAppropriateValueType(expected);
+        
+        Object ret = get(key != null ? key.toString() : null, storedType, type);
+        
+        if( ret == null ) return null;
+        else if( expected.isInstance(ret) ) return expected.cast(ret);
+        else throw new IllegalArgumentException("Type [" + expected + "] does not match mapping type: " + ret);
+        // FUTURE: Common conversions!?!
+    }
+    
+    /**
+     * Works out the most appropriate value type given the expected type
+     * of a value.
+     * 
+     * @param cls
+     * @return
+     */
+    protected ValueType getAppropriateValueType(Class<?> cls) {
+        if( String.class.equals(cls) ) return ValueType.STRING;
+        else if( Double.class.equals(cls) || double.class.equals(cls) ) return ValueType.DOUBLE;
+        else if( Float.class.equals(cls) || float.class.equals(cls) ) return ValueType.FLOAT;
+        else if( Long.class.equals(cls) || long.class.equals(cls) ) return ValueType.LONG;
+        else if( Date.class.equals(cls) ) return ValueType.LONG;
+        else if( Integer.class.equals(cls) || int.class.equals(cls) ) return ValueType.INT;
+        else if( Short.class.equals(cls) || short.class.equals(cls) ) return ValueType.SHORT;
+        else if( Character.class.equals(cls) || char.class.equals(cls) ) return ValueType.CHAR;
+        else if( Byte.class.equals(cls) || byte.class.equals(cls) ) return ValueType.BYTE;
+        else if( Boolean.class.equals(cls) || boolean.class.equals(cls) ) return ValueType.BOOL;
+        else if( String[].class.equals(cls) ) return ValueType.STRING_ARRAY;
+        else if( Object[].class.equals(cls) ) return ValueType.OBJECT;
+        else throw new IllegalArgumentException("Unsupported expected type: " + cls);
+    }
+    
+    /**
+     * This is the method that gets a nodes value as a specific type.
+     * This method is not exposed to the outside world.
+     * 
+     * @param <T>
+     * @param key The key of the property (null if it is this nodes natural value)
+     * @param expected The expected type
+     * @return The type of the node
+     */
+    protected <T> T get(String key, Class<T> expected, ValueType type) {
+        T ret = null;
         
         // Directly get this nodes value
         if( key == null ) {
-            Object[] val = getCurrentValue();
-            
-            if( val == null || val.length == 0 ) ret = null;
-            else if( val.length == 1 ) ret = val[0];
-            else ret = val;
+            ret = getCurrentValue(type, expected);
         }
         
         // Get the value from the list
         else if( isPropertyInList(key.toString()) ) {
-            currentValue = getCurrentValue();   // Ensures this is set
+            Object[] value = getCurrentValue(ValueType.OBJECT, Object[].class);   // Ensures this is set
             
             int position = mapping.getNodeValue(key.toString()).getPosition();
-            if( currentValue != null && position < currentValue.length ) ret = currentValue[position];
+            if( value != null && position < value.length ) ret = expected.isInstance(value[position]) ? expected.cast(value[position]) : null;
         }
         
         // Get the sub-node and get value from there
         else {
-            Node sub = getSubNode(key.toString());
-            ret = sub != null ? sub.get(null) : null;
+            NodeImpl sub = getSubNode(key.toString());
+            ret = sub.get(null, expected, type);
         }
         
         return ret;
@@ -526,48 +808,80 @@ public class NodeImpl implements Node {
      * {@inheritDoc}
      */
     public Object put(String key, Object value) {
-        boolean flag = false;   // Set to true if we have changed
-        Object oldValue = null;
+        if( value == null ) return remove(key);
         
-        // Property is in a sub node
-        if( key == null ) {
-            Object[] val = getCurrentValue();
-            oldValue = val != null && val.length > 0 ? val[0] : null;
-            if( oldValue != value && (oldValue == null || !oldValue.equals(value)) ) {
-                currentValue = new Object[]{value};
-                flag = true;
+        ValueType naturalType = null;
+        Class<?> storageType = null;
+        
+        if( mapping != null ) {
+            if( key == null ) {
+                naturalType = mapping.getValueType();
+                storageType = mapping.getValueClass();
             }
+            else if( mapping.getNodeValue(key) != null ) {
+                storageType = mapping.getNodeValue(key).getExpected();
+                naturalType = mapping.getNodeValue(key).getType();
+            }
+            
+            if( storageType != null && !storageType.isInstance(value) ) throw new IllegalArgumentException("The type of value [" + key + ":" + value + "] does not match expected for node: " + storageType);
         }
-        
-        // Property is in a list inside here
-        else if( isPropertyInList(key.toString()) ) {
-            currentValue = getCurrentValue();   // Ensures this is set
-            int position = mapping.getNodeValue(key.toString()).getPosition();
-            if( currentValue != null && position < currentValue.length ) {
-                oldValue = currentValue[position];
-                if( oldValue != value && (oldValue == null || !oldValue.equals(value)) ) {
-                    currentValue[position] = value;
-                    flag = true;
-                }
-            }
-            else {
-                Object[] vals = new Object[mapping.getTotalFieldsInList()];
-                if( currentValue != null ) System.arraycopy(currentValue, 0, vals, 0, currentValue.length);
-                vals[position] = value;
-                currentValue = vals;
-                flag = true;
-            }
-        }
-        
-        // Set on subnode
         else {
-            Node sub = getSubNode(key.toString());
-            oldValue = sub.put(null, value);
+            storageType = value.getClass();
+            naturalType = getAppropriateValueType(storageType);
         }
         
+        return put(key, value, storageType, naturalType);
+    }
+    
+    /**
+     * Internal method to set a value given it's type. It is assumed
+     * in this method the value's type matches the ValueType sent
+     * in.
+     * 
+     * @param key The name of the field
+     * @param value The value
+     * @param expected The type of the value (needed if value is null)
+     * @param type The value type to store as
+     * @return The existing value
+     */
+    protected Object put(String key, Object value, Class<?> expected, ValueType type) {
+        if( value == null ) return remove(key);
+        
+        boolean flag = false;   // Set to true if we have changed
+        Object ret = null;
+        
+        // a. Handle direct node value
+        if( key == null ) {
+            ret = getCurrentValue(type, expected);
+            currentValue = value;
+            currentType = type;
+            flag = true;
+        }
+        
+        // b. Handle list in node value
+        else if( isPropertyInList(key) ) {
+            int position = mapping.getNodeValue(key).getPosition();
+            
+            Object[] arr = getCurrentValue(ValueType.OBJECT, Object[].class);
+            if( arr == null || arr.length < position ) {
+                Object[] newarr = new Object[mapping.getTotalFieldsInList() > position ? mapping.getTotalFieldsInList() : position];
+                if( arr != null ) System.arraycopy(arr, 0, newarr, 0, arr.length);
+                arr = newarr;
+            }
+            
+            arr[position] = value;
+            currentValue = arr;
+            currentType = ValueType.OBJECT;
+            flag = true;
+        }
+        
+        // c. Handle regular sub-node
+        else {
+            ret = getSubNode(key).put(null, value, expected, type);
+        }
         
         if( flag ) parent.changedSubNode(this);
-        return oldValue;
+        return ret;
     }
     
     /**
@@ -584,37 +898,27 @@ public class NodeImpl implements Node {
      */
     public Object remove(Object key) {
         boolean flag = false;   // Set to true if we have changed
-        Object oldValue = null;
+        Object oldValue = get(key);
         
-        // Self value
         if( key == null ) {
-            Object[] val = getCurrentValue();
-            if( val == null || val.length > 0 ) {
-                currentValue = new Object[0];
+            oldValue = get(key);
+            currentValue = null;
+            updateType = UpdateType.KILL;
+            flag = true;
+        }
+        else if( isPropertyInList(key.toString()) ) {
+            int position = mapping.getNodeValue(key.toString()).getPosition();
+            Object[] arr = getCurrentValue(ValueType.OBJECT, Object[].class);
+            if( arr != null && arr.length > position ) {
+                oldValue = arr[position];
+                arr[position] = null;
+                updateType = UpdateType.UPDATE;
                 flag = true;
             }
         }
-        
-        // Property is in a list inside here
-        else if( isPropertyInList(key.toString()) ) {
-            currentValue = getCurrentValue();   // Ensures this is set
-            
-            int position = mapping.getNodeValue(key.toString()).getPosition();
-            if( currentValue != null && position < currentValue.length ) {
-                oldValue = currentValue[position];
-                if( oldValue != null ) {
-                    currentValue[position] = null;
-                    flag = true;
-                }
-            }
-        }
-        
-        // Is on subnode
         else {
-            Node sub = getSubNode(key.toString());
-            oldValue = sub.remove(null);
+            oldValue = getSubNode(key.toString()).remove(null);
         }
-        
         
         if( flag ) parent.changedSubNode(this);
         return oldValue;
@@ -738,5 +1042,19 @@ public class NodeImpl implements Node {
             buf.append(node);
             return buf.toString();
         }
+    }
+    
+    /**
+     * Enum indicates what to do at commit time (if anything)
+     *
+     * @author Tom Spencer
+     */
+    private static enum UpdateType {
+        /** Indicates to update the nodes value */
+        UPDATE,
+        /** Indicates to blank the nodes value */
+        KILL,
+        /** Indicates to kill the node and sub-nodes */
+        KILL_ALL;
     }
 }

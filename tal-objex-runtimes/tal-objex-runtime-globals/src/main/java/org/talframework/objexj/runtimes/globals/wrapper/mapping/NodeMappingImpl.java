@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talframework.objexj.runtimes.globals.wrapper.Node;
 import org.talframework.objexj.runtimes.globals.wrapper.NodeMapping;
 import org.talframework.objexj.runtimes.globals.wrapper.RootNode;
@@ -18,11 +20,16 @@ import org.talframework.objexj.runtimes.globals.wrapper.impl.NodeService;
  * @author Tom Spencer
  */
 public class NodeMappingImpl implements NodeMapping {
-
+    private final static Logger logger = LoggerFactory.getLogger(NodeMappingImpl.class);
+    
     /** Holds the types name */
     private final String name;
     /** Holds the nodes type */
     private final NodeType type;
+    /** The java type of this node if this node holds a single value */
+    private final Class<?> nodeClass;
+    /** The type of this node if this node holds a single value */
+    private final ValueType nodeType;
     /** Holds the map of sub nodes */
     private Map<String, NodeMapping> subNodes;
     /** Holds the map of properties held in the list */
@@ -30,9 +37,32 @@ public class NodeMappingImpl implements NodeMapping {
     /** Max holds the highest amount of properties, though not all neccessarily still exist */
     private int maxProperties = 0;
     
+    /**
+     * Constructor for simple or complex objects
+     * 
+     * @param name
+     * @param type
+     */
     public NodeMappingImpl(String name, NodeType type) {
         this.name = name;
         this.type = type;
+        this.nodeClass = Object[].class;
+        this.nodeType = ValueType.OBJECT;
+    }
+    
+    /**
+     * Constructor for other custom nodes
+     * 
+     * @param name
+     * @param type
+     * @param nodeClass
+     * @param nodeType
+     */
+    public NodeMappingImpl(String name, NodeType type, Class<?> nodeClass, ValueType nodeType) {
+        this.name = name;
+        this.type = type;
+        this.nodeClass = nodeClass;
+        this.nodeType = nodeType;
     }
     
     public void addSubNode(String name, NodeMapping mapping) {
@@ -61,16 +91,23 @@ public class NodeMappingImpl implements NodeMapping {
             Node node = root.getSubNode("_schema").getSubNode(this.name);
             
             // Props
-            Iterator<Node> it = node.iterator();
+            Iterator<Node> it = node.getSubNode("props").iterator();
             while( it.hasNext() ) {
                 Node n = it.next();
-                Object val = n.get(null);
-                if( val != null && val instanceof Number ) {
-                    addProperty(new NodeValueImpl(n.getName(), ((Number)val).intValue()));
-                }
+                
+                String name = n.getName();
+                int position = n.get("position", int.class);
+                Class<?> javaType = Class.forName(n.get("class", String.class));
+                ValueType valueType = ValueType.valueOf(n.get("type", String.class));
+                
+                addProperty(new NodeValueImpl(name, javaType, valueType, position));
             }
             
             // Sub-nodes
+        }
+        catch( Exception e ) {
+            logger.error("Failure [{}] loading Node Schema: {}", name, e.getMessage());
+            throw new RuntimeException(e);
         }
         finally {
             if( root != null ) root.release();
@@ -94,8 +131,11 @@ public class NodeMappingImpl implements NodeMapping {
             Node props = node.getSubNode("props");
             for( String prop : properties.keySet() ) {
                 NodeValue value = properties.get(prop);
-                props.put(value.getName(), value.getPosition());
-                // TODO: Also store type information???
+                
+                Node propNode = props.getSubNode(value.getName());
+                propNode.put("position", value.getPosition());
+                propNode.put("class", value.getExpected().getName());
+                propNode.put("type", value.getType().toString());
             }
             
             // Sub-Nodes
@@ -156,5 +196,21 @@ public class NodeMappingImpl implements NodeMapping {
     @Override
     public NodeMapping getSubNodeMapping(String subNode) {
         return subNodes != null ? subNodes.get(subNode) : null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Class<?> getValueClass() {
+        return nodeClass;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ValueType getValueType() {
+        return nodeType;
     }
 }

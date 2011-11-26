@@ -27,8 +27,8 @@ Objex
   Welcome!
   
   Objex is personal pet project that attempts it make it easy to create document 
-  orientated, object-orientated, persistence agnostic domains for use in, 
-  typically Enterprise, systems.
+  orientated, object-orientated, persistence agnostic domains for use in enterprise
+  systems.
   
     <<Document Orientated>> because life in most organisations is centred on files or
     documents. Typically in IT we tend to group data by type. This can mean that we

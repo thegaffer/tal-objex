@@ -22,41 +22,78 @@
 ~~ two years.
 ~~
 
-  Objex is a long-term personal project for its author Tom Spencer. I conceived the idea
-  in the mid-nineties after constructing my first software project. My route into IT was
-  not a typical education led route, computing was a passion (I think we're called geeks!)
-  and that passion brought me into IT professionally.
+  Objex is a long-term personal project for me. It was conceived in the mid to late
+  nineties after constructing my first software project. The ideas within it are to solve
+  a number of issues I found. Indeed the ideas were formed fairly early on and I am
+  still working on implementing those ideas!
   
-  When I was creating my first software project I had naturally chosen a document 
-  orientated approach. The system stored quotes and each 'quote' was a file on the file
-  system. When I looked into hooking up to a DB this was the first time I had really
-  looked into the relational database model. I was actually shocked to see that its view
-  of the data was so totally at odds to my document orientated model. 
+  Without going to to loads of details, here are those issues I faced. Before I list them
+  you do need to understand my route into IT was, shall we say, ad-hoc. I have basically
+  started with an OO appoach and then discovered things like relational databases some
+  time afterwards. What I am trying to say is some of these issues might seem quite niave!
   
-  Specifically how all the data was separated by type, not by it's relationship. So the
-  speed of pulling an item from a quote document when stored in a relational database is
-  proportional to the total amount of items in all quotes stored - not proportional to
-  the amount of items inside the 1 quote I am looking at. Of course RDBMS's have all 
-  sorts of tricks to speed that kind of search up, but the point remains.
+* OO Approach
+
+  The first issue is simply the mismatch between the OO approach and a relational database.
+  Simply that state and behaviour belong together! Following the relational approach too
+  much will encourage this more data centric approach to your data. 
   
-  Clearly relational databases do make it easy to search across quotes to answer all
-  sorts of questions - BI. And frankly BI is actually more important that how I basically
-  store the data. BI is the value add that IT offers. That said, it is my view that the
-  RDBMS creates friction in systems that allow people to create, modify and process
-  documents. 
+  Really I want to define my domain objects, including state, behaviour and relationships
+  and then have that persisted away irrespective of any 'schema' that is used to do this
+  (of course arguably there might not be a schema). 
+
+* Relationships
+
+  Taking this a step further the next part of my view of the OO approach is that it 
+  encourages relationships to be formed between Objects. Relationships are important before
+  Objects because it allows, at the very least, a 'user' or 'agent' to follow the relationships
+  to make sense of the data, i.e. to turn it into information.  
   
-  That friction manifests itself not only because there is a mis-match between how people 
-  view their data (in mostly document form) and how the DB views their data (as a bunch 
-  of addresses, another bunch of order items etc, etc). But also because the RDBMS
-  typically (not always, but typically) says that all your data must go into the same
-  database - I cannot pick and choose my persistence technology according to what is
-  best.  
+  A relational approach can discourage this for a number of reasons.
   
-  And these days there are different approaches that can be taken to BI - 
-  indeed many companies don't report off online transactional systems, instead export
-  the data into a warehouse for reporting. So why is it that relational databases still
-  pervade as the de-facto cornerstone of every transactional system??
+  Firstly relationships are very specific, there is no concept of a generic relationship
+  in a relational database. You have to specifically link two tables together via a foreign
+  key. This means that both sides of the relationship need to know some intimate details
+  of each other - specifically how each is identifiable. What I really envisage is there is
+  a way to form a relationship between any two objects without them neccessarily needing to
+  know about one another.
   
-  So over the years Objex has been a way of expressing and proving some of these ideas.
-  I've partially implemented it in both C++ and Java, although currently it is only the
-  Java version I actively work on. 
+  Secondly forming relationships between objects is typically the wrong way round. For
+  instance if I have an Order 'object' it would be natural to follow a relationship to
+  the 'order items' of that order. In a relational DB the relationship is the other way
+  around - the order item points to the order.
+  
+  I know that ORM frameworks have made this somewhat easier, but they still force you to 
+  think about how the relationships are formed and require the relationships to be
+  explicitly expressed in your schema - and that means it will be difficult to change your
+  mind later.
+
+* Documents
+
+  The next issue in concept I have is that naturally in enterprises we talk in terms of 
+  documents. So I may have many instances of a Order document according to how much business
+  I have done. I probably have some special one-off documents, like our Stock catalog and
+  I call these stores.
+  
+  However, a relational database encourages all the data to sit together. So imagine a 
+  relational database, given the points above, all order items in all orders ever made sit
+  inside a table together. The speed of accessing the order items for any order is a function
+  of the amount of order items there have ever been.
+  
+  I think this is wrong for most transactional systems. It is clearly the right approach for
+  a data mining/warehouse type environment. I should be able to access from my transactional
+  system every document, but once I've got a document the speed to access it should not,
+  in an ideal world, take time proportional to the total number of all orders and order items. 
+
+* Changing Persistence
+
+  Taking this a step further, the relational database encourages all data to be stored
+  together. And if you follow the relational model into your systems that will be integral
+  to your application.
+  
+  But ... I think you should be able to pick and choose and even mix and match persistence
+  strategies for different types of documents and stores. Use too much of the relational
+  model in your apps and you will not be able to do this.
+
+
+  

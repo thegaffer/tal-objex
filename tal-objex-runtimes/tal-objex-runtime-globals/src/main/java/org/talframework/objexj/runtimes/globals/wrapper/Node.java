@@ -95,6 +95,16 @@ public interface Node extends Map<String, Object> {
     public long increment(int number);
     
     /**
+     * Call to get the value of node or direct descendent, but return
+     * as given type. This is a helper to make it easier to code with.
+     * 
+     * @param key The
+     * @param expected
+     * @return
+     */
+    public <T> T get(Object key, Class<T> expected);
+    
+    /**
      * An iterator to iterate this nodes children
      * 
      * @return The iterator

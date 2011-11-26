@@ -37,9 +37,9 @@ Objex
  Very often, particularly in Enterprise systems, largely I think due 
  to the widespread use of Relational Databases, the object view  
  becomes obscured. Objex is a way to put documents and OO at the very 
- heart of applications. I do not for a minute that persistence is not
- important, because it is - but it is not more important than your
- core logic.
+ heart of applications. I do not think for a minute that persistence is 
+ not important or complex, because it is - but it is not more important 
+ than your core logic.
  
 Concept
 

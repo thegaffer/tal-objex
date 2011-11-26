@@ -20,6 +20,16 @@ public interface NodeMapping {
     public NodeType getNodeType();
     
     /**
+     * @return The value type of this nodes data
+     */
+    public ValueType getValueType();
+    
+    /**
+     * @return The class of this nodes data
+     */
+    public Class<?> getValueClass();
+    
+    /**
      * @return A set of the allowed sub nodes and properties of this node
      */
     public Set<String> getKeyNames();
@@ -100,6 +110,16 @@ public interface NodeMapping {
         public String getName();
         
         /**
+         * @return The type of this node value
+         */
+        public ValueType getType();
+        
+        /**
+         * @return The Java class expected of this type
+         */
+        public Class<?> getExpected();
+        
+        /**
          * @return If true, value is held in a sub-node (otherwise in a list in the node itself)
          */
         public boolean isSubNode();
@@ -113,17 +133,51 @@ public interface NodeMapping {
     }
     
     /**
-     * This describes the type of the
+     * This describes the type of the property/value. This value type
+     * exists so we don't have to calculate the type all the time.  
      *
      * @author Tom Spencer
      */
     public enum ValueType {
+        /** Value is a string */
         STRING,
-        INT,
+        /** Value is a double */
         DOUBLE,
+        /** Value is an float */
+        FLOAT,
+        /** Value is a long */
         LONG,
+        /** Value is an integer */
+        INT,
+        /** Value is an short */
+        SHORT,
+        /** Value is an char */
+        CHAR,
+        /** Value is an byte */
+        BYTE,
+        /** Value is an boolean */
+        BOOL,
         
-        /** A custom object, where the values of the object are in a list */
+        /** Value is an array of strings */
+        STRING_ARRAY,
+        /** Value is an list of strings */
+        STRING_LIST,
+        /** Value is an array of doubles */
+        DOUBLE_ARRAY,
+        /** Value is an array of floats */
+        FLOAT_ARRAY,
+        /** Value is an array of longs */
+        LONG_ARRAY,
+        /** Value is an array of integers */
+        INT_ARRAY,
+        /** Value is an array of shorts */
+        SHORT_ARRAY,
+        /** Value is an array of chars */
+        CHAR_ARRAY,
+        /** Value is an array of bytes */
+        BYTE_ARRAY,
+        
+        /** A custom object, where the values are in a ValueList */
         OBJECT
     }
 }
